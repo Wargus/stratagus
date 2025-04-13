@@ -45,7 +45,7 @@
 #include "luacallback.h"
 #include "map.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "sound.h"
 #include "spells.h"
 #include "ui.h"
@@ -2449,25 +2449,27 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 */
 void UnitTypeCclRegister()
 {
-	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
-	lua_register(Lua, "CopyUnitType", CclCopyUnitType);
-	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
-	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
-	lua_register(Lua, "DefineVariables", CclDefineVariables);
-	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
-	lua_register(Lua, "DefinePaletteSwap", CclDefinePaletteSwap);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
+	luaSol["DefineUnitType"] = CclDefineUnitType;
+	luaSol["CopyUnitType"] = CclCopyUnitType;
+	luaSol["DefineUnitStats"] = CclDefineUnitStats;
+	luaSol["DefineBoolFlags"] = CclDefineBoolFlags;
+	luaSol["DefineVariables"] = CclDefineVariables;
+	luaSol["DefineDecorations"] = CclDefineDecorations;
+	luaSol["DefinePaletteSwap"] = CclDefinePaletteSwap;
+
+	luaSol["DefineExtraDeathTypes"] = CclDefineExtraDeathTypes;
 
 	UnitTypeVar.Init();
 
-	lua_register(Lua, "UnitType", CclUnitType);
-	lua_register(Lua, "UnitTypeArray", CclUnitTypeArray);
+	luaSol["UnitType"] = CclUnitType;
+	luaSol["UnitTypeArray"] = CclUnitTypeArray;
 	// unit type structure access
-	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
-	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
-	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
-	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
+	luaSol["GetUnitTypeIdent"] = CclGetUnitTypeIdent;
+	luaSol["GetUnitTypeName"] = CclGetUnitTypeName;
+	luaSol["SetUnitTypeName"] = CclSetUnitTypeName;
+	luaSol["GetUnitTypeData"] = CclGetUnitTypeData;
 }
 
 //@}

@@ -51,6 +51,7 @@
 #include "luacallback.h"
 #include "script_sound.h"
 #include "script.h"
+#include "script_sol.h"
 #include "unittype.h"
 #include "upgrade.h"
 
@@ -450,7 +451,9 @@ static int CclDefineSpell(lua_State *l)
 */
 void SpellCclRegister()
 {
-	lua_register(Lua, "DefineSpell", CclDefineSpell);
+	sol::state_view luaSol(Lua);
+
+	luaSol["DefineSpell"] = CclDefineSpell;
 }
 
 //@}

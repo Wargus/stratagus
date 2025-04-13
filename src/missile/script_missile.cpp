@@ -38,7 +38,7 @@
 #include "missile.h"
 
 #include "luacallback.h"
-#include "script.h"
+#include "script_sol.h"
 #include "unittype.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -414,10 +414,12 @@ static int CclCreateMissile(lua_State *l)
 */
 void MissileCclRegister()
 {
-	lua_register(Lua, "DefineMissileType", CclDefineMissileType);
-	lua_register(Lua, "Missile", CclMissile);
-	lua_register(Lua, "DefineBurningBuilding", CclDefineBurningBuilding);
-	lua_register(Lua, "CreateMissile", CclCreateMissile);
+	sol::state_view luaSol(Lua);
+	
+	luaSol["DefineMissileType"] = CclDefineMissileType;
+	luaSol["Missile"] = CclMissile;
+	luaSol["DefineBurningBuilding"] = CclDefineBurningBuilding;
+	luaSol["CreateMissile"] = CclCreateMissile;
 }
 
 //@}

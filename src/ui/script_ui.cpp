@@ -42,7 +42,7 @@
 #include "interface.h"
 #include "map.h"
 #include "menus.h"
-#include "script.h"
+#include "script_sol.h"
 #include "spells.h"
 #include "title.h"
 #include "util.h"
@@ -1274,53 +1274,55 @@ static int CclSetFontCodePage(lua_State *l)
 void UserInterfaceCclRegister()
 {
 	CursorCclRegister();
-	lua_register(Lua, "AddMessage", CclAddMessage);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
-	lua_register(Lua, "GetKeyScrollSpeed", CclGetKeyScrollSpeed);
-	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
-	lua_register(Lua, "GetMouseScrollSpeed", CclGetMouseScrollSpeed);
-	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);
-	lua_register(Lua, "GetMouseScrollSpeedDefault", CclGetMouseScrollSpeedDefault);
-	lua_register(Lua, "SetMouseScrollSpeedControl", CclSetMouseScrollSpeedControl);
-	lua_register(Lua, "GetMouseScrollSpeedControl", CclGetMouseScrollSpeedControl);
+	luaSol["AddMessage"] = CclAddMessage;
 
-	lua_register(Lua, "SetClickMissile", CclSetClickMissile);
-	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
+	luaSol["SetKeyScrollSpeed"] = CclSetKeyScrollSpeed;
+	luaSol["GetKeyScrollSpeed"] = CclGetKeyScrollSpeed;
+	luaSol["SetMouseScrollSpeed"] = CclSetMouseScrollSpeed;
+	luaSol["GetMouseScrollSpeed"] = CclGetMouseScrollSpeed;
+	luaSol["SetMouseScrollSpeedDefault"] = CclSetMouseScrollSpeedDefault;
+	luaSol["GetMouseScrollSpeedDefault"] = CclGetMouseScrollSpeedDefault;
+	luaSol["SetMouseScrollSpeedControl"] = CclSetMouseScrollSpeedControl;
+	luaSol["GetMouseScrollSpeedControl"] = CclGetMouseScrollSpeedControl;
 
-	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
-	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
-	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
-	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
-	lua_register(Lua, "SetWindowSize", CclSetWindowSize);
-	lua_register(Lua, "SetVerticalPixelSize", CclSetVerticalPixelSize);
+	luaSol["SetClickMissile"] = CclSetClickMissile;
+	luaSol["SetDamageMissile"] = CclSetDamageMissile;
 
-	lua_register(Lua, "SetFontCodePage", CclSetFontCodePage);
+	luaSol["SetVideoResolution"] = CclSetVideoResolution;
+	luaSol["GetVideoResolution"] = CclGetVideoResolution;
+	luaSol["SetVideoFullScreen"] = CclSetVideoFullScreen;
+	luaSol["GetVideoFullScreen"] = CclGetVideoFullScreen;
+	luaSol["SetWindowSize"] = CclSetWindowSize;
+	luaSol["SetVerticalPixelSize"] = CclSetVerticalPixelSize;
 
-	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
-	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);
+	luaSol["SetFontCodePage"] = CclSetFontCodePage;
 
-	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
-	lua_register(Lua, "DefinePopup", CclDefinePopup);
-	lua_register(Lua, "DefineViewports", CclDefineViewports);
+	luaSol["SetTitleScreens"] = CclSetTitleScreens;
+	luaSol["ShowTitleScreens"] = CclShowTitleScreens;
 
-	lua_register(Lua, "RightButtonAttacks", CclRightButtonAttacks);
-	lua_register(Lua, "RightButtonMoves", CclRightButtonMoves);
-	lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
+	luaSol["DefinePanelContents"] = CclDefinePanelContents;
+	luaSol["DefinePopup"] = CclDefinePopup;
+	luaSol["DefineViewports"] = CclDefineViewports;
 
-	lua_register(Lua, "DefineButton", CclDefineButton);
-	lua_register(Lua, "ClearButtons", CclClearButtons);
+	luaSol["RightButtonAttacks"] = CclRightButtonAttacks;
+	luaSol["RightButtonMoves"] = CclRightButtonMoves;
+	luaSol["SetFancyBuildings"] = CclSetFancyBuildings;
 
-	lua_register(Lua, "CopyButtonsForUnitType", CclCopyButtonsForUnitType);
+	luaSol["DefineButton"] = CclDefineButton;
+	luaSol["ClearButtons"] = CclClearButtons;
 
-	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
+	luaSol["CopyButtonsForUnitType"] = CclCopyButtonsForUnitType;
+
+	luaSol["DefineButtonStyle"] = CclDefineButtonStyle;
 
 	//
 	// Look and feel of units
 	//
-	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
+	luaSol["SetSelectionStyle"] = CclSetSelectionStyle;
 
-	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
+	luaSol["SetGroupKeys"] = CclSetGroupKeys;
 }
 
 //@}

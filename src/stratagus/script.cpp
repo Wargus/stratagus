@@ -34,6 +34,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "script.h"
+#include "script_sol.h"
 
 #include "animation/animation_setplayervar.h"
 #include "filesystem.h"
@@ -1783,46 +1784,48 @@ static int CclPlayerName(lua_State *l)
 
 static void AliasRegister()
 {
-	// Number.
-	lua_register(Lua, "Add", CclAdd);
-	lua_register(Lua, "Sub", CclSub);
-	lua_register(Lua, "Mul", CclMul);
-	lua_register(Lua, "Div", CclDiv);
-	lua_register(Lua, "Min", CclMin);
-	lua_register(Lua, "Max", CclMax);
-	lua_register(Lua, "Rand", CclRand);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "GreaterThan", CclGreaterThan);
-	lua_register(Lua, "LessThan", CclLessThan);
-	lua_register(Lua, "Equal", CclEqual);
-	lua_register(Lua, "GreaterThanOrEq", CclGreaterThanOrEq);
-	lua_register(Lua, "LessThanOrEq", CclLessThanOrEq);
-	lua_register(Lua, "NotEqual", CclNotEqual);
-	lua_register(Lua, "VideoTextLength", CclVideoTextLength);
-	lua_register(Lua, "StringFind", CclStringFind);
+	// Number.
+	luaSol["Add"] = CclAdd;
+	luaSol["Sub"] = CclSub;
+	luaSol["Mul"] = CclMul;
+	luaSol["Div"] = CclDiv;
+	luaSol["Min"] = CclMin;
+	luaSol["Max"] = CclMax;
+	luaSol["Rand"] = CclRand;
+
+	luaSol["GreaterThan"] = CclGreaterThan;
+	luaSol["LessThan"] = CclLessThan;
+	luaSol["Equal"] = CclEqual;
+	luaSol["GreaterThanOrEq"] = CclGreaterThanOrEq;
+	luaSol["LessThanOrEq"] = CclLessThanOrEq;
+	luaSol["NotEqual"] = CclNotEqual;
+	luaSol["VideoTextLength"] = CclVideoTextLength;
+	luaSol["StringFind"] = CclStringFind;
 
 
 	// Unit
-	lua_register(Lua, "AttackerVar", CclUnitAttackerVar);
-	lua_register(Lua, "DefenderVar", CclUnitDefenderVar);
-	lua_register(Lua, "ActiveUnitVar", CclActiveUnitVar);
+	luaSol["AttackerVar"] = CclUnitAttackerVar;
+	luaSol["DefenderVar"] = CclUnitDefenderVar;
+	luaSol["ActiveUnitVar"] = CclActiveUnitVar;
 
 	// Type
-	lua_register(Lua, "TypeVar", CclActiveTypeVar);
+	luaSol["TypeVar"] = CclActiveTypeVar;
 
 	// String.
-	lua_register(Lua, "Concat", CclConcat);
-	lua_register(Lua, "String", CclString);
-	lua_register(Lua, "InverseVideo", CclInverseVideo);
-	lua_register(Lua, "UnitName", CclUnitName);
-	lua_register(Lua, "SubString", CclSubString);
-	lua_register(Lua, "Line", CclLine);
-	lua_register(Lua, "GameInfo", CclGameInfo);
-	lua_register(Lua, "PlayerName", CclPlayerName);
-	lua_register(Lua, "PlayerData", CclPlayerData);
+	luaSol["Concat"] = CclConcat;
+	luaSol["String"] = CclString;
+	luaSol["InverseVideo"] = CclInverseVideo;
+	luaSol["UnitName"] = CclUnitName;
+	luaSol["SubString"] = CclSubString;
+	luaSol["Line"] = CclLine;
+	luaSol["GameInfo"] = CclGameInfo;
+	luaSol["PlayerName"] = CclPlayerName;
+	luaSol["PlayerData"] = CclPlayerData;
 
-	lua_register(Lua, "If", CclIf);
-	lua_register(Lua, "NumIf", CclNumIf);
+	luaSol["If"] = CclIf;
+	luaSol["NumIf"] = CclNumIf;
 }
 
 /*............................................................................
@@ -2459,24 +2462,26 @@ static int CclListFilesystem(lua_State *l)
 void ScriptRegister()
 {
 	AliasRegister();
+	
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
-	lua_register(Lua, "ListDirectory", CclListDirectory);
-	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
-	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
+	luaSol["LibraryPath"] = CclStratagusLibraryPath;
+	luaSol["ListDirectory"] = CclListDirectory;
+	luaSol["ListFilesInDirectory"] = CclListFilesInDirectory;
+	luaSol["ListDirsInDirectory"] = CclListDirsInDirectory;
 
 	// TODO: Only allow this when extractor tool runs
 	// lua_register(Lua, "ListFilesystem", CclListFilesystem);
 
-	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
+	luaSol["SetDamageFormula"] = CclSetDamageFormula;
 
-	lua_register(Lua, "SavePreferences", CclSavePreferences);
-	lua_register(Lua, "Load", CclLoad);
-	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
+	luaSol["SavePreferences"] = CclSavePreferences;
+	luaSol["Load"] = CclLoad;
+	luaSol["LoadBuffer"] = CclLoadBuffer;
 
-	lua_register(Lua, "DebugPrint", CclDebugPrint);
+	luaSol["DebugPrint"] = CclDebugPrint;
 
-	lua_register(Lua, "RestartStratagus", CclRestartStratagus);
+	luaSol["RestartStratagus"] = CclRestartStratagus;
 }
 
 //@}

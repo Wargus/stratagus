@@ -89,6 +89,7 @@
 #include "font.h"
 #include "iolib.h"
 #include "map.h"
+#include "script_sol.h"
 #include "ui.h"
 #include "widgets.h"
 
@@ -350,7 +351,9 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 
 void VideoCclRegister()
 {
-	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
+	sol::state_view luaSol(Lua);
+
+	luaSol["SetVideoSyncSpeed"] = CclSetVideoSyncSpeed;
 }
 
 /*

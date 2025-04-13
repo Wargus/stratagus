@@ -39,6 +39,7 @@
 
 #include "player.h"
 #include "script.h"
+#include "script_sol.h"
 #include "sound_server.h"
 
 /*----------------------------------------------------------------------------
@@ -346,14 +347,16 @@ static int CclSetSoundRange(lua_State *l)
 */
 void SoundCclRegister()
 {
-	lua_register(Lua, "SetGlobalSoundRange", CclSetGlobalSoundRange);
-	lua_register(Lua, "DefineGameSounds", CclDefineGameSounds);
-	lua_register(Lua, "MapSound", CclMapSound);
-	lua_register(Lua, "SoundForName", CclSoundForName);
-	lua_register(Lua, "SetSoundRange", CclSetSoundRange);
-	lua_register(Lua, "MakeSound", CclMakeSound);
-	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
-	lua_register(Lua, "PlaySound", CclPlaySound);
+	sol::state_view luaSol(Lua);
+
+	luaSol["SetGlobalSoundRange"] = CclSetGlobalSoundRange;
+	luaSol["DefineGameSounds"] = CclDefineGameSounds;
+	luaSol["MapSound"] = CclMapSound;
+	luaSol["SoundForName"] = CclSoundForName;
+	luaSol["SetSoundRange"] = CclSetSoundRange;
+	luaSol["MakeSound"] = CclMakeSound;
+	luaSol["MakeSoundGroup"] = CclMakeSoundGroup;
+	luaSol["PlaySound"] = CclPlaySound;
 }
 
 //@}

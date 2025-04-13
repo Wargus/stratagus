@@ -40,6 +40,7 @@
 
 #include "iolib.h"
 #include "script.h"
+#include "script_sol.h"
 #include "unit_manager.h"
 #include "unittype.h"
 
@@ -266,7 +267,9 @@ static int CclGroup(lua_State *l)
 */
 void GroupCclRegister()
 {
-	lua_register(Lua, "Group", CclGroup);
+	sol::state_view luaSol(Lua);
+
+	luaSol["Group"] = CclGroup;
 }
 
 //@}

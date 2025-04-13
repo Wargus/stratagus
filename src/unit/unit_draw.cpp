@@ -49,7 +49,7 @@
 #include "interface.h"
 #include "map.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "settings.h"
 #include "sound.h"
 #include "translate.h"
@@ -367,8 +367,9 @@ void DecorationCclRegister()
 {
 	DecoSprite.Name.clear();
 	DecoSprite.SpriteArray.clear();
-
-	lua_register(Lua, "DefineSprites", CclDefineSprites);
+	
+	sol::state_view luaSol(Lua);
+	luaSol["DefineSprites"] = CclDefineSprites;
 }
 
 /**

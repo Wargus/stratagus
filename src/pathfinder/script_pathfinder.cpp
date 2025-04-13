@@ -39,7 +39,7 @@
 
 #include "map.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "unittype.h"
 #include "unit.h"
 
@@ -121,9 +121,11 @@ static int CclDumpNextAStar(lua_State *l)
 */
 void PathfinderCclRegister()
 {
-	lua_register(Lua, "AStar", CclAStar);
+	sol::state_view luaSol(Lua);
+
+	luaSol["AStar"] = CclAStar;
 #ifdef DEBUG
-	lua_register(Lua, "DumpNextAStar", CclDumpNextAStar);
+	luaSol["DumpNextAStar"] = CclDumpNextAStar;
 #endif
 }
 

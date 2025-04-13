@@ -41,6 +41,7 @@
 #include <vector>
 
 #include "script.h"
+#include "script_sol.h"
 #include "translate.h"
 #include "ui.h"
 #include "video.h"
@@ -282,7 +283,9 @@ static int CclDefineConstruction(lua_State *l)
 */
 void ConstructionCclRegister()
 {
-	lua_register(Lua, "DefineConstruction", CclDefineConstruction);
+	sol::state_view luaSol(Lua);
+
+	luaSol["DefineConstruction"] = CclDefineConstruction;
 }
 
 //@}

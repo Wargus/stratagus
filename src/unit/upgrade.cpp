@@ -49,7 +49,7 @@
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
@@ -403,9 +403,11 @@ static int CclDefineAllow(lua_State *l)
 */
 void UpgradesCclRegister()
 {
-	lua_register(Lua, "DefineModifier", CclDefineModifier);
-	lua_register(Lua, "DefineAllow", CclDefineAllow);
-	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
+	sol::state_view luaSol(Lua);
+
+	luaSol["DefineModifier"] = CclDefineModifier;
+	luaSol["DefineAllow"] = CclDefineAllow;
+	luaSol["DefineUnitAllow"] = CclDefineUnitAllow;
 }
 
 /*----------------------------------------------------------------------------

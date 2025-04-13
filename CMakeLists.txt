@@ -497,6 +497,7 @@ set(stratagus_generic_HDRS
 	src/include/replay.h
 	src/include/results.h
 	src/include/script.h
+	src/include/script_sol.h
 	src/include/script_sound.h
 	src/include/sdl2_helper.h
 	src/include/settings.h

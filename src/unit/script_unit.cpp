@@ -46,7 +46,7 @@
 #include "network.h"
 #include "pathfinder.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "spells.h"
 #include "trigger.h"
 #include "unit_find.h"
@@ -1620,39 +1620,41 @@ static int CclTurnTowardsLocation(lua_State *l)
 */
 void UnitCclRegister()
 {
-	lua_register(Lua, "SetTrainingQueue", CclSetTrainingQueue);
-	lua_register(Lua, "SetBuildingCapture", CclSetBuildingCapture);
-	lua_register(Lua, "SetRevealAttacker", CclSetRevealAttacker);
-	lua_register(Lua, "ResourcesMultiBuildersMultiplier", CclResourcesMultiBuildersMultiplier);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "Unit", CclUnit);
+	luaSol["SetTrainingQueue"] = CclSetTrainingQueue;
+	luaSol["SetBuildingCapture"] = CclSetBuildingCapture;
+	luaSol["SetRevealAttacker"] = CclSetRevealAttacker;
+	luaSol["ResourcesMultiBuildersMultiplier"] = CclResourcesMultiBuildersMultiplier;
 
-	lua_register(Lua, "MoveUnit", CclMoveUnit);
-	lua_register(Lua, "RemoveUnit", CclRemoveUnit);
-	lua_register(Lua, "CreateUnit", CclCreateUnit);
-	lua_register(Lua, "TransformUnit", CclTransformUnit);
-	lua_register(Lua, "DamageUnit", CclDamageUnit);
-	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
-	lua_register(Lua, "SetTeleportDestination", CclSetTeleportDestination);
-	lua_register(Lua, "OrderUnit", CclOrderUnit);
-	lua_register(Lua, "KillUnit", CclKillUnit);
-	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
-	lua_register(Lua, "FindNextResource", CclFindNextResource);
+	luaSol["Unit"] = CclUnit;
 
-	lua_register(Lua, "GetUnits", CclGetUnits);
-	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
+	luaSol["MoveUnit"] = CclMoveUnit;
+	luaSol["RemoveUnit"] = CclRemoveUnit;
+	luaSol["CreateUnit"] = CclCreateUnit;
+	luaSol["TransformUnit"] = CclTransformUnit;
+	luaSol["DamageUnit"] = CclDamageUnit;
+	luaSol["SetResourcesHeld"] = CclSetResourcesHeld;
+	luaSol["SetTeleportDestination"] = CclSetTeleportDestination;
+	luaSol["OrderUnit"] = CclOrderUnit;
+	luaSol["KillUnit"] = CclKillUnit;
+	luaSol["KillUnitAt"] = CclKillUnitAt;
+	luaSol["FindNextResource"] = CclFindNextResource;
+
+	luaSol["GetUnits"] = CclGetUnits;
+	luaSol["GetUnitsAroundUnit"] = CclGetUnitsAroundUnit;
 
 	// unit member access functions
-	lua_register(Lua, "GetUnitBoolFlag", CclGetUnitBoolFlag);
-	lua_register(Lua, "GetUnitVariable", CclGetUnitVariable);
-	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
+	luaSol["GetUnitBoolFlag"] = CclGetUnitBoolFlag;
+	luaSol["GetUnitVariable"] = CclGetUnitVariable;
+	luaSol["SetUnitVariable"] = CclSetUnitVariable;
 
-	lua_register(Lua, "SlotUsage", CclSlotUsage);
+	luaSol["SlotUsage"] = CclSlotUsage;
 
-	lua_register(Lua, "SelectSingleUnit", CclSelectSingleUnit);
-	lua_register(Lua, "EnableSimplifiedAutoTargeting", CclEnableSimplifiedAutoTargeting);
+	luaSol["SelectSingleUnit"] = CclSelectSingleUnit;
+	luaSol["EnableSimplifiedAutoTargeting"] = CclEnableSimplifiedAutoTargeting;
 
-	lua_register(Lua, "TurnTowardsLocation", CclTurnTowardsLocation);
+	luaSol["TurnTowardsLocation"] = CclTurnTowardsLocation;
 }
 
 //@}

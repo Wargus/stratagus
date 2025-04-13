@@ -41,6 +41,7 @@
 #include "interface.h"
 #include "player.h"
 #include "script.h"
+#include "script_sol.h"
 #include "translate.h"
 #include "unit.h"
 #include "unittype.h"
@@ -343,8 +344,9 @@ static int CclCheckDependency(lua_State *l)
 */
 void DependenciesCclRegister()
 {
-	lua_register(Lua, "DefineDependency", CclDefineDependency);
-	lua_register(Lua, "CheckDependency", CclCheckDependency);
+	sol::state_view luaSol(Lua);
+	luaSol["DefineDependency"] = CclDefineDependency;
+	luaSol["CheckDependency"] = CclCheckDependency;
 }
 
 //@}

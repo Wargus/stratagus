@@ -42,6 +42,7 @@
 #include "map.h"
 #include "network.h"
 #include "player.h"
+#include "script_sol.h"
 #include "ui.h"
 #include "unittype.h"
 #include "unit.h"
@@ -1082,8 +1083,10 @@ static int CclSelection(lua_State *l)
 */
 void SelectionCclRegister()
 {
-	lua_register(Lua, "SetGroupId", CclSetGroupId);
-	lua_register(Lua, "Selection", CclSelection);
+	sol::state_view luaSol(Lua);
+
+	luaSol["SetGroupId"] = CclSetGroupId;
+	luaSol["Selection"] = CclSelection;
 }
 
 //@}

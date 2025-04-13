@@ -42,7 +42,7 @@
 #include "map.h"
 #include "player.h"
 #include "results.h"
-#include "script.h"
+#include "script_sol.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
@@ -556,12 +556,14 @@ void TriggersEachCycle()
 */
 void TriggerCclRegister()
 {
-	lua_register(Lua, "AddTrigger", CclAddTrigger);
-	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
+	sol::state_view luaSol(Lua);
+	
+	luaSol["AddTrigger"] = CclAddTrigger;
+	luaSol["SetActiveTriggers"] = CclSetActiveTriggers;
 	// Conditions
-	lua_register(Lua, "GetNumUnitsAt", CclGetNumUnitsAt);
-	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
-	lua_register(Lua, "IfRescuedNearUnit", CclIfRescuedNearUnit);
+	luaSol["GetNumUnitsAt"] = CclGetNumUnitsAt;
+	luaSol["IfNearUnit"] = CclIfNearUnit;
+	luaSol["IfRescuedNearUnit"] = CclIfRescuedNearUnit;
 }
 
 /**

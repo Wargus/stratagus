@@ -34,7 +34,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "editor.h"
-#include "script.h"
+#include "script_sol.h"
 #include "stratagus.h"
 /*----------------------------------------------------------------------------
 --  Variables
@@ -349,16 +349,18 @@ static int CclEditorRandomizeProperties(lua_State *l)
 */
 void EditorCclRegister()
 {
-	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
-	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
-	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
-	lua_register(Lua, "EditorResizeMap", CclEditorResizeMap);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "EditorAddBrush", CclEditorAddBrush);
-	lua_register(Lua, "EditorBrush_GetGeneratorOption", CclEditorBrush_GetGeneratorOption);
-	lua_register(Lua, "EditorBrush_LoadDecorationTiles", CclEditorBrush_LoadDecorationTiles);
+	luaSol["SetEditorSelectIcon"] = CclSetEditorSelectIcon;
+	luaSol["SetEditorUnitsIcon"] = CclSetEditorUnitsIcon;
+	luaSol["SetEditorStartUnit"] = CclSetEditorStartUnit;
+	luaSol["EditorResizeMap"] = CclEditorResizeMap;
 
-	lua_register(Lua, "SetEditorRandomizeProperties", CclEditorRandomizeProperties);
+	luaSol["EditorAddBrush"] = CclEditorAddBrush;
+	luaSol["EditorBrush_GetGeneratorOption"] = CclEditorBrush_GetGeneratorOption;
+	luaSol["EditorBrush_LoadDecorationTiles"] = CclEditorBrush_LoadDecorationTiles;
+
+	luaSol["SetEditorRandomizeProperties"] = CclEditorRandomizeProperties;
 }
 
 //@}

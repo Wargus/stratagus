@@ -45,6 +45,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "script_sol.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
@@ -1942,48 +1943,49 @@ void AiCclRegister()
 {
 	// FIXME: Need to save memory here.
 	// Loading all into memory isn't necessary.
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "DefineAiHelper", CclDefineAiHelper);
-	lua_register(Lua, "DefineAi", CclDefineAi);
+	luaSol["DefineAiHelper"] = CclDefineAiHelper;
+	luaSol["DefineAi"] = CclDefineAi;
 
-	lua_register(Lua, "AiGetRace", CclAiGetRace);
-	lua_register(Lua, "AiGetSleepCycles", CclAiGetSleepCycles);
+	luaSol["AiGetRace"] = CclAiGetRace;
+	luaSol["AiGetSleepCycles"] = CclAiGetSleepCycles;
 
-	lua_register(Lua, "AiDebug", CclAiDebug);
-	lua_register(Lua, "AiDebugPlayer", CclAiDebugPlayer);
-	lua_register(Lua, "AiNeed", CclAiNeed);
-	lua_register(Lua, "AiSet", CclAiSet);
-	lua_register(Lua, "AiWait", CclAiWait);
-	lua_register(Lua, "AiGetPendingBuilds", CclAiPendingBuildCount);
+	luaSol["AiDebug"] = CclAiDebug;
+	luaSol["AiDebugPlayer"] = CclAiDebugPlayer;
+	luaSol["AiNeed"] = CclAiNeed;
+	luaSol["AiSet"] = CclAiSet;
+	luaSol["AiWait"] = CclAiWait;
+	luaSol["AiGetPendingBuilds"] = CclAiPendingBuildCount;
 
-	lua_register(Lua, "AiForce", CclAiForce);
+	luaSol["AiForce"] = CclAiForce;
 
-	lua_register(Lua, "AiReleaseForce", CclAiReleaseForce);
-	lua_register(Lua, "AiForceRole", CclAiForceRole);
-	lua_register(Lua, "AiCheckForce", CclAiCheckForce);
-	lua_register(Lua, "AiWaitForce", CclAiWaitForce);
+	luaSol["AiReleaseForce"] = CclAiReleaseForce;
+	luaSol["AiForceRole"] = CclAiForceRole;
+	luaSol["AiCheckForce"] = CclAiCheckForce;
+	luaSol["AiWaitForce"] = CclAiWaitForce;
 
-	lua_register(Lua, "AiAttackWithForce", CclAiAttackWithForce);
-	lua_register(Lua, "AiSleep", CclAiSleep);
-	lua_register(Lua, "AiResearch", CclAiResearch);
-	lua_register(Lua, "AiUpgradeTo", CclAiUpgradeTo);
+	luaSol["AiAttackWithForce"] = CclAiAttackWithForce;
+	luaSol["AiSleep"] = CclAiSleep;
+	luaSol["AiResearch"] = CclAiResearch;
+	luaSol["AiUpgradeTo"] = CclAiUpgradeTo;
 
-	lua_register(Lua, "AiPlayer", CclAiPlayer);
-	lua_register(Lua, "AiSetReserve", CclAiSetReserve);
-	lua_register(Lua, "AiSetCollect", CclAiSetCollect);
+	luaSol["AiPlayer"] = CclAiPlayer;
+	luaSol["AiSetReserve"] = CclAiSetReserve;
+	luaSol["AiSetCollect"] = CclAiSetCollect;
 
-	lua_register(Lua, "AiSetBuildDepots", CclAiSetBuildDepots);
+	luaSol["AiSetBuildDepots"] = CclAiSetBuildDepots;
 
-	lua_register(Lua, "AiDump", CclAiDump);
+	luaSol["AiDump"] = CclAiDump;
 
-	lua_register(Lua, "DefineAiPlayer", CclDefineAiPlayer);
-	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
-	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
+	luaSol["DefineAiPlayer"] = CclDefineAiPlayer;
+	luaSol["AiAttackWithForces"] = CclAiAttackWithForces;
+	luaSol["AiWaitForces"] = CclAiWaitForces;
 
 	// for external AI processors
-	lua_register(Lua, "AiProcessorSetup", CclAiProcessorSetup);
-	lua_register(Lua, "AiProcessorStep", CclAiProcessorStep);
-	lua_register(Lua, "AiProcessorEnd", CclAiProcessorEnd);
+	luaSol["AiProcessorSetup"] = CclAiProcessorSetup;
+	luaSol["AiProcessorStep"] = CclAiProcessorStep;
+	luaSol["AiProcessorEnd"] = CclAiProcessorEnd;
 }
 
 //@}

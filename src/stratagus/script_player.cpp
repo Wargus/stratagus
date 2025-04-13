@@ -41,7 +41,7 @@
 #include "ai.h"
 #include "commands.h"
 #include "map.h"
-#include "script.h"
+#include "script_sol.h"
 #include "unittype.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -1278,37 +1278,39 @@ static int CclSetAiType(lua_State *l)
 */
 void PlayerCclRegister()
 {
-	lua_register(Lua, "Player", CclPlayer);
-	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
-	lua_register(Lua, "GiveUnitsToPlayer", CclGiveUnitsToPlayer);
-	lua_register(Lua, "GetThisPlayer", CclGetThisPlayer);
-	lua_register(Lua, "SetThisPlayer", CclSetThisPlayer);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "SetMaxSelectable", CclSetMaxSelectable);
+	luaSol["Player"] = CclPlayer;
+	luaSol["ChangeUnitsOwner"] = CclChangeUnitsOwner;
+	luaSol["GiveUnitsToPlayer"] = CclGiveUnitsToPlayer;
+	luaSol["GetThisPlayer"] = CclGetThisPlayer;
+	luaSol["SetThisPlayer"] = CclSetThisPlayer;
 
-	lua_register(Lua, "SetAllPlayersUnitLimit", CclSetAllPlayersUnitLimit);
-	lua_register(Lua, "SetAllPlayersBuildingLimit", CclSetAllPlayersBuildingLimit);
-	lua_register(Lua, "SetAllPlayersTotalUnitLimit", CclSetAllPlayersTotalUnitLimit);
+	luaSol["SetMaxSelectable"] = CclSetMaxSelectable;
 
-	lua_register(Lua, "SetDiplomacy", CclSetDiplomacy);
-	lua_register(Lua, "GetDiplomacy", CclGetDiplomacy);
-	lua_register(Lua, "Diplomacy", CclDiplomacy);
-	lua_register(Lua, "SetSharedVision", CclSetSharedVision);
-	lua_register(Lua, "SharedVision", CclSharedVision);
+	luaSol["SetAllPlayersUnitLimit"] = CclSetAllPlayersUnitLimit;
+	luaSol["SetAllPlayersBuildingLimit"] = CclSetAllPlayersBuildingLimit;
+	luaSol["SetAllPlayersTotalUnitLimit"] = CclSetAllPlayersTotalUnitLimit;
 
-	lua_register(Lua, "SetRevelationType", CclSetRevelationType);
+	luaSol["SetDiplomacy"] = CclSetDiplomacy;
+	luaSol["GetDiplomacy"] = CclGetDiplomacy;
+	luaSol["Diplomacy"] = CclDiplomacy;
+	luaSol["SetSharedVision"] = CclSetSharedVision;
+	luaSol["SharedVision"] = CclSharedVision;
 
-	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
-	lua_register(Lua, "DefineNewRaceNames", CclDefineRaceNames);
-	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
-	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
+	luaSol["SetRevelationType"] = CclSetRevelationType;
 
-	lua_register(Lua, "NewColors", CclNewPlayerColors);
+	luaSol["DefineRaceNames"] = CclDefineRaceNames;
+	luaSol["DefineNewRaceNames"] = CclDefineRaceNames;
+	luaSol["DefinePlayerColors"] = CclDefinePlayerColors;
+	luaSol["DefinePlayerColorIndex"] = CclDefinePlayerColorIndex;
+
+	luaSol["NewColors"] = CclNewPlayerColors;
 
 	// player member access functions
-	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
-	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
-	lua_register(Lua, "SetAiType", CclSetAiType);
+	luaSol["GetPlayerData"] = CclGetPlayerData;
+	luaSol["SetPlayerData"] = CclSetPlayerData;
+	luaSol["SetAiType"] = CclSetAiType;
 }
 
 //@}

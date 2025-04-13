@@ -41,13 +41,15 @@
 #include "iolib.h"
 #include "netconnect.h"
 #include "network.h"
-#include "script.h"
+#include "script_sol.h"
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "version.h"
 #include "video.h"
+
+
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1171,72 +1173,74 @@ static int CclDefineMapSetup(lua_State *l)
 */
 void MapCclRegister()
 {
-	lua_register(Lua, "StratagusMap", CclStratagusMap);
-	lua_register(Lua, "RevealMap", CclRevealMap);
-	lua_register(Lua, "CenterMap", CclCenterMap);
-	lua_register(Lua, "SetStartView", CclSetStartView);
-	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "SetTileSize", CclSetTileSize);
+	luaSol["StratagusMap"] = CclStratagusMap;
+	luaSol["RevealMap"] = CclRevealMap;
+	luaSol["CenterMap"] = CclCenterMap;
+	luaSol["SetStartView"] = CclSetStartView;
+	luaSol["ShowMapLocation"] = CclShowMapLocation;
 
-	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
-	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
-	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
+	luaSol["SetTileSize"] = CclSetTileSize;
 
-	lua_register(Lua, "SetEnableMapGrid", CclSetEnableMapGrid);
-	lua_register(Lua, "GetIsMapGridEnabled", CclGetIsMapGridEnabled);
+	luaSol["SetFogOfWar"] = CclSetFogOfWar;
+	luaSol["GetFogOfWar"] = CclGetFogOfWar;
+	luaSol["SetMinimapTerrain"] = CclSetMinimapTerrain;
 
-	lua_register(Lua, "SetHighlightPassability", CclSetHighlightPassability);
-	lua_register(Lua, "GetIsPassabilityHighlighted", CclGetIsPassabilityHighlighted);
+	luaSol["SetEnableMapGrid"] = CclSetEnableMapGrid;
+	luaSol["GetIsMapGridEnabled"] = CclGetIsMapGridEnabled;
 
-	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
-	lua_register(Lua, "GetFieldOfViewType", CclGetFieldOfViewType);
-	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);
-	lua_register(Lua, "RemoveOpaqueFor", CclRemoveOpaqueFor);
-	lua_register(Lua, "GetIsOpaqueFor", CclGetIsOpaqueFor);
+	luaSol["SetHighlightPassability"] = CclSetHighlightPassability;
+	luaSol["GetIsPassabilityHighlighted"] = CclGetIsPassabilityHighlighted;
 
-	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
-	lua_register(Lua, "GetFogOfWarType", CclGetFogOfWarType);
+	luaSol["SetFieldOfViewType"] = CclSetFieldOfViewType;
+	luaSol["GetFieldOfViewType"] = CclGetFieldOfViewType;
+	luaSol["SetOpaqueFor"] = CclSetOpaqueFor;
+	luaSol["RemoveOpaqueFor"] = CclRemoveOpaqueFor;
+	luaSol["GetIsOpaqueFor"] = CclGetIsOpaqueFor;
 
-	lua_register(Lua, "SetFogOfWarOpacityLevels", CclSetFogOfWarOpacityLevels);
-	lua_register(Lua, "SetFogOfWarBlur", CclSetFogOfWarBlur);
-	lua_register(Lua, "SetFogOfWarBilinear", CclSetFogOfWarBilinear);
-	lua_register(Lua, "GetIsFogOfWarBilinear", CclGetIsFogOfWarBilinear);
+	luaSol["SetFogOfWarType"] = CclSetFogOfWarType;
+	luaSol["GetFogOfWarType"] = CclGetFogOfWarType;
 
-	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
-	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
-	lua_register(Lua, "SetFogOfWarEasingSteps", CclSetFogOfWarEasingSteps);
+	luaSol["SetFogOfWarOpacityLevels"] = CclSetFogOfWarOpacityLevels;
+	luaSol["SetFogOfWarBlur"] = CclSetFogOfWarBlur;
+	luaSol["SetFogOfWarBilinear"] = CclSetFogOfWarBilinear;
+	luaSol["GetIsFogOfWarBilinear"] = CclGetIsFogOfWarBilinear;
 
-	lua_register(Lua, "SetMMFogOfWarOpacityLevels", CclSetMMFogOfWarOpacityLevels);
+	luaSol["SetFogOfWarGraphics"] = CclSetFogOfWarGraphics;
+	luaSol["SetFogOfWarColor"] = CclSetFogOfWarColor;
+	luaSol["SetFogOfWarEasingSteps"] = CclSetFogOfWarEasingSteps;
 
-	lua_register(Lua, "SetForestRegeneration", CclSetForestRegeneration);
+	luaSol["SetMMFogOfWarOpacityLevels"] = CclSetMMFogOfWarOpacityLevels;
 
-	lua_register(Lua, "LoadTileModels", CclLoadTileModels);
-	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
+	luaSol["SetForestRegeneration"] = CclSetForestRegeneration;
 
-	lua_register(Lua, "DefineTileset", CclDefineTileset);
-	lua_register(Lua, "GenerateExtendedTileset", CclGenerateExtendedTileset);
+	luaSol["LoadTileModels"] = CclLoadTileModels;
+	luaSol["DefinePlayerTypes"] = CclDefinePlayerTypes;
+
+	luaSol["DefineTileset"] = CclDefineTileset;
+	luaSol["GenerateExtendedTileset"] = CclGenerateExtendedTileset;
 
 #ifdef DEBUG	
-	lua_register(Lua, "SaveTilesetGraphics", CClSaveTilesetGraphics);
+	luaSol["SaveTilesetGraphics"] = CClSaveTilesetGraphics;
 #endif
 
-	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
-	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
+	luaSol["SetTileFlags"] = CclSetTileFlags;
+	luaSol["BuildTilesetTables"] = CclBuildTilesetTables;
 
-	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
-	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
+	luaSol["GetTileTerrainName"] = CclGetTileTerrainName;
+	luaSol["GetTileTerrainHasFlag"] = CclGetTileTerrainHasFlag;
 
-	lua_register(Lua, "SetEnableWallsForSP", CclSetEnableWallsForSP);
-	lua_register(Lua, "GetIsWallsEnabledForSP", CclIsWallsEnabledForSP);
+	luaSol["SetEnableWallsForSP"] = CclSetEnableWallsForSP;
+	luaSol["GetIsWallsEnabledForSP"] = CclIsWallsEnabledForSP;
 
-	lua_register(Lua, "GetIsGameHoster", CclGetIsGameHoster);
+	luaSol["GetIsGameHoster"] = CclGetIsGameHoster;
 
-	lua_register(Lua, "PresentMap", CclPresentMap);
-	lua_register(Lua, "MapEnableHighgrounds", CclMapEnableHighgrounds);
-	lua_register(Lua, "IsHighgroundsEnabled", CclIsHighgroundsEnabled);
+	luaSol["PresentMap"] = CclPresentMap;
+	luaSol["MapEnableHighgrounds"] = CclMapEnableHighgrounds;
+	luaSol["IsHighgroundsEnabled"] = CclIsHighgroundsEnabled;
 
-	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
+	luaSol["DefineMapSetup"] = CclDefineMapSetup;
 }
 
 //@}

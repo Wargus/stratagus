@@ -56,7 +56,7 @@
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "settings.h"
 #include "version.h"
 #include "video.h"
@@ -2073,9 +2073,11 @@ static int CclNetworkDiscoverServers(lua_State *l)
 
 void NetworkCclRegister()
 {
-	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
-	lua_register(Lua, "UsesRandomPlacementMultiplayer", CclUsesRandomPlacementMultiplayer);
-	lua_register(Lua, "NetworkDiscoverServers", CclNetworkDiscoverServers);
+	sol::state_view luaSol(Lua);
+
+	luaSol["NoRandomPlacementMultiplayer"] = CclNoRandomPlacementMultiplayer;
+	luaSol["UsesRandomPlacementMultiplayer"] = CclUsesRandomPlacementMultiplayer;
+	luaSol["NetworkDiscoverServers"] = CclNetworkDiscoverServers;
 }
 
 

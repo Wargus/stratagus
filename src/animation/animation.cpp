@@ -68,6 +68,7 @@
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
+#include "script_sol.h"
 #include "spells.h"
 #include "unit.h"
 #include "unittype.h"
@@ -710,7 +711,8 @@ static int CclDefineAnimations(lua_State *l)
 
 void AnimationCclRegister()
 {
-	lua_register(Lua, "DefineAnimations", CclDefineAnimations);
+	sol::state_view luaSol(Lua);
+	luaSol["DefineAnimations"] = CclDefineAnimations;
 }
 
 //@}

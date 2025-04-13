@@ -45,7 +45,7 @@
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
-#include "script.h"
+#include "script_sol.h"
 #include "settings.h"
 #include "sound.h"
 #include "translate.h"
@@ -865,8 +865,10 @@ void StartReplay(const std::string &filename, bool reveal)
 */
 void ReplayCclRegister()
 {
-	lua_register(Lua, "Log", CclLog);
-	lua_register(Lua, "ReplayLog", CclReplayLog);
+	sol::state_view luaSol(Lua);
+
+	luaSol["Log"] = CclLog;
+	luaSol["ReplayLog"] = CclReplayLog;
 }
 
 //@}

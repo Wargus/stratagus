@@ -42,6 +42,7 @@
 #include "editor.h"
 #include "interface.h"
 #include "map.h"
+#include "script_sol.h"
 #include "settings.h"
 #include "tileset.h"
 #include "translate.h"
@@ -521,8 +522,10 @@ static int CclSetGameCursor(lua_State *l)
 
 void CursorCclRegister()
 {
-	lua_register(Lua, "DefineCursor", CclDefineCursor);
-	lua_register(Lua, "SetGameCursor", CclSetGameCursor);
+	sol::state_view luaSol(Lua);
+
+	luaSol["DefineCursor"] = CclDefineCursor;
+	luaSol["SetGameCursor"] = CclSetGameCursor;
 }
 
 

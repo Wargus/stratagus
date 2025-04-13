@@ -59,6 +59,7 @@
 #include "player.h"
 #include "replay.h"
 #include "results.h"
+#include "script_sol.h"
 #include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
@@ -1538,38 +1539,40 @@ static int CclSavedGameInfo(lua_State *l)
 
 void LuaRegisterModules()
 {
-	lua_register(Lua, "SetGameName", CclSetGameName);
-	lua_register(Lua, "SetFullGameName", CclSetFullGameName);
+	sol::state_view luaSol(Lua);
 
-	lua_register(Lua, "SetGodMode", CclSetGodMode);
-	lua_register(Lua, "GetGodMode", CclGetGodMode);
+	luaSol["SetGameName"] = CclSetGameName;
+	luaSol["SetFullGameName"] = CclSetFullGameName;
 
-	lua_register(Lua, "SetSpeedResourcesHarvest", CclSetSpeedResourcesHarvest);
-	lua_register(Lua, "SetSpeedResourcesReturn", CclSetSpeedResourcesReturn);
-	lua_register(Lua, "SetSpeedBuild", CclSetSpeedBuild);
-	lua_register(Lua, "GetSpeedBuild", CclGetSpeedBuild);
-	lua_register(Lua, "SetSpeedTrain", CclSetSpeedTrain);
-	lua_register(Lua, "GetSpeedTrain", CclGetSpeedTrain);
-	lua_register(Lua, "SetSpeedUpgrade", CclSetSpeedUpgrade);
-	lua_register(Lua, "SetSpeedResearch", CclSetSpeedResearch);
-	lua_register(Lua, "SetSpeeds", CclSetSpeeds);
+	luaSol["SetGodMode"] = CclSetGodMode;
+	luaSol["GetGodMode"] = CclGetGodMode;
 
-	lua_register(Lua, "DefineDefaultIncomes", CclDefineDefaultIncomes);
-	lua_register(Lua, "DefineDefaultActions", CclDefineDefaultActions);
-	lua_register(Lua, "DefineDefaultResourceNames", CclDefineDefaultResourceNames);
-	lua_register(Lua, "DefineDefaultResourceAmounts", CclDefineDefaultResourceAmounts);
-	lua_register(Lua, "DefineDefaultResourceMaxAmounts", CclDefineDefaultResourceMaxAmounts);
+	luaSol["SetSpeedResourcesHarvest"] = CclSetSpeedResourcesHarvest;
+	luaSol["SetSpeedResourcesReturn"] = CclSetSpeedResourcesReturn;
+	luaSol["SetSpeedBuild"] = CclSetSpeedBuild;
+	luaSol["GetSpeedBuild"] = CclGetSpeedBuild;
+	luaSol["SetSpeedTrain"] = CclSetSpeedTrain;
+	luaSol["GetSpeedTrain"] = CclGetSpeedTrain;
+	luaSol["SetSpeedUpgrade"] = CclSetSpeedUpgrade;
+	luaSol["SetSpeedResearch"] = CclSetSpeedResearch;
+	luaSol["SetSpeeds"] = CclSetSpeeds;
 
-	lua_register(Lua, "SetUseHPForXp", ScriptSetUseHPForXp);
-	lua_register(Lua, "SetLocalPlayerName", CclSetLocalPlayerName);
-	lua_register(Lua, "GetLocalPlayerName", CclGetLocalPlayerName);
+	luaSol["DefineDefaultIncomes"] = CclDefineDefaultIncomes;
+	luaSol["DefineDefaultActions"] = CclDefineDefaultActions;
+	luaSol["DefineDefaultResourceNames"] = CclDefineDefaultResourceNames;
+	luaSol["DefineDefaultResourceAmounts"] = CclDefineDefaultResourceAmounts;
+	luaSol["DefineDefaultResourceMaxAmounts"] = CclDefineDefaultResourceMaxAmounts;
 
-	lua_register(Lua, "SetMenuRace", CclSetMenuRace);
+	luaSol["SetUseHPForXp"] = ScriptSetUseHPForXp;
+	luaSol["SetLocalPlayerName"] = CclSetLocalPlayerName;
+	luaSol["GetLocalPlayerName"] = CclGetLocalPlayerName;
 
-	lua_register(Lua, "GetStratagusVersion", CclGetStratagusVersion);
-	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
+	luaSol["SetMenuRace"] = CclSetMenuRace;
 
-	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
+	luaSol["GetStratagusVersion"] = CclGetStratagusVersion;
+	luaSol["GetStratagusHomepage"] = CclGetStratagusHomepage;
+
+	luaSol["SavedGameInfo"] = CclSavedGameInfo;
 
 	AiCclRegister();
 	AnimationCclRegister();

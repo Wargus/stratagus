@@ -34,6 +34,7 @@
 #include "iolib.h"
 #include "parameters.h"
 #include "script.h"
+#include "script_sol.h"
 #include "video.h"
 
 #include <SDL_opengl.h>
@@ -532,9 +533,11 @@ bool LoadShaderExtensions() {
 		setCanUseShaders(false);
 	}
 
-	lua_register(Lua, "GetShaderNames", CclGetShaderNames);
-	lua_register(Lua, "GetShader", CclGetShader);
-	lua_register(Lua, "SetShader", CclSetShader);
+	sol::state_view luaSol(Lua);
+
+	luaSol["GetShaderNames"] = CclGetShaderNames;
+	luaSol["GetShader"] = CclGetShader;
+	luaSol["SetShader"] = CclSetShader;
 
 	return canUseShaders;
 }
