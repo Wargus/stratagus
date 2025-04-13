@@ -318,7 +318,7 @@ void DrawCursor()
 			LastSizeVersion = SizeChangeCounter;
 		}
 	} else if (ActuallyVisibleGameCursor) {
-		SDL_SetCursor(Video.blankCursor);
+		SDL_SetCursor(Video.blankCursor.get());
 		ActuallyVisibleGameCursor = nullptr;
 	}
 
@@ -336,7 +336,7 @@ void DrawCursor()
 	//  Only draw it if it exists
 	if (GameCursor == nullptr || IsDemoMode()) {
 		if (Preference.HardwareCursor) {
-			SDL_SetCursor(Video.blankCursor);
+			SDL_SetCursor(Video.blankCursor.get());
 			ActuallyVisibleGameCursor = nullptr;
 		}
 		return;
@@ -392,7 +392,7 @@ void HideCursor()
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
 		SDL_BlitSurface(HiddenSurface.get(), nullptr, TheScreen, &dstRect);
 	} else {
-		SDL_SetCursor(Video.blankCursor);
+		SDL_SetCursor(Video.blankCursor.get());
 		ActuallyVisibleGameCursor = nullptr;
 	}
 }

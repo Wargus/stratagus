@@ -16,7 +16,7 @@ public:
 	bool ResizeScreen(int width, int height);
 };
 
-CVideo Video;
+tolua_readonly CVideo Video;
 void ToggleFullScreen(void);
 
 $using CGraphicPtr = std::shared_ptr<CGraphic>;
