@@ -68,17 +68,13 @@ $]
 $using std::string;
 $using std::vector;
 
-$pfile "ai.pkg"
 $pfile "editor.pkg"
 $pfile "font.pkg"
 $pfile "game.pkg"
-$pfile "map.pkg"
-$pfile "minimap.pkg"
 $pfile "network.pkg"
 $pfile "particle.pkg"
 $pfile "pathfinder.pkg"
 $pfile "player.pkg"
-$pfile "sound.pkg"
 $pfile "translate.pkg"
 $pfile "trigger.pkg"
 $pfile "ui.pkg"

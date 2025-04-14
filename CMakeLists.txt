@@ -346,17 +346,17 @@ set(win32_SRCS
 source_group(win32 FILES ${win32_SRCS})
 
 set(tolua_FILES
-	src/tolua/ai.pkg
+#	src/tolua/ai.pkg
 	src/tolua/editor.pkg
 	src/tolua/font.pkg
 	src/tolua/game.pkg
-	src/tolua/map.pkg
-	src/tolua/minimap.pkg
+#	src/tolua/map.pkg
+#	src/tolua/minimap.pkg
 	src/tolua/network.pkg
 	src/tolua/particle.pkg
 	src/tolua/pathfinder.pkg
 	src/tolua/player.pkg
-	src/tolua/sound.pkg
+#	src/tolua/sound.pkg
 	src/tolua/stratagus.pkg
 	src/tolua/translate.pkg
 	src/tolua/trigger.pkg
@@ -368,6 +368,14 @@ set(tolua_FILES
 	src/tolua/stratagus.lua
 )
 source_group(tolua FILES ${tolua_FILES})
+
+set(luaBindings_SRCS
+	src/luabindings/ai.cpp
+	src/luabindings/bindings.cpp
+	src/luabindings/map.cpp
+	src/luabindings/minimap.cpp
+	src/luabindings/sound.cpp
+)
 
 set(stratagus_SRCS
 	${action_SRCS}
@@ -389,6 +397,7 @@ set(stratagus_SRCS
 	${hqx_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
+	${luaBindings_SRCS}
 )
 
 set(stratagus_action_HDRS

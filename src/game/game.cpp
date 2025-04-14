@@ -1537,9 +1537,13 @@ static int CclSavedGameInfo(lua_State *l)
 	return 0;
 }
 
+extern void Lua_SetBindings();
+
 void LuaRegisterModules()
 {
 	sol::state_view luaSol(Lua);
+
+	Lua_SetBindings();
 
 	luaSol["SetGameName"] = CclSetGameName;
 	luaSol["SetFullGameName"] = CclSetFullGameName;

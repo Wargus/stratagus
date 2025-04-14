@@ -808,7 +808,7 @@ static int CclSetTileSize(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, const int elevation)
+void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int elevation)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
 		ErrorPrint("Invalid map coordinates: (%d, %d)\n", pos.x, pos.y);
