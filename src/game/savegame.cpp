@@ -169,7 +169,7 @@ int SaveGame(const std::string &filename)
 	// FIXME: find all state information which must be saved.
 	const std::string s = SaveGlobal(Lua);
 	if (!s.empty()) {
-		file.printf("-- Lua state\n\n %s\n", s.c_str());
+		file.printf("-- Lua state\n\n%s\n", s.c_str());
 	}
 	SaveTriggers(file); //Triggers are saved in SaveGlobal, so load it after Global
 	file.close();

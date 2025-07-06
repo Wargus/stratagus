@@ -36,11 +36,9 @@
 #include "script.h"
 
 #include "animation/animation_setplayervar.h"
-#include "filesystem.h"
 #include "font.h"
 #include "game.h"
 #include "iolib.h"
-#include "map.h"
 #include "parameters.h"
 #include "stratagus.h"
 #include "translate.h"
@@ -49,6 +47,7 @@
 #include "unit.h"
 
 #include <optional>
+#include <set>
 #include <signal.h>
 #include <variant>
 
@@ -2112,38 +2111,236 @@ static std::string ConcatTableString(const std::vector<std::string> &blockTableN
 	return res;
 }
 
-static bool IsAValidTableName(const std::string &key)
+static bool IsAValidTableName(std::string_view key)
 {
-	return key.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789") == std::string::npos;
+	return key.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789") == std::string_view::npos;
 }
 
-static bool ShouldGlobalTableBeSaved(const std::string &key)
+static bool ShouldGlobalTableBeSaved(std::string_view key)
 {
 	if (IsAValidTableName(key) == false) {
 		return false;
 	}
-	const std::string forbiddenNames[] = {
-		"assert", "gcinfo", "getfenv", "unpack", "tostring", "tonumber",
-		"setmetatable", "require", "pcall", "rawequal", "collectgarbage", "type",
-		"getmetatable", "math", "next", "print", "xpcall", "rawset", "setfenv",
-		"rawget", "newproxy", "ipairs", "loadstring", "dofile", "_TRACEBACK",
-		"_VERSION", "pairs", "__pow", "error", "loadfile", "arg",
-		"_LOADED", "loadlib", "string", "os", "io", "debug",
-		"coroutine", "Icons", "Upgrades", "Fonts", "FontColors", "expansion",
-		"CMap", "CPlayer", "Graphics", "Vec2i", "_triggers_"
-	}; // other string to protected ?
+	static const std::set<std::string_view> forbiddenNames = {
+		"BasicContainer",
+		"Button",
+		"ButtonWidget",
+		"CButtonPanel",
+		"CChunkParticle",
+		"CColor",
+		"CEditor",
+		"CFiller",
+		"CFont",
+		"CFontColor",
+		"CGraphic",
+		"CGraphicPtr",
+		"CIcon",
+		"CInfoPanel",
+		"CMap",
+		"CMapArea",
+		"CMapInfo",
+		"CMenuScreen",
+		"CMinimap",
+		"CNetworkHost",
+		"CParticle",
+		"CParticleManager",
+		"CPieMenu",
+		"CPlayer",
+		"CPlayerColorGraphic",
+		"CPlayerColorGraphicPtr",
+		"CPosition",
+		"CPreference",
+		"CRadialParticle",
+		"CResourceInfo",
+		"CServerSetup",
+		"CStatusLine",
+		"CSmokeParticle",
+		"CTileset",
+		"CUIButton",
+		"CUITimer",
+		"CUIUserButton",
+		"CUnit",
+		"CUnitManager",
+		"CUnitType",
+		"CUserInterface",
+		"CUpgrade",
+		"CVideo",
+		"CViewport",
+		"CheckBox",
+		"Color",
+		"Container",
+		"DownButton",
+		"DropDown",
+		"DropDownWidget",
+		"EditorCommandLine",
+		"EditorEditing",
+		"EditorNotRunning",
+		"EditorStarted",
+		"FoodCost",
+		"FontColors",
+		"Fonts",
+		"FreeWorkersCount",
+		"GameDefeat",
+		"GameDraw",
+		"GameExit",
+		"GameNoResult",
+		"GameQuitToMenu",
+		"GameRestart",
+		"GameVictory",
+		"Graphics",
+		"GraphicAnimation",
+		"Icons",
+		"ImageButton",
+		"ImageCheckBox",
+		"ImageDropDownWidget",
+		"ImageListBox",
+		"ImageListBoxWidget",
+		"ImageRadioButton",
+		"ImageTextField",
+		"ImageSlider",
+		"ImageWidget",
+		"InfiniteRepairRange",
+		"Label",
+		"LeftButton",
+		"ListBox",
+		"ListBoxWidget",
+		"LuaActionListener",
+		"ManaResCost",
+		"MaxCosts",
+		"MaxFontColors",
+		"MaxResourceInfo",
+		"MiddleButton",
+		"Mng",
+		"MngPtr",
+		"Movie",
+		"MultiLineLabel",
+		"NoButton",
+		"NumOfTypes",
+		"OnlineService",
+		"PlayerNeutral",
+		"PlayerComputer",
+		"PlayerMax",
+		"PlayerNobody",
+		"PlayerNumNeutral",
+		"PlayerPerson",
+		"PlayerRescuePassive",
+		"PlayerRescueActive",
+		"PlayerUnset",
+		"RadioButton",
+		"RightButton",
+		"ScoreCost",
+		"ScrollArea",
+		"ScrollingWidget",
+		"ServerSetupStateRacesArray",
+		"Settings",
+		"SettingsGameTypeFreeForAll",
+		"SettingsGameTypeLeftVsRight",
+		"SettingsGameTypeMachineVsMachine",
+		"SettingsGameTypeMachineVsMachineTraining",
+		"SettingsGameTypeManTeamVsMachine",
+		"SettingsGameTypeManVsMachine",
+		"SettingsGameTypeMapDefault",
+		"SettingsGameTypeMelee",
+		"SettingsGameTypeTopVsBottom",
+		"SettingsMultiPlayerGame",
+		"SettingsPresets",
+		"SettingsPresetMapDefault",
+		"SettingsSinglePlayerGame",
+		"Slider",
+		"SlotAvailable",
+		"SlotClosed",
+		"SlotComputer",
+		"StatBoxWidget",
+		"StaticParticle",
+		"TextBox",
+		"TextField",
+		"UnitTypes",
+		"Unset",
+		"UpButton",
+		"Upgrades",
+		"VIEWPORT_SINGLE",
+		"VIEWPORT_SPLIT_HORIZ",
+		"VIEWPORT_SPLIT_HORIZ3",
+		"VIEWPORT_SPLIT_VERT",
+		"VIEWPORT_QUAD",
+		"Vec2i",
+		"Widget",
+		"Window",
+		"Windows",
+		"arg",
+		"assert",
+		"cAllUnits",
+		"cBuildingsOnly",
+		"cExplored",
+		"cKnown",
+		"cHidden",
+		"cNoRevelation",
+		"cNumOfModes",
+		"cShadowCasting",
+		"cSimpleRadial",
+		"collectgarbage",
+		"coroutine",
+		"debug",
+		"dofile",
+		"error",
+		"expansion",
+		"gcinfo",
+		"getfenv",
+		"getmetatable",
+		"io",
+		"ipairs",
+		"loadfile",
+		"loadlib",
+		"loadstring",
+		"math",
+		"mt",
+		"next",
+		"newproxy",
+		"os",
+		"package",
+		"pairs",
+		"pcall",
+		"print",
+		"rawequal",
+		"rawget",
+		"rawset",
+		"require",
+		"setfenv",
+		"setmetatable",
+		"string",
+		"table",
+		"tolua",
+		"tonumber",
+		"tostring",
+		"type",
+		"unpack",
+		"vector_CFiller_",
+		"vector_CUIButton_",
+		"vector_CUIUserButton_",
+		"vector_string_",
+		"xpcall",
+		"_LOADED",
+		"_TRACEBACK",
+		"_VERSION",
+		"_ai_scripts_",
+		"_stringfunction_",
+		"_triggers_",
+		"_uiButtonCallbacks",
+		"__file__",
+		"__pow",
+	}; // other string to protect?
 
-	return !ranges::contains(forbiddenNames, key);
+	return !forbiddenNames.count(key);
 }
 
-static bool ShouldLocalTableBeSaved(const std::string &key)
+static bool ShouldLocalTableBeSaved(std::string_view key)
 {
 	if (IsAValidTableName(key) == false) {
 		return false;
 	}
-	const std::string forbiddenNames[] = { "tolua_ubox" }; // other string to protected ?
+	static const std::set<std::string_view> forbiddenNames = {"tolua_ubox", "_base", "__index"}; // other strings to protect?
 
-	return !ranges::contains(forbiddenNames, key);
+	return !forbiddenNames.count(key);
 }
 
 static std::optional<std::string> LuaValueToString(lua_State *l)
@@ -2196,7 +2393,7 @@ static std::optional<std::string> LuaValueToString(lua_State *l)
 **  For saving lua state (table, number, string, bool, not function).
 **
 **  @param l        lua_State to save.
-**  @param is_root  true for the main call, 0 for recursif call.
+**  @param is_root  true for the main call, 0 for recursive call.
 **
 **  @return  "" if nothing could be saved.
 **           else a string that could be executed in lua to restore lua state
