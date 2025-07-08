@@ -13,11 +13,12 @@ jobs:
       matrix:
         game: [{id: wargus, name: Wargus}, {id: war1gus, name: War1gus}]
     name: Linux x64_64 (Continuous)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 #   container: centos:7
 
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get install libfuse2
       - name: Build game ${{ matrix.game.id }}
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
       - name: Archive production artifacts
