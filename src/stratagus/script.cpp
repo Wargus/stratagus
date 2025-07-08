@@ -2116,6 +2116,15 @@ static bool IsAValidTableName(std::string_view key)
 	return key.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789") == std::string_view::npos;
 }
 
+static std::set<std::string, std::less<>> userForbiddenNames;
+
+static int CclIgnoreVariableNameWhenSaving(lua_State *l)
+{
+	luaL_checkstring(l, -1);
+	userForbiddenNames.insert(lua_tostring(l, -1));
+	return 0;
+}
+
 static bool ShouldGlobalTableBeSaved(std::string_view key)
 {
 	if (IsAValidTableName(key) == false) {
@@ -2330,7 +2339,7 @@ static bool ShouldGlobalTableBeSaved(std::string_view key)
 		"__pow",
 	}; // other string to protect?
 
-	return !forbiddenNames.count(key);
+	return !forbiddenNames.count(key) && !userForbiddenNames.count(key);
 }
 
 static bool ShouldLocalTableBeSaved(std::string_view key)
@@ -2662,6 +2671,7 @@ void ScriptRegister()
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
 
+	lua_register(Lua, "IgnoreVariableNameWhenSaving", CclIgnoreVariableNameWhenSaving);
 	// TODO: Only allow this when extractor tool runs
 	// lua_register(Lua, "ListFilesystem", CclListFilesystem);
 
