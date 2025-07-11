@@ -63,12 +63,14 @@ void CUnitManager::Init()
 		delete unit;
 	}
 	
+	// Make sure all variables are empty
+	// Initialize the free unit slots
+	// and the released units and pointers
 	//Assert(units.empty());
 	units.clear();
-	// Initialize releasedUnits
-	releasedUnits.clear();	
-	// Initialize the free unit slots
 	unitSlots.clear();
+	releasedUnits.clear();	
+	ptrList.clear();
 }
 
 /**
