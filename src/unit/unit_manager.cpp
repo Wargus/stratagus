@@ -57,15 +57,15 @@ CUnitManager *UnitManager;          /// Unit manager
 void CUnitManager::Init()
 {
 	lastCreated = nullptr;
-	//Assert(units.empty());
-	units.clear();
+
 	// Release memory of units in release list.
-	while (!releasedUnits.empty()) {
-		CUnit *unit = releasedUnits.front();
-		releasedUnits.pop_front();
+	for (CUnit* unit : ptrList) {
 		delete unit;
 	}
-
+	
+	//Assert(units.empty());
+	units.clear();
+	
 	// Initialize the free unit slots
 	unitSlots.clear();
 }
