@@ -65,6 +65,7 @@ void CUnitManager::Init()
 	
 	//Assert(units.empty());
 	units.clear();
+	// Initialize releasedUnits
 	releasedUnits.clear();	
 	// Initialize the free unit slots
 	unitSlots.clear();
@@ -88,7 +89,7 @@ CUnit *CUnitManager::AllocUnit()
 		return unit;
 	} else {
 		CUnit *unit = new CUnit;
-
+		ptrList.push_back(unit);
 		unit->UnitManagerData.slot = unitSlots.size();
 		unitSlots.push_back(unit);
 		return unit;
