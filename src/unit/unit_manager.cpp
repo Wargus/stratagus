@@ -65,7 +65,7 @@ void CUnitManager::Init()
 	
 	//Assert(units.empty());
 	units.clear();
-	
+	releasedUnits.clear();	
 	// Initialize the free unit slots
 	unitSlots.clear();
 }
