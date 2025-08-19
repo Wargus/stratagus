@@ -57,17 +57,20 @@ CUnitManager *UnitManager;          /// Unit manager
 void CUnitManager::Init()
 {
 	lastCreated = nullptr;
-	//Assert(units.empty());
-	units.clear();
+
 	// Release memory of units in release list.
-	while (!releasedUnits.empty()) {
-		CUnit *unit = releasedUnits.front();
-		releasedUnits.pop_front();
+	for (CUnit* unit : ptrList) {
 		delete unit;
 	}
-
+	
+	// Make sure all variables are empty
 	// Initialize the free unit slots
+	// and the released units and pointers
+	//Assert(units.empty());
+	units.clear();
 	unitSlots.clear();
+	releasedUnits.clear();	
+	ptrList.clear();
 }
 
 /**
@@ -88,7 +91,7 @@ CUnit *CUnitManager::AllocUnit()
 		return unit;
 	} else {
 		CUnit *unit = new CUnit;
-
+		ptrList.push_back(unit);
 		unit->UnitManagerData.slot = unitSlots.size();
 		unitSlots.push_back(unit);
 		return unit;
