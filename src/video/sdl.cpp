@@ -106,6 +106,29 @@ static bool dummyRenderer = false;
 
 uint32_t SDL_CUSTOM_KEY_UP;
 
+/**
+**  Clean up SDL video resources properly
+*/
+static void CleanUpVideoSdl()
+{
+	if (TheRenderer) {
+		SDL_DestroyRenderer(TheRenderer);
+		TheRenderer = nullptr;
+	}
+
+	if (TheWindow) {
+		SDL_DestroyWindow(TheWindow);
+		TheWindow = nullptr;
+	}
+
+	if (Video.blankCursor) {
+		Video.blankCursor.reset();
+	}
+
+	SDL_StopTextInput();
+	SDL_Quit();
+}
+
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
@@ -319,14 +342,14 @@ void InitVideoSdl()
 		SDL_StartTextInput();
 
 		// Clean up on exit
-		atexit(SDL_Quit);
+		atexit(CleanUpVideoSdl);
 
 		// If debug is enabled, Stratagus disable SDL Parachute.
 		// So we need gracefully handle segfaults and aborts.
 #if defined(DEBUG) && !defined(USE_WIN32)
 		const auto cleanExit = [](int) {
 			// Clean SDL
-			SDL_Quit();
+			CleanUpVideoSdl();
 			// Reestablish normal behaviour for next abort call
 			signal(SIGABRT, SIG_DFL);
 			// Generates a core dump
