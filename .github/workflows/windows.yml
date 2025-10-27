@@ -47,19 +47,19 @@ jobs:
         ctest --output-on-failure
 
     - name: Upload installer
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: stratagus
         path: build/Release/**.*
 
 #    - name: Upload installer
-#      uses: actions/upload-artifact@v4
+#      uses: actions/upload-artifact@v5
 #      with:
 #        name: stratagus-installer.exe
 #        path: build/**.exe
 #
 #    - name: Upload pdb files
-#      uses: actions/upload-artifact@v4
+#      uses: actions/upload-artifact@v5
 #      with:
 #        name: stratagus_pdbs
 #        path: "**.pdb"
