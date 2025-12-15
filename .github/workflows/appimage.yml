@@ -22,7 +22,7 @@ jobs:
       - name: Build game ${{ matrix.game.id }}
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.game.id }}
           retention-days: 90
