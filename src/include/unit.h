@@ -366,6 +366,7 @@ public:
 
 	unsigned Burning : 1;        /// unit is burning
 	unsigned Destroyed : 1;      /// unit is destroyed pending reference
+	unsigned Released : 1;       /// unit is released
 	unsigned Removed : 1;        /// unit is removed (not on map)
 	unsigned Selected : 1;       /// unit is selected
 
