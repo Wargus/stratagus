@@ -957,7 +957,7 @@ void CUnit::Draw(const CViewport &vp) const
 		type = this->Seen.Type;
 		constructed = this->Seen.Constructed;
 		state = this->Seen.State;
-		cframe = this->Seen.CFrame != -1 ? &type->Construction->Frames[this->Seen.CFrame] : nullptr;
+		cframe = this->Seen.CFrame != -1 && type->Construction ? &type->Construction->Frames[this->Seen.CFrame] : nullptr;
 	}
 
 #ifdef DYNAMIC_LOAD

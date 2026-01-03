@@ -425,6 +425,7 @@ void CUnit::Init()
 	AutoRepair = 0;
 	Burning = 0;
 	Destroyed = 0;
+	Released = 0;
 	Removed = 0;
 	Selected = 0;
 	Constructed = 0;
