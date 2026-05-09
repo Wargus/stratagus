@@ -47,17 +47,23 @@ public:
 	CUnitPtr(std::nullptr_t) : unit(nullptr) {}
 	explicit CUnitPtr(CUnit *u);
 	CUnitPtr(const CUnitPtr &u);
+	CUnitPtr(CUnitPtr &&u) noexcept;
 	~CUnitPtr() { Reset(); }
 
 	void Reset();
+	CUnit *get() const { return unit; }
 
 	operator CUnit *() { return unit; }
 	operator CUnit *() const { return unit; }
+	explicit operator bool() const { return unit != nullptr; }
 
 	CUnit &operator*() { return *unit; }
 	CUnit *operator->() const { return unit; }
 
 	CUnitPtr &operator= (CUnit *u);
+	CUnitPtr &operator= (std::nullptr_t);
+	CUnitPtr &operator= (const CUnitPtr &u);
+	CUnitPtr &operator= (CUnitPtr &&u) noexcept;
 
 	bool operator== (CUnit *u) const { return this->unit == u; }
 	bool operator!= (CUnit *u) const { return this->unit != u; }
@@ -65,6 +71,8 @@ public:
 private:
 	CUnit *unit = nullptr;
 };
+
+using CUnitRef = CUnitPtr;
 
 //@}
 
