@@ -48,6 +48,11 @@ CUnitPtr::CUnitPtr(const CUnitPtr &u) : unit(u.unit)
 	}
 }
 
+CUnitPtr::CUnitPtr(CUnitPtr &&u) noexcept : unit(u.unit)
+{
+	u.unit = nullptr;
+}
+
 void CUnitPtr::Reset()
 {
 	if (unit) {
@@ -66,6 +71,27 @@ CUnitPtr &CUnitPtr::operator= (CUnit *u)
 			unit->RefsDecrease();
 		}
 		unit = u;
+	}
+	return *this;
+}
+
+CUnitPtr &CUnitPtr::operator= (std::nullptr_t)
+{
+	Reset();
+	return *this;
+}
+
+CUnitPtr &CUnitPtr::operator= (const CUnitPtr &u)
+{
+	return *this = u.unit;
+}
+
+CUnitPtr &CUnitPtr::operator= (CUnitPtr &&u) noexcept
+{
+	if (this != &u) {
+		Reset();
+		unit = u.unit;
+		u.unit = nullptr;
 	}
 	return *this;
 }
