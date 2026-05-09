@@ -1694,7 +1694,7 @@ static int CclDefineAiPlayer(lua_State *l)
 #if 0
 						[[maybe_unused]]const std::string_view ident = LuaToString(l, -1, subk + 1);
 #endif
-						ai.Force[forceIdx].Units.push_back(&UnitManager->GetSlotUnit(num));
+						ai.Force[forceIdx].Units.emplace_back(&UnitManager->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (value == "state") {

@@ -310,14 +310,12 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 
 void AiForce::Insert(CUnit &unit)
 {
-	Units.push_back(&unit);
-	unit.RefsIncrease();
+	Units.emplace_back(&unit);
 }
 
 /* static */ void AiForce::InternalRemoveUnit(CUnit *unit)
 {
 	unit->GroupId = 0;
-	unit->RefsDecrease();
 }
 
 
@@ -327,9 +325,9 @@ void AiForce::Insert(CUnit &unit)
 void AiForce::RemoveDeadUnit()
 {
 	// Release all killed units.
-	auto end = ranges::partition(Units, [](const CUnit *unit) { return unit->IsAlive(); });
+	auto end = ranges::partition(Units, [](const CUnitRef &unit) { return unit->IsAlive(); });
 	for (auto it = end; it != std::end(Units); ++it) {
-		InternalRemoveUnit(*it);
+		InternalRemoveUnit(it->get());
 	}
 	Units.erase(end, std::end(Units));
 }
@@ -698,7 +696,7 @@ void AiAttackWithForce(unsigned int force)
 
 		for (CUnit* aiunit : AiPlayer->Force[intForce].Units) {
 			aiunit->GroupId = f + 1;
-			AiPlayer->Force[f].Units.push_back(aiunit);
+			AiPlayer->Force[f].Units.emplace_back(aiunit);
 		}
 		AiPlayer->Force[intForce].Units.clear();
 
@@ -740,7 +738,7 @@ void AiAttackWithForces(int *forces)
 
 			for (CUnit *aiunit : AiPlayer->Force[force].Units) {
 				aiunit->GroupId = f + 1;
-				AiPlayer->Force[f].Units.push_back(aiunit);
+				AiPlayer->Force[f].Units.emplace_back(aiunit);
 			}
 			AiPlayer->Force[force].Units.clear();
 
@@ -906,7 +904,8 @@ void AiForce::Update()
 		return;
 	}
 	CUnit *leader = nullptr;
-	if (auto it = ranges::find_if(Units, &CUnit::IsAggressive); it != Units.end()) {
+	if (auto it = ranges::find_if(Units, [](const CUnit *unit) { return unit->IsAggressive(); });
+	    it != Units.end()) {
 		leader = *it;
 	}
 
@@ -962,7 +961,9 @@ void AiForce::Update()
 	}
 
 	std::vector<CUnit *> idleUnits;
-	ranges::copy_if(Units, std::back_inserter(idleUnits), &CUnit::IsIdle);
+	ranges::copy_if(Units, std::back_inserter(idleUnits), [](const CUnit *unit) {
+		return unit->IsIdle();
+	});
 
 	if (idleUnits.empty()) {
 		return;
