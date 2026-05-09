@@ -45,26 +45,33 @@ void FillCustomValue(CNetworkHost *obj)
 
 void FillCustomValue(CServerSetup *obj)
 {
-#if 0
-	obj->ResourcesOption = 42;
-	obj->UnitsOption = 44;
-	obj->FogOfWar = 46;
-	obj->RevealMap = 48;
-	obj->TilesetSelection = 50;
-	obj->GameTypeOption = 52;
-	obj->Difficulty = 54;
-	obj->MapRichness = 56;
-	obj->Opponents = 58;
+	obj->Clear();
+	obj->ServerGameSettings.Resources = 1;
+	obj->ServerGameSettings.NumUnits = 2;
+	obj->ServerGameSettings.Opponents = 3;
+	obj->ServerGameSettings.Difficulty = 4;
+	obj->ServerGameSettings.GameType = GameTypes::SettingsGameTypeFreeForAll;
+	obj->ServerGameSettings.FoV = FieldOfViewTypes::cShadowCasting;
+	obj->ServerGameSettings.RevealMap = MapRevealModes::cExplored;
+	obj->ServerGameSettings.DefeatReveal = RevealTypes::cBuildingsOnly;
+	obj->ServerGameSettings.NoFogOfWar = 1;
+	obj->ServerGameSettings.Inside = 1;
+	obj->ServerGameSettings.AiExplores = 0;
+	obj->ServerGameSettings.SimplifiedAutoTargeting = 1;
+	obj->ServerGameSettings.AiChecksDependencies = 1;
+	obj->ServerGameSettings.AllyDepositsAllowed = 1;
+	obj->ServerGameSettings.UserGameSettings = 0x1A2B3;
 	for (int i = 0; i != PlayerMax; ++i) {
-		obj->CompOpt[i] = i + 1;
+		obj->ServerGameSettings.Presets[i].Race = i % 2;
+		obj->ServerGameSettings.Presets[i].PlayerColor = i;
+		obj->ServerGameSettings.Presets[i].Team = i % 4;
+		obj->ServerGameSettings.Presets[i].Type =
+			i % 2 == 0 ? PlayerTypes::PlayerPerson : PlayerTypes::PlayerComputer;
+		obj->CompOpt[i] = static_cast<SlotOption>(i % 3);
 	}
 	for (int i = 0; i != PlayerMax; ++i) {
 		obj->Ready[i] = i + 11;
 	}
-	for (int i = 0; i != PlayerMax; ++i) {
-		obj->Race[i] = i + 21;
-	}
-#endif
 }
 
 void FillCustomValue(CInitMessage_Header *obj)
@@ -170,12 +177,47 @@ TEST_CASE("CNetworkHost")
 	CHECK(CheckSerialization<CNetworkHost>());
 }
 
-#if 0
 TEST_CASE("CServerSetup")
 {
-	CHECK(CheckSerialization<CServerSetup>());
+	CServerSetup obj1;
+	FillCustomValue(&obj1);
+
+	std::vector<unsigned char> buffer(obj1.Size());
+	unsigned char *end = buffer.data() + obj1.Serialize(buffer.data());
+	CHECK(size_t(end - buffer.data()) == obj1.Size());
+
+	CServerSetup obj2;
+	obj2.Deserialize(buffer.data());
+	CHECK(obj1 == obj2);
 }
-#endif
+
+TEST_CASE("Settings bitfield preserves simulation-affecting flags")
+{
+	Settings settings;
+	settings.Init();
+	settings.NoFogOfWar = 1;
+	settings.Inside = 1;
+	settings.AiExplores = 0;
+	settings.SimplifiedAutoTargeting = 1;
+	settings.AiChecksDependencies = 1;
+	settings.AllyDepositsAllowed = 1;
+	settings.UserGameSettings = 0x03A5A5A5;
+
+	Settings restored;
+	restored.Init();
+	restored.setBitfield(settings.getBitfield());
+
+	CHECK(static_cast<unsigned>(restored.NoFogOfWar) == static_cast<unsigned>(settings.NoFogOfWar));
+	CHECK(static_cast<unsigned>(restored.Inside) == static_cast<unsigned>(settings.Inside));
+	CHECK(static_cast<unsigned>(restored.AiExplores) == static_cast<unsigned>(settings.AiExplores));
+	CHECK(static_cast<unsigned>(restored.SimplifiedAutoTargeting)
+	      == static_cast<unsigned>(settings.SimplifiedAutoTargeting));
+	CHECK(static_cast<unsigned>(restored.AiChecksDependencies)
+	      == static_cast<unsigned>(settings.AiChecksDependencies));
+	CHECK(static_cast<unsigned>(restored.AllyDepositsAllowed)
+	      == static_cast<unsigned>(settings.AllyDepositsAllowed));
+	CHECK(static_cast<unsigned>(restored.UserGameSettings) == static_cast<unsigned>(settings.UserGameSettings));
+}
 
 TEST_CASE("CInitMessage_Header")
 {
@@ -216,7 +258,16 @@ TEST_CASE("CInitMessage_Map")
 
 TEST_CASE("CInitMessage_State")
 {
-	CHECK(CheckSerialization_return<CInitMessage_State>());
+	CServerSetup state;
+	FillCustomValue(&state);
+	const CInitMessage_State obj1(MessageInit_FromServer, state);
+	std::vector<unsigned char> buffer = obj1.Serialize();
+
+	CInitMessage_State obj2;
+	obj2.Deserialize(buffer.data());
+	CHECK(obj2.GetHeader().GetType() == MessageInit_FromServer);
+	CHECK(obj2.GetHeader().GetSubType() == ICMState);
+	CHECK(obj2.State == state);
 }
 
 TEST_CASE("CInitMessage_Resync")
