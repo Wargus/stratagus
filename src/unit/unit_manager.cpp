@@ -51,6 +51,10 @@ CUnitManager *UnitManager;          /// Unit manager
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CUnitManager::CUnitManager() = default;
+
+CUnitManager::~CUnitManager() = default;
+
 /**
 **  Initial memory allocation for units.
 */
@@ -59,12 +63,7 @@ void CUnitManager::Init()
 	lastCreated = nullptr;
 	//Assert(units.empty());
 	units.clear();
-	// Release memory of units in release list.
-	while (!releasedUnits.empty()) {
-		CUnit *unit = releasedUnits.front();
-		releasedUnits.pop_front();
-		delete unit;
-	}
+	releasedUnits.clear();
 
 	// Initialize the free unit slots
 	unitSlots.clear();
@@ -87,10 +86,10 @@ CUnit *CUnitManager::AllocUnit()
 		unit->UnitManagerData.unitSlot = -1;
 		return unit;
 	} else {
-		CUnit *unit = new CUnit;
+		unitSlots.push_back(std::make_unique<CUnit>());
+		CUnit *unit = unitSlots.back().get();
 
-		unit->UnitManagerData.slot = unitSlots.size();
-		unitSlots.push_back(unit);
+		unit->UnitManagerData.slot = unitSlots.size() - 1;
 		return unit;
 	}
 }
@@ -183,8 +182,8 @@ void CUnitManager::Load(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	for (unsigned int i = 0; i < unitCount; i++) {
-		CUnit *unit = new CUnit;
-		unitSlots.push_back(unit);
+		unitSlots.push_back(std::make_unique<CUnit>());
+		CUnit *unit = unitSlots.back().get();
 		unit->UnitManagerData.slot = i;
 	}
 	const unsigned int args = lua_rawlen(l, 2);

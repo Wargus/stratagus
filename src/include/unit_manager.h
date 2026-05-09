@@ -35,8 +35,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <vector>
 #include <list>
+#include <memory>
+#include <vector>
 
 
 /*----------------------------------------------------------------------------
@@ -50,7 +51,8 @@ struct lua_State;
 class CUnitManager
 {
 public:
-	CUnitManager() = default;
+	CUnitManager();
+	~CUnitManager();
 	void Init();
 
 	CUnit *AllocUnit();
@@ -72,7 +74,7 @@ public:
 
 private:
 	std::vector<CUnit *> units;
-	std::vector<CUnit *> unitSlots;
+	std::vector<std::unique_ptr<CUnit>> unitSlots;
 	std::list<CUnit *> releasedUnits;
 	CUnit *lastCreated = nullptr;
 };
