@@ -42,6 +42,7 @@
 #include <vector>
 
 #include "upgrade_structs.h" // MaxCost
+#include "unitptr.h"
 #include "vec2i.h"
 
 /*----------------------------------------------------------------------------
@@ -129,8 +130,8 @@ public:
 	{
 		auto it = ranges::find(Units, &unit);
 		if (it != Units.end()) {
-			Units.erase(it);
 			InternalRemoveUnit(&unit);
+			Units.erase(it);
 		}
 	}
 
@@ -150,8 +151,8 @@ public:
 		} else {
 			State = AiForceAttackingState::Waiting;
 		}
-		for (CUnit *unit : Units) {
-			InternalRemoveUnit(unit);
+		for (const CUnitRef &unit : Units) {
+			InternalRemoveUnit(unit.get());
 		}
 		Units.clear();
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
@@ -183,7 +184,7 @@ public:
 	AiForceRole Role = AiForceRole::Default;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
-	std::vector<CUnit *> Units;  /// Units in the force
+	std::vector<CUnitRef> Units; /// Units held by the force
 
 	// If attacking
 	int FormerForce = -1;             /// Original force number
