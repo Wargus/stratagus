@@ -967,16 +967,20 @@ static int CclSetTeleportDestination(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  OrderUnit(player, unit-type, start_loc, dest_loc, order)
+**  OrderUnit(player, unit-type, start_loc, dest_loc, order[, build-type])
 **
 ** Example:
 **
 ** <div class="example"><code>-- Move transport from position x=94,y=0 to x=80,y=9
-**		<strong>OrderUnit</strong>(1,"unit-human-transport",{94,0},{80,9},"move")</code></div>
+**		<strong>OrderUnit</strong>(1,"unit-human-transport",{94,0},{80,9},"move")
+**		<strong>OrderUnit</strong>(1,"unit-peasant",{94,0},{80,9},"build","unit-farm")</code></div>
 */
 static int CclOrderUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 5);
+	const int nargs = lua_gettop(l);
+	if (nargs < 5 || nargs > 6) {
+		LuaError(l, "incorrect argument count");
+	}
 
 	lua_pushvalue(l, 1);
 	const auto unitPlayerValidator = TriggerGetPlayer(l);
@@ -1012,6 +1016,15 @@ static int CclOrderUnit(lua_State *l)
 		dpos2 = dpos1;
 	}
 	const std::string_view order = LuaToString(l, 5);
+	CUnitType *buildType = nullptr;
+	if (order == "build") {
+		if (nargs != 6) {
+			LuaError(l, "build order requires a unit type");
+		}
+		lua_pushvalue(l, 6);
+		buildType = CclGetUnitType(l);
+		lua_pop(l, 1);
+	}
 	std::vector<CUnit *> table = Select(pos1, pos2);
 	for (CUnit *unit : table) {
 		if (unitValidator(*unit) && unitPlayerValidator(*unit)) {
@@ -1024,6 +1037,16 @@ static int CclOrderUnit(lua_State *l)
 			} else if (order == "attack") {
 				CUnit *attack = TargetOnMap(*unit, dpos1, dpos2);
 				CommandAttack(*unit, (dpos1 + dpos2) / 2, attack, EFlushMode::On);
+			} else if (order == "resource") {
+				CUnit *resource = TargetOnMap(*unit, dpos1, dpos2);
+				if (resource != nullptr) {
+					CommandResource(*unit, *resource, EFlushMode::On);
+				} else {
+					CommandResourceLoc(*unit, (dpos1 + dpos2) / 2, EFlushMode::On);
+				}
+			} else if (order == "build") {
+				Assert(buildType != nullptr);
+				CommandBuildBuilding(*unit, (dpos1 + dpos2) / 2, *buildType, EFlushMode::On);
 			} else if (order == "explore") {
 				CommandExplore(*unit, EFlushMode::On);
 			} else if (order == "patrol") {
