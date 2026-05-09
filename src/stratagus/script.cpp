@@ -51,8 +51,9 @@
 #include <signal.h>
 #include <variant>
 
-#ifdef _MSC_VER
- #include <Shlobj.h>
+#ifdef USE_WIN32
+#include <windows.h>
+#include <shlobj.h>
 #endif
 
 /*----------------------------------------------------------------------------
@@ -2542,7 +2543,7 @@ void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 }
 
 #ifdef WIN32
-fs::path GetAVolumePath(__in PWCHAR VolumeName)
+fs::path GetAVolumePath(PWCHAR VolumeName)
 {
 	DWORD CharCount = MAX_PATH + 1;
 	std::vector<WCHAR> Names(CharCount);

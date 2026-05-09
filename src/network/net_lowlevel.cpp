@@ -50,7 +50,7 @@
 #include <windows.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
-#include <Iphlpapi.h>
+#include <iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
 
 using setsockopttype = const char *;
