@@ -67,11 +67,7 @@ void MDNS::AnswerServerQueries() {
         // When receiving, a socket can receive data from all network interfaces
         struct sockaddr_in sock_addr{};
         sock_addr.sin_family = AF_INET;
-#ifdef _WIN32
-        sock_addr.sin_addr = in4addr_any;
-#else
         sock_addr.sin_addr.s_addr = INADDR_ANY;
-#endif
         sock_addr.sin_port = htons(MDNS_PORT);
 #ifdef __APPLE__
         sock_addr.sin_len = sizeof(struct sockaddr_in);
