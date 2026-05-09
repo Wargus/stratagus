@@ -716,6 +716,10 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 
 static void ParseResendCommand(const CNetworkPacket &packet)
 {
+	if (!ThisPlayer) {
+		DebugPrint("Ignoring resend command before local player is initialized\n");
+		return;
+	}
 	// Destination cycle (time to execute).
 	unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
 	if (n > GameCycle + 128) {
@@ -798,6 +802,10 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 
 static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHost &host)
 {
+	if (!ThisPlayer) {
+		DebugPrint("Ignoring in-game network event before local player is initialized\n");
+		return;
+	}
 	CNetworkPacket packet;
 	int commands;
 	packet.Deserialize(buf, len, &commands);
