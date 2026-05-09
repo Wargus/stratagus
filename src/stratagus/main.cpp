@@ -32,9 +32,15 @@
 #include "stratagus.h"
 
 #include <SDL.h>
+#include <cstdio>
+#include <cstdlib>
 
 int main(int argc, char **argv)
 {
+	if (std::getenv("STRATAGUS_UNBUFFERED_STDIO")) {
+		setvbuf(stdout, nullptr, _IONBF, 0);
+		setvbuf(stderr, nullptr, _IONBF, 0);
+	}
 	return stratagusMain(argc, argv);
 }
 
