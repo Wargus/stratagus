@@ -44,3 +44,5 @@ pytorchenv
 .*.kate-swp
 .swp.*
 appbuild/
+games/
+.venv/
