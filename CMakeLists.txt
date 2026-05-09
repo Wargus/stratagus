@@ -542,7 +542,6 @@ set(stratagus_tests_SRCS
 	tests/stratagus/test_depend.cpp
 	tests/stratagus/test_format.cpp
 	tests/stratagus/test_luacallback.cpp
-	tests/stratagus/test_unitptr.cpp
 	tests/stratagus/test_missile_fire.cpp
 	tests/stratagus/test_trigger.cpp
 	tests/stratagus/test_unitptr.cpp
