@@ -26,7 +26,7 @@ STRATAGUS_BIN=/path/to/stratagus-dbg \
 python3 -m pytest pytests/test_wargus_multiplayer_process.py
 ```
 
-War1gus process tests can exercise every host/client pairing from multiple
+Wargus and War1gus process tests can exercise every host/client pairing from multiple
 Stratagus builds. `auto` discovers the native debug build, native release build,
 and the aarch64 build under qemu when those paths exist:
 
@@ -45,7 +45,7 @@ cmake --build build-aarch64 --target stratagus
 
 WARGUS_GUI_TESTS=1 PYTEST_SDL_VIDEODRIVER=dummy \
 STRATAGUS_PARTICIPANTS=auto \
-python3 -m pytest pytests/test_war1gus_multiplayer_process.py
+python3 -m pytest pytests/test_wargus_multiplayer_process.py pytests/test_war1gus_multiplayer_process.py
 ```
 
 An optional Windows build can be produced with MinGW:

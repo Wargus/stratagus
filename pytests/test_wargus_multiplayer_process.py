@@ -41,6 +41,10 @@ def _combined_logs(paths: tuple[Path, ...]) -> str:
     return "\n".join(f"--- {path.name} ---\n{_read(path)}" for path in paths)
 
 
+def _participant_cmd(participant: dict, args: list[str]) -> list[str]:
+    return [*participant["argv"], *args]
+
+
 def _game_settings_block(output: str) -> str:
     marker = "FINAL NETWORK GAME SETTINGS\n"
     assert marker in output
@@ -65,10 +69,11 @@ def _setting_value(settings: str, name: str) -> str:
 def _run_command_line_multiplayer(
     *,
     repo_root: Path,
-    stratagus_bin: str,
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
+    stratagus_bin: str | None = None,
+    stratagus_pair: tuple[dict, dict] | None = None,
     map_name: str = "maps/skirmish/multiplayer/(2)timeless-isle.smp.gz",
     run_after_start_seconds: float = 8,
     fog_of_war: int = 1,
@@ -81,6 +86,12 @@ def _run_command_line_multiplayer(
     host_preferences: dict[str, Any] | None = None,
     client_preferences: dict[str, Any] | None = None,
 ) -> tuple[str, list[str]]:
+    if stratagus_pair is None:
+        assert stratagus_bin is not None
+        host_participant = client_participant = {"argv": [stratagus_bin]}
+    else:
+        host_participant, client_participant = stratagus_pair
+
     port = _free_udp_port()
     host_user = tmp_path / "host-user"
     write_wargus_preferences(host_user, host_preferences)
@@ -95,7 +106,6 @@ def _run_command_line_multiplayer(
     client_outs = [tmp_path / f"client-{i}.stdout" for i, _race in enumerate(client_races)]
     client_errs = [tmp_path / f"client-{i}.stderr" for i, _race in enumerate(client_races)]
     common = [
-        stratagus_bin,
         "-d",
         str(extracted_wargus_data),
         "-W",
@@ -119,31 +129,37 @@ def _run_command_line_multiplayer(
         server_options.append(f"aiplayers={ai_players}")
     if dedicated:
         server_options.append("dedicated")
-    host_cmd = [
-        *common,
-        "-u",
-        str(host_user),
-        "-P",
-        str(port),
-        "-c",
-        "scripts/multiplayer.lua",
-        "-G",
-        ",".join(server_options),
-    ]
+    host_cmd = _participant_cmd(
+        host_participant,
+        [
+            *common,
+            "-u",
+            str(host_user),
+            "-P",
+            str(port),
+            "-c",
+            "scripts/multiplayer.lua",
+            "-G",
+            ",".join(server_options),
+        ],
+    )
     client_cmds = []
     for i, race in enumerate(client_races):
         client_cmds.append(
-            [
-                *common,
-                "-u",
-                str(client_users[i]),
-                "-P",
-                "0",
-                "-c",
-                "scripts/multiplayer.lua",
-                "-G",
-                f"client,race={race},ip=127.0.0.1,port={port},player=pytest-client-{i}",
-            ]
+            _participant_cmd(
+                client_participant,
+                [
+                    *common,
+                    "-u",
+                    str(client_users[i]),
+                    "-P",
+                    "0",
+                    "-c",
+                    "scripts/multiplayer.lua",
+                    "-G",
+                    f"client,race={race},ip=127.0.0.1,port={port},player=pytest-client-{i}",
+                ],
+            )
         )
 
     host = _launch(host_cmd, cwd=repo_root, env=xvfb_env, stdout=host_out, stderr=host_err)
@@ -181,17 +197,18 @@ def _run_command_line_multiplayer(
 
 
 @pytest.mark.gui
+@pytest.mark.cross
 @pytest.mark.slow
 def test_wargus_command_line_multiplayer_host_and_client_start_game(
     repo_root: Path,
-    stratagus_bin: str,
+    stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
 ):
     host_output, _client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
-        stratagus_bin=stratagus_bin,
+        stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
@@ -202,17 +219,18 @@ def test_wargus_command_line_multiplayer_host_and_client_start_game(
 
 
 @pytest.mark.gui
+@pytest.mark.cross
 @pytest.mark.slow
 def test_wargus_multiplayer_uses_synchronized_settings_for_simulation_preferences(
     repo_root: Path,
-    stratagus_bin: str,
+    stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
 ):
     host_output, client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
-        stratagus_bin=stratagus_bin,
+        stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
@@ -231,10 +249,11 @@ def test_wargus_multiplayer_uses_synchronized_settings_for_simulation_preference
 
 
 @pytest.mark.gui
+@pytest.mark.cross
 @pytest.mark.slow
 def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
     repo_root: Path,
-    stratagus_bin: str,
+    stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
@@ -242,7 +261,7 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
     # Covers the resource/fog/network-sync surface from Wargus/stratagus#569.
     host_output, _client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
-        stratagus_bin=stratagus_bin,
+        stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
@@ -259,6 +278,7 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
 
 
 @pytest.mark.gui
+@pytest.mark.cross
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "map_name,ai_players",
@@ -266,17 +286,14 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
         pytest.param(
             "maps/skirmish/(3)three-ways-to-cross.smp.gz",
             1,
-            marks=pytest.mark.xfail(reason="reproduces early multiplayer desync with AI"),
         ),
         pytest.param(
             "maps/skirmish/multiplayer/(4)central-park.smp.gz",
             2,
-            marks=pytest.mark.xfail(reason="reproduces early multiplayer desync with AI"),
         ),
         pytest.param(
             "maps/skirmish/(8)bridge-to-bridge-combat.smp.gz",
             2,
-            marks=pytest.mark.xfail(reason="reproduces early multiplayer desync with AI"),
         ),
         pytest.param(
             "maps/skirmish/(8)garden-of-war.smp.gz",
@@ -287,7 +304,7 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
 )
 def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
     repo_root: Path,
-    stratagus_bin: str,
+    stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
@@ -296,7 +313,7 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
 ):
     host_output, _client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
-        stratagus_bin=stratagus_bin,
+        stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
@@ -309,18 +326,19 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
 
 
 @pytest.mark.gui
+@pytest.mark.cross
 @pytest.mark.slow
 @pytest.mark.xfail(reason="dedicated AI command-line setup currently stalls before final config")
 def test_wargus_dedicated_ai_server_starts_reported_ai_map(
     repo_root: Path,
-    stratagus_bin: str,
+    stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
 ):
     host_output, _client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
-        stratagus_bin=stratagus_bin,
+        stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
