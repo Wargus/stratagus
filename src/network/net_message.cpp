@@ -268,6 +268,9 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 		p += serialize8(p, static_cast<int8_t>(preset.PlayerColor));
 		p += serialize8(p, static_cast<int8_t>(preset.Team));
 		p += serialize8(p, static_cast<int8_t>(preset.Type));
+		char aiScript[NetAIScriptNameSize]{};
+		strncpy_s(aiScript, sizeof(aiScript), preset.AIScript.c_str(), _TRUNCATE);
+		p += serialize(p, aiScript);
 	}
 	for (const auto &compOpt : this->CompOpt) {
 		p += serialize8(p, static_cast<int8_t>(compOpt));
@@ -301,6 +304,9 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.PlayerColor));
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Team));
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Type));
+		char aiScript[NetAIScriptNameSize]{};
+		p += deserialize(p, aiScript);
+		preset.AIScript = aiScript;
 	}
 	for (auto &compOpt : this->CompOpt) {
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&compOpt));

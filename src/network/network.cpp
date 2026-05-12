@@ -241,6 +241,7 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <array>
 #include <cstddef>
 #include <deque>
 #include <list>
@@ -888,14 +889,17 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 */
 void NetworkEvent()
 {
+	static constexpr size_t networkEventBufferSize =
+		CInitMessage_State::Size() > 1024 ? CInitMessage_State::Size() : 1024;
+
 	if (!IsNetworkGame()) {
 		NetworkInSync = true;
 		return;
 	}
 	// Read the packet.
-	unsigned char buf[1024];
+	std::array<unsigned char, networkEventBufferSize> buf;
 	CHost host;
-	int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
+	int len = NetworkFildes.Recv(buf.data(), buf.size(), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
@@ -903,13 +907,13 @@ void NetworkEvent()
 		return;
 	}
 
-	if (OnlineContextHandler->handleUDP(buf, len, host)) {
+	if (OnlineContextHandler->handleUDP(buf.data(), len, host)) {
 		return;
 	}
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, len, host)) {
+		if (NetworkParseSetupEvent(buf.data(), len, host)) {
 			return;
 		}
 	}
@@ -917,7 +921,7 @@ void NetworkEvent()
 	if (msgtype == MessageInit_FromClient || msgtype == MessageInit_FromServer) {
 		return;
 	}
-	NetworkParseInGameEvent(buf, len, host);
+	NetworkParseInGameEvent(buf.data(), len, host);
 }
 
 /**

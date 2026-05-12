@@ -1929,17 +1929,17 @@ breakout:
 		}
 
 		// Wait for acknowledge
-		unsigned char buf[1024];
+		std::array<unsigned char, CInitMessage_State::Size()> buf;
 		while (hostsToAck && NetworkFildes.HasDataToRead(1000)) {
 			CHost host;
-			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
+			const int len = NetworkFildes.Recv(buf.data(), buf.size(), &host);
 			if (len < 0) {
 				const std::string hostStr = host.toString();
 				DebugPrint("*Receive ack failed: (%d) from %s\n", len, hostStr.c_str());
 				continue;
 			}
 			CInitMessage_Header header;
-			header.Deserialize(buf);
+			header.Deserialize(buf.data());
 			const unsigned char type = header.GetType();
 			const unsigned char subtype = header.GetSubType();
 
