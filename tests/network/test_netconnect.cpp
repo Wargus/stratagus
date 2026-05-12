@@ -32,6 +32,24 @@
 #include "stratagus.h"
 #include "netconnect.h"
 
+namespace {
+
+void ClearNetworkHosts()
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i].Clear();
+	}
+}
+
+void SetHost(int hostIndex, int playerIndex, const char *name)
+{
+	Hosts[hostIndex].Host = 0x7F000001 + hostIndex;
+	Hosts[hostIndex].Port = 10000 + hostIndex;
+	Hosts[hostIndex].PlyNr = playerIndex;
+	Hosts[hostIndex].SetName(name);
+}
+
+}
 
 void FillCustomValue(CNetworkHost *obj)
 {
@@ -217,6 +235,121 @@ TEST_CASE("Settings bitfield preserves simulation-affecting flags")
 	CHECK(static_cast<unsigned>(restored.AllyDepositsAllowed)
 	      == static_cast<unsigned>(settings.AllyDepositsAllowed));
 	CHECK(static_cast<unsigned>(restored.UserGameSettings) == static_cast<unsigned>(settings.UserGameSettings));
+}
+
+TEST_CASE("Network setup sync tracks ready by host and race by assigned player slot")
+{
+	ClearNetworkHosts();
+	SetHost(3, 7, "client");
+
+	CServerSetup server;
+	CServerSetup local = server;
+	server.Ready[3] = 1;
+	local.Ready[3] = 1;
+	server.ServerGameSettings.Presets[7].Race = 1;
+	local.ServerGameSettings.Presets[7].Race = 1;
+
+	CHECK(NetworkGetPlayerIndexForHost(3) == 7);
+	CHECK(NetworkIsLocalSetupInSync(server, local, 3));
+
+	local.ServerGameSettings.Presets[3].Race = 2;
+	CHECK(NetworkIsLocalSetupInSync(server, local, 3));
+
+	local.ServerGameSettings.Presets[7].Race = 3;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 3));
+
+	local.ServerGameSettings.Presets[7].Race = 1;
+	local.Ready[3] = 0;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 3));
+}
+
+TEST_CASE("Network setup sync handles invalid host slots without reading player presets")
+{
+	ClearNetworkHosts();
+
+	CServerSetup server;
+	CServerSetup local = server;
+
+	local.ServerGameSettings.Presets[4].Race = 2;
+	CHECK(NetworkGetPlayerIndexForHost(4) == -1);
+	CHECK(NetworkIsLocalSetupInSync(server, local, 4));
+
+	local.Ready[4] = 1;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 4));
+}
+
+TEST_CASE("Client setup state changes apply host-indexed ready and player-indexed race")
+{
+	ClearNetworkHosts();
+	SetHost(5, 2, "client");
+
+	CServerSetup server;
+	CServerSetup client = server;
+	server.Ready[5] = 0;
+	server.ServerGameSettings.Presets[2].Race = 1;
+	server.ServerGameSettings.Presets[5].Race = 4;
+	client.Ready[5] = 1;
+	client.ServerGameSettings.Presets[2].Race = 3;
+	client.ServerGameSettings.Presets[5].Race = 8;
+
+	NetworkApplyClientSetupStateChange(server, client, 5);
+
+	CHECK(server.Ready[5] == 1);
+	CHECK(server.ServerGameSettings.Presets[2].Race == 3);
+	CHECK(server.ServerGameSettings.Presets[5].Race == 4);
+}
+
+TEST_CASE("Client setup state changes ignore race updates for invalid host slots")
+{
+	ClearNetworkHosts();
+
+	CServerSetup server;
+	CServerSetup client = server;
+	server.ServerGameSettings.Presets[4].Race = 1;
+	client.Ready[4] = 1;
+	client.ServerGameSettings.Presets[4].Race = 3;
+
+	NetworkApplyClientSetupStateChange(server, client, 4);
+
+	CHECK(server.Ready[4] == 1);
+	CHECK(server.ServerGameSettings.Presets[4].Race == 1);
+}
+
+TEST_CASE("Network host compaction preserves sparse host to player assignments")
+{
+	ClearNetworkHosts();
+	SetHost(0, 0, "server");
+	SetHost(3, 7, "client-a");
+	SetHost(9, 2, "client-b");
+	SetHost(PlayerMax - 1, 11, "client-c");
+
+	NetworkCompactHosts();
+
+	CHECK(Hosts[0].IsValid());
+	CHECK(Hosts[0].PlyNr == 0);
+	CHECK(Hosts[1].IsValid());
+	CHECK(Hosts[1].PlyNr == 7);
+	CHECK(Hosts[2].IsValid());
+	CHECK(Hosts[2].PlyNr == 2);
+	CHECK(Hosts[3].IsValid());
+	CHECK(Hosts[3].PlyNr == 11);
+	for (int i = 4; i < PlayerMax; ++i) {
+		CHECK_FALSE(Hosts[i].IsValid());
+	}
+}
+
+TEST_CASE("Network remote host indices include only compact valid clients")
+{
+	ClearNetworkHosts();
+	SetHost(0, 0, "server");
+	SetHost(1, 4, "client-a");
+	SetHost(2, 8, "client-b");
+
+	const std::vector<int> remoteHostIndices = NetworkRemoteHostIndices();
+
+	REQUIRE(remoteHostIndices.size() == 2);
+	CHECK(remoteHostIndices[0] == 1);
+	CHECK(remoteHostIndices[1] == 2);
 }
 
 TEST_CASE("CInitMessage_Header")
