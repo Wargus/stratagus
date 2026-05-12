@@ -34,6 +34,8 @@
 #include "net_message.h"
 #include "network/netsockets.h"
 
+#include <vector>
+
 class CHost;
 
 /*----------------------------------------------------------------------------
@@ -111,6 +113,15 @@ extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of pl
 ----------------------------------------------------------------------------*/
 
 extern int FindHostIndexBy(const CHost &host);
+extern int NetworkGetPlayerIndexForHost(int hostIndex);
+extern bool NetworkIsLocalSetupInSync(const CServerSetup &state1,
+                                      const CServerSetup &state2,
+                                      int hostIndex);
+extern void NetworkApplyClientSetupStateChange(CServerSetup &serverSetup,
+                                               const CServerSetup &clientSetup,
+                                               int hostIndex);
+extern void NetworkCompactHosts();
+extern std::vector<int> NetworkRemoteHostIndices();
 extern void NetworkServerStartGame();       /// Server user has finally hit the start game button
 extern void NetworkGamePrepareGameSettings();
 

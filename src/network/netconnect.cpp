@@ -432,7 +432,7 @@ bool CClient::Update_connected(unsigned long tick)
 	}
 }
 
-static int GetPlayerIndexForHost(int hostIndex)
+int NetworkGetPlayerIndexForHost(int hostIndex)
 {
 	if (hostIndex < 0 || hostIndex >= PlayerMax || !Hosts[hostIndex].IsValid()) {
 		return -1;
@@ -443,12 +443,12 @@ static int GetPlayerIndexForHost(int hostIndex)
 	return Hosts[hostIndex].PlyNr;
 }
 
-static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int hostIndex)
+bool NetworkIsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int hostIndex)
 {
 	if (hostIndex < 0 || hostIndex >= PlayerMax) {
 		return true;
 	}
-	const int playerIndex = GetPlayerIndexForHost(hostIndex);
+	const int playerIndex = NetworkGetPlayerIndexForHost(hostIndex);
 	if (playerIndex == -1) {
 		return state1.Ready[hostIndex] == state2.Ready[hostIndex];
 	}
@@ -457,11 +457,26 @@ static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &s
 	        && state1.Ready[hostIndex] == state2.Ready[hostIndex]);
 }
 
+void NetworkApplyClientSetupStateChange(CServerSetup &serverSetup,
+                                        const CServerSetup &clientSetup,
+                                        int hostIndex)
+{
+	if (hostIndex < 0 || hostIndex >= PlayerMax) {
+		return;
+	}
+	const int playerIndex = NetworkGetPlayerIndexForHost(hostIndex);
+	serverSetup.Ready[hostIndex] = clientSetup.Ready[hostIndex];
+	if (playerIndex != -1) {
+		serverSetup.ServerGameSettings.Presets[playerIndex].Race =
+			clientSetup.ServerGameSettings.Presets[playerIndex].Race;
+	}
+}
+
 bool CClient::Update_synced(unsigned long tick)
 {
 	Assert(networkState.State == ccs_synced);
 
-	if (IsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
+	if (NetworkIsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
 		networkState.State = ccs_changed;
 		networkState.MsgCnt = 0;
 		return Update(tick);
@@ -1043,7 +1058,7 @@ void CClient::Parse_AreYouThere()
 void CServer::KickClient(int c)
 {
 	DebugPrint("kicking client %d, player number %d\n", c, Hosts[c].PlyNr);
-	const int playerIndex = GetPlayerIndexForHost(c);
+	const int playerIndex = NetworkGetPlayerIndexForHost(c);
 	Hosts[c].Clear();
 	serverSetup->Ready[c] = 0;
 	if (playerIndex != -1) {
@@ -1457,12 +1472,7 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			// networkStates[h].State = ccs_async;
 			networkStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
-			const int playerIndex = GetPlayerIndexForHost(h);
-			serverSetup->Ready[h] = msg.State.Ready[h];
-			if (playerIndex != -1) {
-				serverSetup->ServerGameSettings.Presets[playerIndex].Race =
-					msg.State.ServerGameSettings.Presets[playerIndex].Race;
-			}
+			NetworkApplyClientSetupStateChange(*serverSetup, msg.State, h);
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -1702,6 +1712,37 @@ int FindHostIndexBy(const CHost &host)
 	return -1;
 }
 
+void NetworkCompactHosts()
+{
+	for (int i = 0; i < PlayerMax; i++) {
+		if (!Hosts[i].IsValid()) {
+			bool anyMoreHosts = false;
+			for (int j = i + 1; j < PlayerMax; j++) {
+				if (Hosts[j].IsValid()) {
+					Hosts[i] = Hosts[j];
+					Hosts[j].Clear();
+					anyMoreHosts = true;
+					break;
+				}
+			}
+			if (!anyMoreHosts) {
+				break;
+			}
+		}
+	}
+}
+
+std::vector<int> NetworkRemoteHostIndices()
+{
+	std::vector<int> remoteHostIndices;
+	for (int i = 1; i < PlayerMax; ++i) {
+		if (Hosts[i].IsValid()) {
+			remoteHostIndices.push_back(i);
+		}
+	}
+	return remoteHostIndices;
+}
+
 /**
 ** Server Menu Loop: Send out server request messages
 */
@@ -1852,23 +1893,7 @@ void NetworkServerStartGame()
 	// Slot 0 is the server!
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 
-	// compact hosts array
-	for (int i = 0; i < PlayerMax; i++) {
-		if (!Hosts[i].IsValid()) {
-			bool any_more_hosts = false;
-			for (int j = i + 1; j < PlayerMax; j++) {
-				if (Hosts[j].IsValid()) {
-					Hosts[i] = Hosts[j];
-					Hosts[j].Clear();
-					any_more_hosts = true;
-					break;
-				}
-			}
-			if (!any_more_hosts) {
-				break;
-			}
-		}
-	}
+	NetworkCompactHosts();
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
@@ -1882,12 +1907,7 @@ void NetworkServerStartGame()
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
-	std::vector<int> remoteHostIndices;
-	for (int i = 1; i < PlayerMax; ++i) {
-		if (Hosts[i].IsValid()) {
-			remoteHostIndices.push_back(i);
-		}
-	}
+	const std::vector<int> remoteHostIndices = NetworkRemoteHostIndices();
 	int hostsToAck = remoteHostIndices.size();
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n", hostsToAck);
 	// Send all clients host:ports to all clients.
