@@ -85,6 +85,7 @@ void FillCustomValue(CServerSetup *obj)
 		obj->ServerGameSettings.Presets[i].Team = i % 4;
 		obj->ServerGameSettings.Presets[i].Type =
 			i % 2 == 0 ? PlayerTypes::PlayerPerson : PlayerTypes::PlayerComputer;
+		obj->ServerGameSettings.Presets[i].AIScript = i % 2 == 0 ? "ai-passive" : "ai-active";
 		obj->CompOpt[i] = static_cast<SlotOption>(i % 3);
 	}
 	for (int i = 0; i != PlayerMax; ++i) {
@@ -391,6 +392,8 @@ TEST_CASE("CInitMessage_Map")
 
 TEST_CASE("CInitMessage_State")
 {
+	CHECK(CInitMessage_State::Size() > 1024);
+
 	CServerSetup state;
 	FillCustomValue(&state);
 	const CInitMessage_State obj1(MessageInit_FromServer, state);
