@@ -26,6 +26,19 @@ STRATAGUS_BIN=/path/to/stratagus-dbg \
 python3 -m pytest pytests/test_wargus_multiplayer_process.py
 ```
 
+The free Timeless Tales data tree can also be exercised without proprietary
+media. The process suite covers menu startup, single-player startup, a For the
+Motherland map, editor startup, localhost multiplayer sync-stress, synchronized
+multiplayer settings, one network-human-plus-AI map, and map PNG preview integrity.
+By default the fixture uses `games/timeless-tales`; set `TIMELESS_TALES_DATA_DIR`
+to point at another checkout or installed data tree:
+
+```sh
+WARGUS_GUI_TESTS=1 \
+STRATAGUS_BIN=/path/to/stratagus-dbg \
+python3 -m pytest pytests/test_timeless_tales_process.py
+```
+
 Wargus and War1gus process tests can exercise every host/client pairing from multiple
 Stratagus builds. `auto` discovers the native debug build, native release build,
 and the aarch64 build under qemu when those paths exist:
@@ -45,7 +58,10 @@ cmake --build build-aarch64 --target stratagus
 
 WARGUS_GUI_TESTS=1 PYTEST_SDL_VIDEODRIVER=dummy \
 STRATAGUS_PARTICIPANTS=auto \
-python3 -m pytest pytests/test_wargus_multiplayer_process.py pytests/test_war1gus_multiplayer_process.py
+python3 -m pytest \
+  pytests/test_wargus_multiplayer_process.py \
+  pytests/test_war1gus_multiplayer_process.py \
+  pytests/test_timeless_tales_process.py
 ```
 
 An optional Windows build can be produced with MinGW:
@@ -74,7 +90,9 @@ unpack it with `7z`, build `wartool`, and extract data into
 same source-side scripts, maps, shaders, campaigns, and contrib assets that the
 Wargus launcher/package installs. War1gus helpers do the same with
 `games/WAR1.ISO` and `war1tool` for tests that request the
-`extracted_war1gus_data` fixture.
+`extracted_war1gus_data` fixture. Timeless Tales is a free data tree and is not
+extracted from an ISO; the `timeless_tales_data` fixture only verifies the data
+directory contains the expected assets and scripts.
 
 System setup on Debian/Ubuntu:
 
