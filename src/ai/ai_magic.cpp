@@ -40,6 +40,8 @@
 #include "actions.h"
 #include "ai_local.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -61,6 +63,16 @@ void AiCheckMagic()
 				}
 			}
 			const size_t spellCount = std::min(SpellTypeTable.size(), unit->Type->CanCastSpell.size());
+			if (spellCount != SpellTypeTable.size()) {
+				static std::set<std::string> warnedTypes;
+				if (warnedTypes.insert(unit->Type->Ident).second) {
+					ErrorPrint("Warning: unit type '%s' has CanCastSpell size %zu but %zu spells are defined; "
+					           "AI magic will ignore missing spell slots\n",
+					           unit->Type->Ident.c_str(),
+					           unit->Type->CanCastSpell.size(),
+					           SpellTypeTable.size());
+				}
+			}
 			for (size_t j = 0; j < spellCount; ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j)
