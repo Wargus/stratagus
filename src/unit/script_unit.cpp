@@ -54,6 +54,8 @@
 #include "unittype.h"
 #include "upgrade.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -64,6 +66,15 @@
 
 /// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);
+
+static void WarnLegacySaveField(const char *field)
+{
+	static std::set<std::string> warned;
+	if (warned.insert(field).second) {
+		ErrorPrint("Warning: legacy savegame field '%s' found; loading with compatibility handling\n",
+		           field);
+	}
+}
 
 /**
 ** <b>Description</b>
@@ -157,6 +168,7 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 static CUnit *CclGetUnit(lua_State *l)
 {
 	if (lua_type(l, -1) == LUA_TSTRING) {
+		WarnLegacySaveField("unit-ref-string");
 		return CclGetUnitFromRef(l);
 	}
 
@@ -256,6 +268,7 @@ void PathFinderOutput::Load(lua_State *l)
 			if (lua_type(l, -1) == LUA_TNUMBER) {
 				this->Fast = LuaToNumber(l, -1);
 			} else {
+				WarnLegacySaveField("pathfinder-output.fast");
 				this->Fast = 1;
 				--i;
 			}
@@ -541,10 +554,11 @@ static int CclUnit(lua_State *l)
 			unit->Boarded = 1;
 			--j;
 		} else if (value == "next-worker") {
-			// Legacy savegame data
+			WarnLegacySaveField("next-worker");
 		} else if (value == "resource-workers") {
 			lua_rawgeti(l, 2, j + 1);
 			if (lua_isstring(l, -1)) {
+				WarnLegacySaveField("resource-workers-string");
 				unit->Resource.AssignedWorkers.push_back(CclGetUnitFromRef(l));
 			} else if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -559,7 +573,7 @@ static int CclUnit(lua_State *l)
 			}
 			lua_pop(l, 1);
 		} else if (value == "resource-assigned") {
-			// Legacy savegame data
+			WarnLegacySaveField("resource-assigned");
 		} else if (value == "resource-active") {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);
@@ -630,12 +644,15 @@ static int CclUnit(lua_State *l)
 				unit->SpellCoolDownTimers.resize(SpellTypeTable.size());
 			}
 			const size_t cooldowns = std::min<size_t>(lua_rawlen(l, -1), SpellTypeTable.size());
+			if (cooldowns != SpellTypeTable.size()) {
+				WarnLegacySaveField("spell-cooldown-count");
+			}
 			for (size_t k = 0; k < cooldowns; ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);
 		} else if (value == "ShadowFly") {
-                    // Legacy savegame data
+			WarnLegacySaveField("ShadowFly");
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index
