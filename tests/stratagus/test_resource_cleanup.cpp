@@ -11,13 +11,24 @@
 
 #include <doctest.h>
 
-#define private public
 #include "action/action_resource.h"
-#undef private
 
 #include "actions.h"
 #include "stratagus.h"
 #include "unit.h"
+
+struct ResourceOrderTestAccess
+{
+	static void DropResource(COrder_Resource &order, CUnit &unit)
+	{
+		order.DropResource(unit);
+	}
+
+	static CUnit *Mine(COrder_Resource &order)
+	{
+		return order.Resource.Mine;
+	}
+};
 
 namespace {
 
@@ -83,12 +94,12 @@ TEST_CASE("Dropping carried resources clears mine assignment")
 	worker.CurrentResource = GoldCost;
 	worker.ResourcesHeld = 100;
 
-	order.DropResource(worker);
+	ResourceOrderTestAccess::DropResource(order, worker);
 
 	CHECK(worker.CurrentResource == 0);
 	CHECK(worker.ResourcesHeld == 0);
 	CHECK(mine.Resource.AssignedWorkers.empty());
-	CHECK(order.Resource.Mine == nullptr);
+	CHECK(ResourceOrderTestAccess::Mine(order) == nullptr);
 	CHECK(worker.Refs == 2);
 	CHECK(mine.Refs == 2);
 }
