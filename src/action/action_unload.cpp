@@ -97,6 +97,12 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, std::string_view val
 		++j;
 		this->Retries = LuaToNumber(l, -1, j + 1);
 	} else if (value == "range") {
+		static bool warnedLegacyRange = false;
+		if (!warnedLegacyRange) {
+			ErrorPrint("Warning: legacy savegame field 'range' found in unload order; "
+			           "loading with compatibility handling\n");
+			warnedLegacyRange = true;
+		}
 		++j;
 	} else if (value == "tile") {
 		++j;
