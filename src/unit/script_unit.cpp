@@ -634,6 +634,8 @@ static int CclUnit(lua_State *l)
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);
+		} else if (value == "ShadowFly") {
+                    // Legacy savegame data
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index

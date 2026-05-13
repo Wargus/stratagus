@@ -543,6 +543,16 @@ static int CclReplayLog(lua_State *l)
 			replay->Network[0] = LuaToNumber(l, -1, 1);
 			replay->Network[1] = LuaToNumber(l, -1, 2);
 			replay->Network[2] = LuaToNumber(l, -1, 3);
+		} else if (value == "Type" || value == "Race") {
+			// Legacy replay metadata, superseded by per-player setup fields.
+		} else if (value == "MapRichness") {
+			// Legacy Wargus metadata, no longer represented in Settings.
+		} else if (value == "Resource") {
+			replay->ReplaySettings.Resources = LuaToNumber(l, -1);
+		} else if (value == "NoFow") {
+			replay->ReplaySettings.NoFogOfWar = LuaToBoolean(l, -1);
+		} else if (value == "Inside") {
+			replay->ReplaySettings.Inside = LuaToBoolean(l, -1);
 		} else {
 			if (!replay->ReplaySettings.SetField({value.data(), value.size()}, LuaToNumber(l, -1))) {
 				LuaError(l, "Unsupported key: %s", value.data());

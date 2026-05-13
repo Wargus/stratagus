@@ -1466,6 +1466,8 @@ static int CclDefineUnitStats(lua_State *l)
 				stats->ImproveIncomes[resId] = LuaToNumber(l, -1, k + 1);
 				lua_pop(l, 1);
 			}
+		} else if (value == "ShadowFly") {
+                    // Legacy savegame data
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
