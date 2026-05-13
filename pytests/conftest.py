@@ -392,6 +392,7 @@ def timeless_tales_data(repo_root: Path) -> Path:
     data_dir = Path(os.environ.get("TIMELESS_TALES_DATA_DIR", repo_root / "games" / "timeless-tales"))
     if not data_dir.exists():
         pytest.skip(f"Timeless Tales data directory not found: {data_dir}")
+    data_dir = data_dir.resolve()
     if not _has_asset_markers(data_dir) or not (data_dir / "scripts" / "stratagus.lua").exists():
         pytest.skip(f"Timeless Tales data directory is incomplete: {data_dir}")
     return data_dir

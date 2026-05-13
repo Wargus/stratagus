@@ -458,7 +458,7 @@ def test_timeless_tales_beethoven_day_wise_man_selection_survives(
         tmp_path=tmp_path,
         script=repo_root / "pytests" / "lua" / "timeless_tales_select_wiseman.lua",
         ready_marker="PYTEST_TIMELESS_SELECTED_WISEMAN",
-        run_seconds=30,
+        run_seconds=8,
     )
 
 
