@@ -848,6 +848,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 	           pos.x,
 	           pos.y,
 	           dest ? UnitNumber(*dest) : 0);
+	Assert(spell.Slot < unit.Type->CanCastSpell.size());
 	Assert(unit.Type->CanCastSpell[spell.Slot]);
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -875,6 +876,9 @@ void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
+	}
+	if (spellid < 0 || static_cast<size_t>(spellid) >= unit.AutoCastSpell.size()) {
+		return;
 	}
 	unit.AutoCastSpell[spellid] = on;
 }

@@ -90,7 +90,8 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		return false;
 	}
 	// check countdown timer
-	if (caster.SpellCoolDownTimers[spell.Slot]) { // Check caster mana.
+	if (spell.Slot < caster.SpellCoolDownTimers.size()
+	    && caster.SpellCoolDownTimers[spell.Slot]) { // Check caster mana.
 		return false;
 	}
 	// Check caster's resources
@@ -444,7 +445,8 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 	//  Check for mana and cooldown time, trivial optimization.
 	if (!SpellIsAvailable(*caster.Player, spell.Slot)
 		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
-		|| caster.SpellCoolDownTimers[spell.Slot]) {
+		|| (spell.Slot < caster.SpellCoolDownTimers.size()
+		    && caster.SpellCoolDownTimers[spell.Slot])) {
 		return false;
 	}
 	auto target = SelectTargetUnitsOfAutoCast(caster, spell);
@@ -523,7 +525,9 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 		}
 		caster.Player->SubCosts(spell.Costs);
-		caster.SpellCoolDownTimers[spell.Slot] = spell.CoolDown;
+		if (spell.Slot < caster.SpellCoolDownTimers.size()) {
+			caster.SpellCoolDownTimers[spell.Slot] = spell.CoolDown;
+		}
 		//
 		// Spells like blizzard are casted again.
 		// This is sort of confusing, we do the test again, to
