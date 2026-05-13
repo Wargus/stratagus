@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import os
 import shutil
 import subprocess
@@ -19,6 +20,7 @@ class SavegameCase:
     issue: str
     symptom: str
     run_seconds: float = 8.0
+    lua_epilogue: str = ""
 
 
 SAVEGAME_CASES = [
@@ -93,6 +95,11 @@ SAVEGAME_CASES = [
         "stratagus-720-11a.sav.gz",
         "Wargus/stratagus#720",
         "Khadgar spell availability after save/load",
+        lua_epilogue="""
+if GetPlayerData(0, "Allow", "upgrade-blizzard") ~= "R" then
+  error("Khadgar save did not restore researched Blizzard")
+end
+""",
     ),
 ]
 
@@ -127,7 +134,13 @@ def _copy_fixture_to_user_save(case: SavegameCase, repo_root: Path, user_dir: Pa
     save_root = user_dir / ("wc1" if case.game == "war1gus" else "wc2") / "save"
     save_root.mkdir(parents=True, exist_ok=True)
     target = save_root / case.filename
-    shutil.copy2(fixture, target)
+    if case.lua_epilogue:
+        with gzip.open(fixture, "rb") as src, gzip.open(target, "wb") as dst:
+            shutil.copyfileobj(src, dst)
+            dst.write(b"\n")
+            dst.write(case.lua_epilogue.encode())
+    else:
+        shutil.copy2(fixture, target)
     return f"~save/{case.filename}"
 
 
