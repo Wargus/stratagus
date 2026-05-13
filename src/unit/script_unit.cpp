@@ -541,22 +541,25 @@ static int CclUnit(lua_State *l)
 			unit->Boarded = 1;
 			--j;
 		} else if (value == "next-worker") {
-			LuaError(l, "Unsupported old savegame");
+			// Legacy savegame data
 		} else if (value == "resource-workers") {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1)) {
+			if (lua_isstring(l, -1)) {
+				unit->Resource.AssignedWorkers.push_back(CclGetUnitFromRef(l));
+			} else if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				lua_rawgeti(l, -1, k + 1);
-				CUnit *u = CclGetUnitFromRef(l);
-				lua_pop(l, 1);
-				unit->Resource.AssignedWorkers.push_back(u);
+			} else {
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					lua_rawgeti(l, -1, k + 1);
+					CUnit *u = CclGetUnitFromRef(l);
+					lua_pop(l, 1);
+					unit->Resource.AssignedWorkers.push_back(u);
+				}
 			}
 			lua_pop(l, 1);
 		} else if (value == "resource-assigned") {
-			LuaError(l, "Unsupported old savegame");
+			// Legacy savegame data
 		} else if (value == "resource-active") {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);
