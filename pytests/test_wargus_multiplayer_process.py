@@ -298,7 +298,6 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
         pytest.param(
             "maps/skirmish/(8)garden-of-war.smp.gz",
             2,
-            marks=pytest.mark.xfail(reason="reproduces early multiplayer desync with AI"),
         ),
     ],
 )
