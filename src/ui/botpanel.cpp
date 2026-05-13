@@ -292,7 +292,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 						WarnInvalidButtonSpell(*unit, button.Value, "autocast status", unit->AutoCastSpell.size());
 						return false;
 					}
-					return unit->AutoCastSpell[button.Value];
+					return static_cast<bool>(unit->AutoCastSpell[button.Value]);
 				})) {
 				res |= IconAutoCast;
 			}
