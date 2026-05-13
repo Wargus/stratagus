@@ -1467,7 +1467,12 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else if (value == "ShadowFly") {
-                    // Legacy savegame data
+			static bool warnedLegacyShadowFly = false;
+			if (!warnedLegacyShadowFly) {
+				ErrorPrint("Warning: legacy savegame field 'ShadowFly' found in unit stats; "
+				           "loading with compatibility handling\n");
+				warnedLegacyShadowFly = true;
+			}
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index

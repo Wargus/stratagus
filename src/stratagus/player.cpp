@@ -1275,6 +1275,9 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 void SetPlayersPalette()
 {
 	if (PlayerColorsRGB.size() < PlayerMax) {
+		ErrorPrint("Warning: legacy savegame player palette has only %zu colors; "
+		           "filling missing colors with compatibility fallback\n",
+		           PlayerColorsRGB.size());
 		const std::vector<CColor> fallback(PlayerColorIndexCount);
 		const size_t definedColors = PlayerColorsRGB.size();
 		for (size_t i = definedColors; i < PlayerMax; ++i) {

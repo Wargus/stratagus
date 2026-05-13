@@ -127,6 +127,13 @@ static bool InitReplay;             /// Initialize replay
 static std::unique_ptr<FullReplay> CurrentReplay;
 static std::optional<std::size_t> ReplayIndex;
 
+static void WarnLegacyReplayField(std::string_view field)
+{
+	ErrorPrint("Warning: legacy replay/savegame field '%.*s' found; loading with compatibility handling\n",
+	           static_cast<int>(field.size()),
+	           field.data());
+}
+
 //----------------------------------------------------------------------------
 // Log commands
 //----------------------------------------------------------------------------
@@ -544,14 +551,19 @@ static int CclReplayLog(lua_State *l)
 			replay->Network[1] = LuaToNumber(l, -1, 2);
 			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else if (value == "Type" || value == "Race") {
+			WarnLegacyReplayField(value);
 			// Legacy replay metadata, superseded by per-player setup fields.
 		} else if (value == "MapRichness") {
+			WarnLegacyReplayField(value);
 			// Legacy Wargus metadata, no longer represented in Settings.
 		} else if (value == "Resource") {
+			WarnLegacyReplayField(value);
 			replay->ReplaySettings.Resources = LuaToNumber(l, -1);
 		} else if (value == "NoFow") {
+			WarnLegacyReplayField(value);
 			replay->ReplaySettings.NoFogOfWar = LuaToBoolean(l, -1);
 		} else if (value == "Inside") {
+			WarnLegacyReplayField(value);
 			replay->ReplaySettings.Inside = LuaToBoolean(l, -1);
 		} else {
 			if (!replay->ReplaySettings.SetField({value.data(), value.size()}, LuaToNumber(l, -1))) {
