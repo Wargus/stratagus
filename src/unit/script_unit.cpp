@@ -156,6 +156,10 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
+	if (lua_type(l, -1) == LUA_TSTRING) {
+		return CclGetUnitFromRef(l);
+	}
+
 	int num = LuaToNumber(l, -1);
 	if (num == -1) {
 		if (!Selected.empty()) {
@@ -248,7 +252,14 @@ void PathFinderOutput::Load(lua_State *l)
 		if (tag == "cycles") {
 			this->Cycles = LuaToNumber(l, -1, i);
 		} else if (tag == "fast") {
-			this->Fast = LuaToNumber(l, -1, i);
+			lua_rawgeti(l, -1, i);
+			if (lua_type(l, -1) == LUA_TNUMBER) {
+				this->Fast = LuaToNumber(l, -1);
+			} else {
+				this->Fast = 1;
+				--i;
+			}
+			lua_pop(l, 1);
 		} else if (tag == "overflow-length") {
 			this->OverflowLength = LuaToNumber(l, -1, i);
 		} else if (tag == "path") {
@@ -609,13 +620,14 @@ static int CclUnit(lua_State *l)
 			unit->AutoCastSpell[SpellTypeByIdent(s).Slot] = true;
 		} else if (value == "spell-cooldown") {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {
+			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			if (unit->SpellCoolDownTimers.empty()) {
 				unit->SpellCoolDownTimers.resize(SpellTypeTable.size());
 			}
-			for (size_t k = 0; k < SpellTypeTable.size(); ++k) {
+			const size_t cooldowns = std::min<size_t>(lua_rawlen(l, -1), SpellTypeTable.size());
+			for (size_t k = 0; k < cooldowns; ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);

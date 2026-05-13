@@ -1274,6 +1274,15 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 */
 void SetPlayersPalette()
 {
+	if (PlayerColorsRGB.size() < PlayerMax) {
+		const std::vector<CColor> fallback(PlayerColorIndexCount);
+		const size_t definedColors = PlayerColorsRGB.size();
+		for (size_t i = definedColors; i < PlayerMax; ++i) {
+			PlayerColorsRGB.push_back(definedColors ? PlayerColorsRGB[i % definedColors] : fallback);
+			PlayerColorsSDL.emplace_back(PlayerColorsRGB.back().begin(), PlayerColorsRGB.back().end());
+		}
+	}
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].SetUnitColors(PlayerColorsRGB[i]);
 	}
