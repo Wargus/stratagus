@@ -40,6 +40,11 @@ def _existing_argv(argv: list[str]) -> bool:
     return Path(argv[-1]).exists() and (len(argv) == 1 or executable is not None)
 
 
+def _absolute_existing_path(path: str) -> str:
+    candidate = Path(path)
+    return str(candidate.resolve()) if candidate.exists() else path
+
+
 def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]:
     configured = os.environ.get("STRATAGUS_PARTICIPANTS")
     if configured and configured != "auto":
@@ -82,7 +87,7 @@ def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]
     if not Path(fallback).exists():
         fallback = shutil.which("stratagus") or fallback
     if Path(fallback).exists():
-        return [{"name": "default", "argv": [fallback]}]
+        return [{"name": "default", "argv": [_absolute_existing_path(fallback)]}]
     pytest.skip("Stratagus binary not found; set STRATAGUS_BIN or STRATAGUS_PARTICIPANTS")
 
 
@@ -118,7 +123,7 @@ def lua51(repo_root: Path) -> str:
     ]
     for candidate in candidates:
         if candidate and Path(candidate).exists():
-            return candidate
+            return _absolute_existing_path(candidate)
     pytest.skip("Lua 5.1 interpreter not found; set LUA51 or build vendored Lua")
 
 
@@ -380,6 +385,16 @@ def extracted_war1gus_data(repo_root: Path, stratagus_bin: str) -> Path:
         iso_names=("WAR1.ISO", "WARCRAFT.ISO"),
         stratagus_bin=stratagus_bin,
     )
+
+
+@pytest.fixture(scope="session")
+def timeless_tales_data(repo_root: Path) -> Path:
+    data_dir = Path(os.environ.get("TIMELESS_TALES_DATA_DIR", repo_root / "games" / "timeless-tales"))
+    if not data_dir.exists():
+        pytest.skip(f"Timeless Tales data directory not found: {data_dir}")
+    if not _has_asset_markers(data_dir) or not (data_dir / "scripts" / "stratagus.lua").exists():
+        pytest.skip(f"Timeless Tales data directory is incomplete: {data_dir}")
+    return data_dir
 
 
 @pytest.fixture
