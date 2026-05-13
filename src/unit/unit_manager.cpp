@@ -62,6 +62,12 @@ void CUnitManager::Init()
 {
 	lastCreated = nullptr;
 	//Assert(units.empty());
+	for (std::unique_ptr<CUnit> &unit : unitSlots) {
+		unit->Orders.clear();
+		unit->SavedOrder = nullptr;
+		unit->NewOrder = nullptr;
+		unit->CriticalOrder = nullptr;
+	}
 	units.clear();
 	releasedUnits.clear();
 
