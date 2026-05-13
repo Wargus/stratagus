@@ -58,6 +58,18 @@ def _game_settings_block(output: str) -> str:
     return "\n".join(lines)
 
 
+def _network_setup_lines(output: str) -> list[str]:
+    marker = "FINAL NETWORK GAME SETUP\n"
+    assert marker in output
+    lines = []
+    for line in output.split(marker, 1)[1].splitlines():
+        if line.startswith("FINAL NETWORK GAME SETTINGS"):
+            break
+        if line:
+            lines.append(line)
+    return lines
+
+
 def _setting_value(settings: str, name: str) -> str:
     prefix = f"{name} = "
     for line in settings.splitlines():
@@ -327,7 +339,6 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
 @pytest.mark.gui
 @pytest.mark.cross
 @pytest.mark.slow
-@pytest.mark.xfail(reason="dedicated AI command-line setup currently stalls before final config")
 def test_wargus_dedicated_ai_server_starts_reported_ai_map(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
@@ -351,3 +362,15 @@ def test_wargus_dedicated_ai_server_starts_reported_ai_map(
     )
 
     assert "FINAL NETWORK GAME SETUP" in host_output
+
+    setup = _network_setup_lines(host_output)
+    assert setup[0].startswith("0: CO: 2")
+    assert "Host:" not in setup[0]
+    assert (
+        sum(line.startswith(("1: CO: 0", "2: CO: 0", "3: CO: 0")) and "Host:" in line for line in setup)
+        == 2
+    )
+    assert (
+        sum(line.startswith(("1: CO: 1", "2: CO: 1", "3: CO: 1")) and "Host:" not in line for line in setup)
+        == 1
+    )
