@@ -73,6 +73,8 @@
 #include "unittype.h"
 #include "pathfinder.h"
 
+#include <set>
+
 struct LabelsLaterStruct {
 	std::size_t *Index;
 	std::string Name;
@@ -273,7 +275,20 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 	} else if (s[0] == 'S') { // check if autocast for this spell available
 		auto cur = s.substr(2);
 		const SpellType &spell = SpellTypeByIdent(cur);
-		if (spell.Slot < unit.AutoCastSpell.size() && unit.AutoCastSpell[spell.Slot]) {
+		if (spell.Slot >= unit.AutoCastSpell.size()) {
+			static std::set<std::string> warned;
+			const std::string key = unit.Type->Ident + ":" + spell.Ident;
+			if (warned.insert(key).second) {
+				ErrorPrint("Warning: animation for unit type '%s' checks autocast spell '%s' slot %zu, "
+				           "but AutoCastSpell size is %zu\n",
+				           unit.Type->Ident.c_str(),
+				           spell.Ident.c_str(),
+				           spell.Slot,
+				           unit.AutoCastSpell.size());
+			}
+			return 0;
+		}
+		if (unit.AutoCastSpell[spell.Slot]) {
 			return 1;
 		}
 		return 0;

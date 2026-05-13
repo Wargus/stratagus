@@ -57,9 +57,26 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <set>
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+static void WarnInvalidSpellCastCooldown(const CUnit &unit, const SpellType &spell)
+{
+	static std::set<std::string> warned;
+	const std::string key = unit.Type->Ident + ":" + spell.Ident;
+	if (!warned.insert(key).second) {
+		return;
+	}
+	ErrorPrint("Warning: spell '%s' slot %zu is outside cooldown timer size %zu "
+	           "for unit type '%s'; treating spell as ready\n",
+	           spell.Ident.c_str(),
+	           spell.Slot,
+	           unit.SpellCoolDownTimers.size(),
+	           unit.Type->Ident.c_str());
+}
 
 /* static */ std::unique_ptr<COrder> COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
 {
@@ -317,8 +334,9 @@ void COrder_SpellCast::Execute(CUnit &unit) /* override */
 					                    _("%s: not enough mana for spell: %s"),
 					                    unit.Type->Name.c_str(),
 					                    spell.Name.c_str());
-				} else if (spell.Slot < unit.SpellCoolDownTimers.size()
-				           && unit.SpellCoolDownTimers[spell.Slot]) {
+				} else if (spell.Slot >= unit.SpellCoolDownTimers.size()) {
+					WarnInvalidSpellCastCooldown(unit, spell);
+				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
 					unit.Player->Notify(ColorYellow,
 					                    unit.tilePos,
 					                    _("%s: spell is not ready yet: %s"),

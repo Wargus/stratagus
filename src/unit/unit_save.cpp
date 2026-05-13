@@ -35,6 +35,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <set>
 
 #include "stratagus.h"
 
@@ -307,6 +308,16 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	if (!unit.Type->CanCastSpell.empty() && !unit.AutoCastSpell.empty()) {
 		const size_t spellCount = std::min(SpellTypeTable.size(), unit.AutoCastSpell.size());
+		if (spellCount != SpellTypeTable.size()) {
+			static std::set<std::string> warnedTypes;
+			if (warnedTypes.insert(unit.Type->Ident).second) {
+				ErrorPrint("Warning: unit type '%s' has AutoCastSpell size %zu but %zu spells are defined; "
+				           "save will ignore missing autocast spell slots\n",
+				           unit.Type->Ident.c_str(),
+				           unit.AutoCastSpell.size(),
+				           SpellTypeTable.size());
+			}
+		}
 		for (size_t i = 0; i < spellCount; ++i) {
 			if (unit.AutoCastSpell[i]) {
 				file.printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
