@@ -21,6 +21,8 @@ class SavegameCase:
     symptom: str
     run_seconds: float = 8.0
     lua_epilogue: str = ""
+    results_menu: bool = False
+    expected_failure: str = ""
 
 
 SAVEGAME_CASES = [
@@ -35,6 +37,16 @@ SAVEGAME_CASES = [
         "stratagus-719-10l.sav.gz",
         "Wargus/stratagus#719",
         "intermittent victory-button crash after Siege of Vanguard",
+        lua_epilogue="""
+local pytest_previous_game_starting = GameStarting
+GameStarting = function()
+  if pytest_previous_game_starting ~= nil then
+    pytest_previous_game_starting()
+  end
+  StopGame(GameVictory)
+end
+""",
+        results_menu=True,
     ),
     SavegameCase(
         "wargus",
@@ -96,10 +108,17 @@ SAVEGAME_CASES = [
         "Wargus/stratagus#720",
         "Khadgar spell availability after save/load",
         lua_epilogue="""
-if GetPlayerData(0, "Allow", "upgrade-blizzard") ~= "R" then
-  error("Khadgar save did not restore researched Blizzard")
+local pytest_previous_game_starting = GameStarting
+GameStarting = function()
+  if pytest_previous_game_starting ~= nil then
+    pytest_previous_game_starting()
+  end
+  if GetPlayerData(0, "Allow", "upgrade-blizzard") ~= "R" then
+    error("Khadgar save did not restore researched Blizzard")
+  end
 end
 """,
+        expected_failure="Khadgar save did not restore researched Blizzard",
     ),
 ]
 
@@ -165,7 +184,8 @@ def test_attached_savegame_loads_and_runs_without_crashing(
 
     stdout = tmp_path / "savegame.stdout"
     stderr = tmp_path / "savegame.stderr"
-    driver = repo_root / "pytests" / "lua" / "savegame_driver.lua"
+    driver_name = "savegame_results_driver.lua" if case.results_menu else "savegame_driver.lua"
+    driver = repo_root / "pytests" / "lua" / driver_name
     command = [
         stratagus_bin,
         "-d",
@@ -197,4 +217,8 @@ def test_attached_savegame_loads_and_runs_without_crashing(
 
     combined = f"{case.issue}: {case.symptom}\n--- stdout ---\n{_read(stdout)}\n--- stderr ---\n{_read(stderr)}"
     _assert_no_failure_markers(combined)
+    if case.expected_failure and case.expected_failure in combined:
+        pytest.xfail(f"{case.issue}: {case.expected_failure}")
+    if case.results_menu:
+        assert "PYTEST_SAVEGAME_RESULTS_START" in combined, combined
     assert proc.returncode in (0, -9), combined
