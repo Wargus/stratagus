@@ -324,7 +324,8 @@ bool COrder_Attack::IsMovingToAttackPos() const
 bool COrder_Attack::IsAttackGroundOrWall() const
 {
 	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
-	return this->Action == UnitAction::AttackGround || Map.WallOnMap(this->goalPos);
+	return this->Action == UnitAction::AttackGround
+	       || (Map.Info.IsPointOnMap(this->goalPos) && Map.WallOnMap(this->goalPos));
 }
 
 CUnit &COrder_Attack::BestTarget(const CUnit &unit, CUnit &target1, CUnit &target2) const
