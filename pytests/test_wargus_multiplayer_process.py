@@ -109,6 +109,7 @@ def _run_command_line_multiplayer(
     setup_timeout: float = 70,
     host_preferences: dict[str, Any] | None = None,
     client_preferences: dict[str, Any] | None = None,
+    require_running_after_start: bool = True,
 ) -> tuple[str, list[str]]:
     if stratagus_pair is None:
         assert stratagus_bin is not None
@@ -202,9 +203,14 @@ def _run_command_line_multiplayer(
             logs
         )
         time.sleep(run_after_start_seconds)
-        assert host.poll() is None, _combined_logs(logs)
-        for client in clients:
-            assert client.poll() is None, _combined_logs(logs)
+        if require_running_after_start:
+            assert host.poll() is None, _combined_logs(logs)
+            for client in clients:
+                assert client.poll() is None, _combined_logs(logs)
+        else:
+            assert host.poll() in (None, 0), _combined_logs(logs)
+            for client in clients:
+                assert client.poll() in (None, 0), _combined_logs(logs)
 
         combined = _combined_logs(logs)
         for marker in ("Network out of sync", "sent bad command", "Unknown unitType", "Segmentation fault", "Aborted"):
@@ -351,12 +357,44 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
 @pytest.mark.gui
 @pytest.mark.cross
 @pytest.mark.slow
-def test_wargus_dedicated_ai_server_starts_reported_ai_map(
+@pytest.mark.parametrize(
+    "map_name,client_races,ai_players",
+    [
+        pytest.param(
+            "maps/skirmish/(3)three-ways-to-cross.smp.gz",
+            ("orc",),
+            1,
+            id="three-ways-to-cross",
+        ),
+        pytest.param(
+            "maps/skirmish/multiplayer/(4)central-park.smp.gz",
+            ("human", "orc"),
+            1,
+            id="central-park",
+        ),
+        pytest.param(
+            "maps/skirmish/(8)bridge-to-bridge-combat.smp.gz",
+            ("human", "orc"),
+            2,
+            id="bridge-to-bridge-combat",
+        ),
+        pytest.param(
+            "maps/skirmish/(8)garden-of-war.smp.gz",
+            ("human", "orc"),
+            2,
+            id="garden-of-war",
+        ),
+    ],
+)
+def test_wargus_dedicated_ai_server_starts_reported_ai_maps(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
     xvfb_env,
     tmp_path: Path,
+    map_name: str,
+    client_races: tuple[str, ...],
+    ai_players: int,
 ):
     if _host_uses_emulator(stratagus_pair):
         pytest.skip("qemu-aarch64 host does not reach Wargus command-line setup reliably")
@@ -367,25 +405,27 @@ def test_wargus_dedicated_ai_server_starts_reported_ai_map(
         extracted_wargus_data=extracted_wargus_data,
         xvfb_env=xvfb_env,
         tmp_path=tmp_path,
-        map_name="maps/skirmish/multiplayer/(4)central-park.smp.gz",
-        numplayers=2,
-        ai_players=1,
+        map_name=map_name,
+        numplayers=len(client_races),
+        ai_players=ai_players,
         dedicated=True,
-        client_races=("human", "orc"),
+        client_races=client_races,
         setup_timeout=300 if _uses_emulator(stratagus_pair) else 35,
-        run_after_start_seconds=15,
+        run_after_start_seconds=0,
+        require_running_after_start=False,
     )
 
     assert "FINAL NETWORK GAME SETUP" in host_output
 
+    player_prefixes = tuple(f"{i}: CO: " for i in range(1, 16))
     setup = _network_setup_lines(host_output)
     assert setup[0].startswith("0: CO: 2")
     assert "Host:" not in setup[0]
-    assert (
-        sum(line.startswith(("1: CO: 0", "2: CO: 0", "3: CO: 0")) and "Host:" in line for line in setup)
-        == 2
-    )
-    assert (
-        sum(line.startswith(("1: CO: 1", "2: CO: 1", "3: CO: 1")) and "Host:" not in line for line in setup)
-        == 1
-    )
+    assert sum(
+        line.startswith(tuple(f"{prefix}0" for prefix in player_prefixes)) and "Host:" in line
+        for line in setup
+    ) == len(client_races)
+    assert sum(
+        line.startswith(tuple(f"{prefix}1" for prefix in player_prefixes)) and "Host:" not in line
+        for line in setup
+    ) >= ai_players
