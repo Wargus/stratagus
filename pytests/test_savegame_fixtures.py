@@ -118,7 +118,6 @@ GameStarting = function()
   end
 end
 """,
-        expected_failure="Khadgar save did not restore researched Blizzard",
     ),
 ]
 
