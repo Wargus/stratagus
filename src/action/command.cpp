@@ -848,6 +848,15 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 	           pos.x,
 	           pos.y,
 	           dest ? UnitNumber(*dest) : 0);
+	if (spell.Slot >= unit.Type->CanCastSpell.size() || !unit.Type->CanCastSpell[spell.Slot]) {
+		ErrorPrint("Warning: rejecting spell '%s' for unit type '%s'; unit cannot cast slot %zu "
+		           "(CanCastSpell=%zu)\n",
+		           spell.Ident.c_str(),
+		           unit.Type->Ident.c_str(),
+		           spell.Slot,
+		           unit.Type->CanCastSpell.size());
+		return;
+	}
 	Assert(spell.Slot < unit.Type->CanCastSpell.size());
 	Assert(unit.Type->CanCastSpell[spell.Slot]);
 	Assert(Map.Info.IsPointOnMap(pos));
@@ -878,6 +887,11 @@ void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 		return ;
 	}
 	if (spellid < 0 || static_cast<size_t>(spellid) >= unit.AutoCastSpell.size()) {
+		ErrorPrint("Warning: ignoring invalid autocast command for unit type '%s'; spell id %d "
+		           "is outside AutoCastSpell size %zu\n",
+		           unit.Type->Ident.c_str(),
+		           spellid,
+		           unit.AutoCastSpell.size());
 		return;
 	}
 	unit.AutoCastSpell[spellid] = on;

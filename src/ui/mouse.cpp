@@ -354,6 +354,11 @@ static bool DoRightButton_AttackUnit(
 			for (spellnum = 0; spellnum < spellCount && !type.CanCastSpell[spellnum]; spellnum++) {
 			}
 			if (spellnum == spellCount) {
+				ErrorPrint("Warning: right-click spell action requested for unit type '%s', "
+				           "but it has no castable spell slots (CanCastSpell=%zu, spells=%zu)\n",
+				           type.Ident.c_str(),
+				           type.CanCastSpell.size(),
+				           SpellTypeTable.size());
 				return false;
 			}
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
