@@ -96,6 +96,8 @@ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, std::string_view val
 	} else if (value == "retries") {
 		++j;
 		this->Retries = LuaToNumber(l, -1, j + 1);
+	} else if (value == "range") {
+		++j;
 	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
