@@ -60,7 +60,8 @@ void AiCheckMagic()
 					return;
 				}
 			}
-			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
+			const size_t spellCount = std::min(SpellTypeTable.size(), unit->Type->CanCastSpell.size());
+			for (size_t j = 0; j < spellCount; ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
 				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j)
 					&& SpellTypeTable[j]->AICast) {

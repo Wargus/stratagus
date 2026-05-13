@@ -317,7 +317,8 @@ void COrder_SpellCast::Execute(CUnit &unit) /* override */
 					                    _("%s: not enough mana for spell: %s"),
 					                    unit.Type->Name.c_str(),
 					                    spell.Name.c_str());
-				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
+				} else if (spell.Slot < unit.SpellCoolDownTimers.size()
+				           && unit.SpellCoolDownTimers[spell.Slot]) {
 					unit.Player->Notify(ColorYellow,
 					                    unit.tilePos,
 					                    _("%s: spell is not ready yet: %s"),

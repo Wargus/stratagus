@@ -305,8 +305,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Goal) {
 		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
-	if (!unit.AutoCastSpell.empty()) {
-		for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
+	if (!unit.Type->CanCastSpell.empty() && !unit.AutoCastSpell.empty()) {
+		const size_t spellCount = std::min(SpellTypeTable.size(), unit.AutoCastSpell.size());
+		for (size_t i = 0; i < spellCount; ++i) {
 			if (unit.AutoCastSpell[i]) {
 				file.printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
 			}

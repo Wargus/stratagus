@@ -52,6 +52,8 @@
 #include "ui.h"
 #include "video.h"
 
+#include <algorithm>
+
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -1260,10 +1262,15 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 	// TODO: This vector allocation is costly in profiles
 	std::vector<SDL_Color> sdlColors = PlayerColorsSDL[colorIndex];
 	const auto palette = sprite.getSurface()->format->palette;
-	Assert(!palette || palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
-	SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
-	if (sprite.SurfaceFlip) {
-		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+	if (palette && palette->ncolors > PlayerColorIndexStart) {
+		const int count = std::min(PlayerColorIndexCount, palette->ncolors - PlayerColorIndexStart);
+		SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, count);
+	}
+	if (sprite.SurfaceFlip && sprite.SurfaceFlip->format->palette
+	    && sprite.SurfaceFlip->format->palette->ncolors > PlayerColorIndexStart) {
+		const int count = std::min(PlayerColorIndexCount,
+		                           sprite.SurfaceFlip->format->palette->ncolors - PlayerColorIndexStart);
+		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, count);
 	}
 }
 

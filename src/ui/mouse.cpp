@@ -350,7 +350,11 @@ static bool DoRightButton_AttackUnit(
 		if (action == EMouseAction::SpellCast) {
 			// This is for demolition squads and such
 			size_t spellnum;
-			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
+			const size_t spellCount = std::min(SpellTypeTable.size(), type.CanCastSpell.size());
+			for (spellnum = 0; spellnum < spellCount && !type.CanCastSpell[spellnum]; spellnum++) {
+			}
+			if (spellnum == spellCount) {
+				return false;
 			}
 			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
 		} else {

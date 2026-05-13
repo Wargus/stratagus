@@ -249,6 +249,9 @@ void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
 void CGraphic::DrawFrame(unsigned frame, int x, int y,
 						 SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frame_map.size()) {
+		return;
+	}
 	DrawSub(frame_map[frame].x, frame_map[frame].y,
 			Width, Height, x, y, surface);
 }
@@ -264,6 +267,9 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y,
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y,
 							 SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frame_map.size()) {
+		return;
+	}
 	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
 				Width, Height, x, y, surface);
 }
@@ -271,6 +277,9 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y,
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 							  SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frame_map.size()) {
+		return;
+	}
 	DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
 				 Width, Height, x, y, alpha, surface);
 }
@@ -278,6 +287,9 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha,
 								  SDL_Surface *surface /* = TheScreen*/) const
 {
+	if (frame >= frame_map.size()) {
+		return;
+	}
 	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 					 Width, Height, x, y, alpha, surface);
 }
@@ -287,6 +299,9 @@ void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y,
 									  const uint32_t param,
 									  SDL_Surface *surface /* = TheScreen*/) const
 {
+	if (frame >= frame_map.size()) {
+		return;
+	}
 	DrawSubClipCustomMod(frame_map[frame].x, frame_map[frame].y,
 						 Width, Height, x, y, modifier, param, surface);
 }
@@ -336,6 +351,9 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y,
 void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 							  SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frameFlip_map.size()) {
+		return;
+	}
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 	const int oldx = x;
@@ -352,6 +370,9 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
 							   SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frameFlip_map.size()) {
+		return;
+	}
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 	Uint8 oldalpha = 0xff;
@@ -365,6 +386,9 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
 void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 								   SDL_Surface *surface /*= TheScreen*/) const
 {
+	if (frame >= frameFlip_map.size()) {
+		return;
+	}
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 	int oldx = x;

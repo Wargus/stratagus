@@ -270,7 +270,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 			// Autocast
 			if (ranges::all_of(Selected, [&](const CUnit *unit) {
-					Assert(!unit->AutoCastSpell.empty());
+					if (button.Value < 0 || static_cast<size_t>(button.Value) >= unit->AutoCastSpell.size()) {
+						return false;
+					}
 					return unit->AutoCastSpell[button.Value];
 				})) {
 				res |= IconAutoCast;
@@ -731,6 +733,9 @@ void CButtonPanel::Draw()
 				gray = true;
 				break;
 			} else if (buttons[i].Action == ButtonCmd::SpellCast
+					   && buttons[i].Value >= 0
+					   && static_cast<size_t>(buttons[i].Value) < SpellTypeTable.size()
+					   && SpellTypeTable[buttons[i].Value]->Slot < unit->SpellCoolDownTimers.size()
 					   && unit->SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
 				Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
@@ -1115,9 +1120,13 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		// for everyone
 
 		const bool autocast = ranges::any_of(
-			Selected, [&](const CUnit *unit) { return !unit->AutoCastSpell[spellId]; });
+			Selected, [&](const CUnit *unit) {
+				return static_cast<size_t>(spellId) >= unit->AutoCastSpell.size()
+				       || !unit->AutoCastSpell[spellId];
+			});
 		for (CUnit *unit : Selected) {
-			if (unit->AutoCastSpell[spellId] != autocast) {
+			if (static_cast<size_t>(spellId) >= unit->AutoCastSpell.size()
+			    || unit->AutoCastSpell[spellId] != autocast) {
 				SendCommandAutoSpellCast(*unit, spellId, autocast);
 			}
 		}

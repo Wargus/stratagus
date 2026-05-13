@@ -273,7 +273,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 	} else if (s[0] == 'S') { // check if autocast for this spell available
 		auto cur = s.substr(2);
 		const SpellType &spell = SpellTypeByIdent(cur);
-		if (unit.AutoCastSpell[spell.Slot]) {
+		if (spell.Slot < unit.AutoCastSpell.size() && unit.AutoCastSpell[spell.Slot]) {
 			return 1;
 		}
 		return 0;
