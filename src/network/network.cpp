@@ -302,6 +302,10 @@ static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
 static unsigned int NetworkSyncSeeds[256];          /// Network sync seeds.
 static unsigned int NetworkSyncHashs[256];          /// Network sync hashs.
+static unsigned long NetworkSyncCycles[256];        /// Game cycle sampled for sync data.
+static unsigned long NetworkFirstDesyncGameCycle;   /// First cycle that detected a desync.
+static unsigned long NetworkFirstDesyncSampleCycle; /// First sampled cycle that diverged.
+static bool NetworkGameInSync = true;               /// Last sync command comparison result.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
@@ -515,9 +519,14 @@ void NetworkOnStartGame()
 	}
 	ranges::fill(NetworkSyncSeeds, 0);
 	ranges::fill(NetworkSyncHashs, 0);
+	ranges::fill(NetworkSyncCycles, 0);
+	NetworkFirstDesyncGameCycle = 0;
+	NetworkFirstDesyncSampleCycle = 0;
+	NetworkGameInSync = true;
 	ranges::fill(PlayerQuit, 0);
 	ranges::fill(NetworkLastFrame, 0);
 	ranges::fill(NetworkLastCycle, 0);
+	ResetSyncDebugCycleHistory();
 }
 
 //----------------------------------------------------------------------------
@@ -940,9 +949,8 @@ void NetworkQuitGame()
 	NetworkSendPacket(ncqs);
 }
 
-static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
+static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq, int player)
 {
-	static bool gameInSync = true;
 	Assert((ncq.Type & 0x7F) == MessageSync);
 
 	CNetworkCommandSync nc;
@@ -950,16 +958,18 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 	const unsigned long gameNetCycle = GameCycle;
 	const unsigned int syncSeed = nc.syncSeed;
 	const unsigned int syncHash = nc.syncHash;
+	const unsigned int localSeed = NetworkSyncSeeds[gameNetCycle & 0xFF];
+	const unsigned int localHash = NetworkSyncHashs[gameNetCycle & 0xFF];
+	const unsigned long sampledCycle = NetworkSyncCycles[gameNetCycle & 0xFF];
 
-	if (syncSeed != NetworkSyncSeeds[gameNetCycle & 0xFF]
-		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
+	if (syncSeed != localSeed || syncHash != localHash) {
 		// if it wasn't already, force enable debug output right now. maybe we get lucky ...
 		EnableDebugPrint = true;
 		EnableUnitDebug = true;
-		if (gameInSync || (gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
+		if (NetworkGameInSync || (gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
-			gameInSync = false;
+			NetworkGameInSync = false;
 			SetGamePaused(true);
 
 			time_t now;
@@ -971,14 +981,36 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			savefile += ".sav";
 			SaveGame(savefile);
 		}
-		ErrorPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n",
+		if (!NetworkFirstDesyncGameCycle) {
+			NetworkFirstDesyncGameCycle = gameNetCycle;
+			NetworkFirstDesyncSampleCycle = sampledCycle;
+			ErrorPrint("\nFirst network desync detected from player %d (%s): "
+			           "exec-cycle %lu, sampled-after-cycle %lu, packet-time %lu, "
+			           "network-lag %u, update-rate %u\n",
+			           player,
+			           Players[player].Name.c_str(),
+			           gameNetCycle,
+			           sampledCycle,
+			           ncq.Time,
+			           CNetworkParameter::Instance.NetworkLag,
+			           CNetworkParameter::Instance.gameCyclesPerUpdate);
+			DumpSyncDebugCycleHistory(sampledCycle, syncSeed, localSeed, syncHash, localHash);
+		}
+		ErrorPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X "
+		           "Cycle %lu sampled-after-cycle %lu first-desync-cycle %lu "
+		           "first-sampled-after-cycle %lu player %d (%s)\n\n",
 		           syncSeed,
-		           NetworkSyncSeeds[gameNetCycle & 0xFF],
+		           localSeed,
 		           syncHash,
-		           NetworkSyncHashs[gameNetCycle & 0xFF],
-		           GameCycle);
+		           localHash,
+		           GameCycle,
+		           sampledCycle,
+		           NetworkFirstDesyncGameCycle,
+		           NetworkFirstDesyncSampleCycle,
+		           player,
+		           Players[player].Name.c_str());
 	} else {
-		gameInSync = true;
+		NetworkGameInSync = true;
 	}
 }
 
@@ -1046,10 +1078,10 @@ static void NetworkExecCommand_Command(const CNetworkCommandQueue &ncq)
 **
 **  @param ncq  Network command from queue
 */
-static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
+static void NetworkExecCommand(const CNetworkCommandQueue &ncq, int player)
 {
 	switch (ncq.Type & 0x7F) {
-		case MessageSync: NetworkExecCommand_Sync(ncq); break;
+		case MessageSync: NetworkExecCommand_Sync(ncq, player); break;
 		case MessageSelection: NetworkExecCommand_Selection(ncq); break;
 		case MessageChat: NetworkExecCommand_Chat(ncq); break;
 		case MessageQuit: NetworkExecCommand_Quit(ncq); break;
@@ -1113,6 +1145,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	}
 	NetworkSyncSeeds[gameNetCycle & 0xFF] = SyncRandSeed;
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
+	NetworkSyncCycles[gameNetCycle & 0xFF] = GameCycle > 0 ? GameCycle - 1 : 0;
 	if (IsNetworkGame()) {
 		NetworkSendPacket(ncq);
 	}
@@ -1132,7 +1165,7 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 				break;
 			}
 			if (ncq.Time && ncq.Time == gameNetCycle) {
-				NetworkExecCommand(ncq);
+				NetworkExecCommand(ncq, i);
 			}
 		}
 	}
