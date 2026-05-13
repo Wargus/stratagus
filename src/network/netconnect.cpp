@@ -1412,6 +1412,7 @@ void CServer::Parse_Map(const int h)
 	switch (networkStates[h].State) {
 		// client has recvd map info waiting for state info
 		case ccs_connected:
+		case ccs_async:
 			networkStates[h].State = ccs_mapinfo;
 			networkStates[h].MsgCnt = 0;
 			[[fallthrough]];
@@ -1785,6 +1786,13 @@ void NetworkServerStartGame()
 	printf("INITIAL ServerSetupState:\n");
 	NetPlayers = 0;
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
+	const bool dedicatedServer = Hosts[0].IsValid() && ServerSetupState.CompOpt[0] == SlotOption::Closed;
+	const auto isHumanHostForPlayer = [dedicatedServer](const int hostIndex, const int playerIndex) {
+		if (dedicatedServer && hostIndex == 0) {
+			return false;
+		}
+		return Hosts[hostIndex].IsValid() && Hosts[hostIndex].PlyNr == playerIndex;
+	};
 
 	// most game settings are already fine, that is, they are on default. however, for human player slots, we need
 	// to adapt the game settings from their defaults to either set the type to person if a human player is assigned,
@@ -1793,8 +1801,9 @@ void NetworkServerStartGame()
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			bool hasHumanPlayer = false;
-			for (auto &h : Hosts) {
-				if (h.IsValid() && h.PlyNr == i) {
+			for (int hostIndex = 0; hostIndex < PlayerMax; ++hostIndex) {
+				if (isHumanHostForPlayer(hostIndex, i)) {
+					const CNetworkHost &h = Hosts[hostIndex];
 					NetPlayers++;
 					hasHumanPlayer = true;
 					ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerPerson;
@@ -1823,8 +1832,8 @@ void NetworkServerStartGame()
 		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 			if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 				bool hasHumanPlayer = false;
-				for (auto &h : Hosts) {
-					if ((hasHumanPlayer = (h.PlyNr == i))) {
+				for (int hostIndex = 0; hostIndex < PlayerMax; ++hostIndex) {
+					if ((hasHumanPlayer = isHumanHostForPlayer(hostIndex, i))) {
 						break;
 					}
 				}
@@ -1841,10 +1850,11 @@ void NetworkServerStartGame()
 		std::vector<int> humanSlotIndices;
 		std::vector<int> humanHostIndices;
 		for (int i = 0; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson
+			    && ServerSetupState.CompOpt[i] != SlotOption::Closed) {
 				humanSlotIndices.push_back(i);
 			}
-			if (Hosts[i].IsValid() && Hosts[i].PlyNr < PlayerMax
+			if ((!dedicatedServer || i != 0) && Hosts[i].IsValid() && Hosts[i].PlyNr < PlayerMax
 			    && ServerSetupState.CompOpt[Hosts[i].PlyNr] == SlotOption::Available
 			    && ServerSetupState.ServerGameSettings.Presets[Hosts[i].PlyNr].Type
 			           == PlayerTypes::PlayerPerson) {
@@ -1890,8 +1900,21 @@ void NetworkServerStartGame()
 	std::fill_n(waitingForInitAck, PlayerMax, false);
 
 	// Send all clients host:ports to all clients.
-	// Slot 0 is the server!
+	// Slot 0 is the server.
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
+	if (dedicatedServer) {
+		bool foundLocalPlayer = false;
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (ServerSetupState.CompOpt[i] == SlotOption::Computer
+			    && ServerSetupState.ServerGameSettings.Presets[i].Type == PlayerTypes::PlayerComputer) {
+				Hosts[0].PlyNr = i;
+				NetLocalPlayerNumber = i;
+				foundLocalPlayer = true;
+				break;
+			}
+		}
+		Assert(foundLocalPlayer);
+	}
 
 	NetworkCompactHosts();
 
