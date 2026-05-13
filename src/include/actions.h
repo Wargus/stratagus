@@ -176,6 +176,12 @@ using COrderPtr = COrder *;
 ----------------------------------------------------------------------------*/
 
 extern unsigned SyncHash;  /// Hash calculated to find sync failures
+extern void ResetSyncDebugCycleHistory();
+extern void DumpSyncDebugCycleHistory(unsigned long centerCycle,
+                                      unsigned int receivedSeed,
+                                      unsigned int localSeed,
+                                      unsigned int receivedHash,
+                                      unsigned int localHash);
 
 /*----------------------------------------------------------------------------
 --  Actions: in action_<name>.c
