@@ -400,55 +400,41 @@ def timeless_tales_data(repo_root: Path) -> Path:
 
 @pytest.fixture
 def xvfb_env(repo_root: Path, tmp_path: Path):
-    if os.environ.get("WARGUS_GUI_TESTS") != "1":
+    if os.environ.get("WARGUS_GUI_TESTS", "1") != "1":
+        # Explicit GUI tests skip
         pytest.skip("Set WARGUS_GUI_TESTS=1 to run GUI tests")
-    video_driver = os.environ.get("PYTEST_SDL_VIDEODRIVER", "x11")
-    if video_driver == "x11" and not _sdl_x11_available(repo_root):
-        pytest.skip("Stratagus SDL build lacks X11 support; install X11 SDL deps and rebuild")
-    xvfb = shutil.which("Xvfb")
-    if not xvfb:
-        pytest.skip("Xvfb not found")
-
-    display = os.environ.get("PYTEST_XVFB_DISPLAY", f":{90 + (os.getpid() % 9)}")
-    log = tmp_path / "xvfb.log"
-    with log.open("wb") as out:
-        proc = subprocess.Popen(
-            [xvfb, display, "-screen", "0", "1024x768x24"],
-            stdout=out,
-            stderr=subprocess.STDOUT,
-        )
-    time.sleep(0.5)
-    if proc.poll() is not None:
-        pytest.fail(f"Xvfb exited early; see {log}")
 
     env = os.environ.copy()
-    env["DISPLAY"] = display
-    env["SDL_VIDEODRIVER"] = video_driver
+    video_driver = os.environ.get("PYTEST_SDL_VIDEODRIVER")
+    proc = None
+
+    if video_driver == "xvfb":
+        env["SDL_VIDEODRIVER"] = "x11"
+        xvfb = shutil.which("Xvfb")
+        if not xvfb:
+            pytest.skip("Xvfb not found")
+        env["DISPLAY"] = os.environ.get("PYTEST_XVFB_DISPLAY", f":{90 + (os.getpid() % 9)}")
+        log = tmp_path / "xvfb.log"
+        with log.open("wb") as out:
+            proc = subprocess.Popen(
+                [xvfb, display, "-screen", "0", "1024x768x24"],
+                stdout=out,
+                stderr=subprocess.STDOUT,
+            )
+        time.sleep(0.5)
+        if proc.poll() is not None:
+            pytest.fail(f"Xvfb exited early; see {log}")
+    elif not (os.environ.get("WAYLAND_DISPLAY") or os.environ.get("DISPLAY")):
+        env["SDL_VIDEODRIVER"] = "dummy"
+
     env["SDL_AUDIODRIVER"] = "dummy"
-    old_display = os.environ.get("DISPLAY")
-    old_sdl_video = os.environ.get("SDL_VIDEODRIVER")
-    old_sdl_audio = os.environ.get("SDL_AUDIODRIVER")
-    os.environ["DISPLAY"] = display
-    os.environ["SDL_VIDEODRIVER"] = env["SDL_VIDEODRIVER"]
-    os.environ["SDL_AUDIODRIVER"] = "dummy"
     try:
         yield env
     finally:
-        if old_display is None:
-            os.environ.pop("DISPLAY", None)
-        else:
-            os.environ["DISPLAY"] = old_display
-        if old_sdl_video is None:
-            os.environ.pop("SDL_VIDEODRIVER", None)
-        else:
-            os.environ["SDL_VIDEODRIVER"] = old_sdl_video
-        if old_sdl_audio is None:
-            os.environ.pop("SDL_AUDIODRIVER", None)
-        else:
-            os.environ["SDL_AUDIODRIVER"] = old_sdl_audio
-        proc.terminate()
-        try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait(timeout=5)
+        if proc:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait(timeout=5)
