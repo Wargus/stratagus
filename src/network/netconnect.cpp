@@ -1713,6 +1713,11 @@ int FindHostIndexBy(const CHost &host)
 	return -1;
 }
 
+bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &setup)
+{
+	return host.IsValid() && host.PlyNr < PlayerMax && setup.CompOpt[host.PlyNr] == SlotOption::Closed;
+}
+
 void NetworkCompactHosts()
 {
 	for (int i = 0; i < PlayerMax; i++) {
@@ -1786,7 +1791,7 @@ void NetworkServerStartGame()
 	printf("INITIAL ServerSetupState:\n");
 	NetPlayers = 0;
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
-	const bool dedicatedServer = Hosts[0].IsValid() && ServerSetupState.CompOpt[0] == SlotOption::Closed;
+	const bool dedicatedServer = NetworkIsDedicatedServerHost(Hosts[0], ServerSetupState);
 	const auto isHumanHostForPlayer = [dedicatedServer](const int hostIndex, const int playerIndex) {
 		if (dedicatedServer && hostIndex == 0) {
 			return false;
