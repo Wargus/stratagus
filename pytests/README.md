@@ -8,21 +8,21 @@ Fast tests:
 python3 -m pytest pytests/test_lua_network_menu.py
 ```
 
-GUI tests are opt-in because they require extra tools and extracted game data:
+GUI tests can be opted out because they require extra tools and extracted game data:
 
 ```sh
-WARGUS_GUI_TESTS=1 \
-STRATAGUS_BIN=/path/to/stratagus-dbg \
-python3 -m pytest pytests/test_wargus_gui.py
+WARGUS_GUI_TESTS=0 python3 -m pytest pytests/test_wargus_gui.py
 ```
+
+Set `PYTEST_SDL_VIDEODRIVER=dummy` or `PYTEST_SDL_VIDEODRIVER=xvfb` for a
+headless run, otherwise it'll open instances on the real screen if there is
+one.
 
 The process-level multiplayer smoke test uses the same Xvfb and extracted-data
 fixtures, launches one Wargus host and one client, and waits for the lobby to
 autostart a real two-player game:
 
 ```sh
-WARGUS_GUI_TESTS=1 \
-STRATAGUS_BIN=/path/to/stratagus-dbg \
 python3 -m pytest pytests/test_wargus_multiplayer_process.py
 ```
 
