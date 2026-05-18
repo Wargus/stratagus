@@ -67,6 +67,7 @@ def write_war1gus_preferences(user_dir: Path, preferences: dict[str, Any] | None
         "wc1 = wc1 or {}\n"
         "wc1.preferences = wc1.preferences or {}\n"
         "wc1.preferences.EnableMouseScrolling = false\n"
+        "wc1.preferences.MusicEnabled = false\n"
         "wc1.preferences.PauseOnLeave = false\n"
         "wc1.preferences.ShowTips = false\n"
         "wc1.preferences.VideoFullScreen = false\n"
