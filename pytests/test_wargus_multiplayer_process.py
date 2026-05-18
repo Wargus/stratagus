@@ -94,7 +94,7 @@ def _run_command_line_multiplayer(
     *,
     repo_root: Path,
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     stratagus_bin: str | None = None,
     stratagus_pair: tuple[dict, dict] | None = None,
@@ -187,7 +187,7 @@ def _run_command_line_multiplayer(
             )
         )
 
-    host = _launch(host_cmd, cwd=repo_root, env=xvfb_env, stdout=host_out, stderr=host_err)
+    host = _launch(host_cmd, cwd=repo_root, env=gui_env, stdout=host_out, stderr=host_err)
     clients = []
     logs = (host_out, host_err, *client_outs, *client_errs)
     try:
@@ -195,7 +195,7 @@ def _run_command_line_multiplayer(
         assert host.poll() is None, _combined_logs((host_out, host_err))
         for i, client_cmd in enumerate(client_cmds):
             clients.append(
-                _launch(client_cmd, cwd=repo_root, env=xvfb_env, stdout=client_outs[i], stderr=client_errs[i])
+                _launch(client_cmd, cwd=repo_root, env=gui_env, stdout=client_outs[i], stderr=client_errs[i])
             )
             time.sleep(1)
 
@@ -233,14 +233,14 @@ def test_wargus_command_line_multiplayer_host_and_client_start_game(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_output, _client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
         stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
     )
 
@@ -255,14 +255,14 @@ def test_wargus_multiplayer_uses_synchronized_settings_for_simulation_preference
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_output, client_outputs = _run_command_line_multiplayer(
         repo_root=repo_root,
         stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         host_preferences={"SimplifiedAutoTargeting": True},
         client_preferences={"SimplifiedAutoTargeting": False},
@@ -285,7 +285,7 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     # Covers the resource/fog/network-sync surface from Wargus/stratagus#569.
@@ -293,7 +293,7 @@ def test_wargus_multiplayer_sync_stress_map_runs_without_desync(
         repo_root=repo_root,
         stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name="maps/test/(2)pytest-sync-stress.smp",
         run_after_start_seconds=45,
@@ -335,7 +335,7 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     map_name: str,
     ai_players: int,
@@ -344,7 +344,7 @@ def test_wargus_reported_multiplayer_maps_run_with_network_humans_and_ai(
         repo_root=repo_root,
         stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name=map_name,
         ai_players=ai_players,
@@ -390,7 +390,7 @@ def test_wargus_dedicated_ai_server_starts_reported_ai_maps(
     repo_root: Path,
     stratagus_pair: tuple[dict, dict],
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     map_name: str,
     client_races: tuple[str, ...],
@@ -403,7 +403,7 @@ def test_wargus_dedicated_ai_server_starts_reported_ai_maps(
         repo_root=repo_root,
         stratagus_pair=stratagus_pair,
         extracted_wargus_data=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name=map_name,
         numplayers=len(client_races),

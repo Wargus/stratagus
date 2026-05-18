@@ -37,7 +37,7 @@ def _run_driver(
     repo_root: Path,
     stratagus_bin: str,
     data_dir: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     driver_name: str,
     mode: str,
@@ -66,7 +66,7 @@ def _run_driver(
         mode,
     ]
     with stdout.open("wb") as out, stderr.open("wb") as err:
-        proc = subprocess.run(cmd, cwd=repo_root, env=xvfb_env, stdout=out, stderr=err, timeout=45)
+        proc = subprocess.run(cmd, cwd=repo_root, env=gui_env, stdout=out, stderr=err, timeout=45)
 
     combined = f"stdout:\n{stdout.read_text(errors='replace')}\nstderr:\n{stderr.read_text(errors='replace')}"
     assert proc.returncode == 0, combined
@@ -86,7 +86,7 @@ def test_wargus_lobby_callbacks_update_setup_slots(
     repo_root: Path,
     stratagus_bin: str,
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     mode: str,
     marker: str,
@@ -95,7 +95,7 @@ def test_wargus_lobby_callbacks_update_setup_slots(
         repo_root=repo_root,
         stratagus_bin=stratagus_bin,
         data_dir=extracted_wargus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         driver_name="wargus_driver",
         mode=mode,
@@ -117,7 +117,7 @@ def test_war1gus_lobby_callbacks_update_setup_slots(
     repo_root: Path,
     stratagus_bin: str,
     extracted_war1gus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     mode: str,
     marker: str,
@@ -126,7 +126,7 @@ def test_war1gus_lobby_callbacks_update_setup_slots(
         repo_root=repo_root,
         stratagus_bin=stratagus_bin,
         data_dir=extracted_war1gus_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         driver_name="war1gus_driver",
         mode=mode,
@@ -141,7 +141,7 @@ def test_wargus_driver_launches_join_ip_menu(
     repo_root: Path,
     stratagus_bin: str,
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     stdout = tmp_path / "wargus.stdout"
@@ -166,7 +166,7 @@ def test_wargus_driver_launches_join_ip_menu(
         "join-ip-menu",
     ]
     with stdout.open("wb") as out, stderr.open("wb") as err:
-        proc = subprocess.Popen(cmd, cwd=repo_root, env=xvfb_env, stdout=out, stderr=err)
+        proc = subprocess.Popen(cmd, cwd=repo_root, env=gui_env, stdout=out, stderr=err)
     try:
         time.sleep(5)
         assert proc.poll() is None, (
@@ -184,7 +184,7 @@ def test_wargus_join_without_server_selection_stays_alive(
     repo_root: Path,
     stratagus_bin: str,
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     stdout = tmp_path / "wargus.stdout"
@@ -209,16 +209,16 @@ def test_wargus_join_without_server_selection_stays_alive(
         "join-ip-menu",
     ]
     with stdout.open("wb") as out, stderr.open("wb") as err:
-        proc = subprocess.Popen(cmd, cwd=repo_root, env=xvfb_env, stdout=out, stderr=err)
+        proc = subprocess.Popen(cmd, cwd=repo_root, env=gui_env, stdout=out, stderr=err)
     try:
         time.sleep(5)
         assert proc.poll() is None, "Wargus exited before menu interaction"
-        if xvfb_env.get("SDL_VIDEODRIVER") != "x11":
+        if gui_env.get("SDL_VIDEODRIVER") != "x11":
             pytest.skip("interactive click test requires an SDL build with the x11 video driver")
 
         # RunJoinIpMenu creates a 352x352 panel centered in a 640x480 window.
         # The Connect button is at local coordinates roughly (60, 180).
-        click_screen(x=255, y=262, display=xvfb_env["DISPLAY"])
+        click_screen(x=255, y=262, display=gui_env["DISPLAY"])
         time.sleep(2)
 
         assert proc.poll() is None, (

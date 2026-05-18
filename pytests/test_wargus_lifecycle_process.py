@@ -30,7 +30,7 @@ def test_wargus_repeated_victory_cleanup_and_map_reload_does_not_crash(
     repo_root: Path,
     stratagus_bin: str,
     extracted_wargus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     # Covers Wargus/Wargus#502's linked victory-button crash reports, especially
@@ -58,7 +58,7 @@ def test_wargus_repeated_victory_cleanup_and_map_reload_does_not_crash(
     ]
 
     with stdout.open("wb") as out, stderr.open("wb") as err:
-        proc = subprocess.run(cmd, cwd=repo_root, env=xvfb_env, stdout=out, stderr=err, timeout=90)
+        proc = subprocess.run(cmd, cwd=repo_root, env=gui_env, stdout=out, stderr=err, timeout=90)
 
     combined = f"--- stdout ---\n{_read(stdout)}\n--- stderr ---\n{_read(stderr)}"
     assert proc.returncode == 0, combined
