@@ -392,7 +392,17 @@ void InitVideoSdl()
 		win_title = Parameters::Instance.applicationName.c_str();
 	}
 
-	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	const char *window_pos = SDL_GetHint("SDL_VIDEO_WINDOW_POS");
+	int x = SDL_WINDOWPOS_UNDEFINED;
+	int y = SDL_WINDOWPOS_UNDEFINED;
+	if (window_pos) {
+		std::stringstream ss(window_pos);
+		ss >> x;     // X
+		ss.ignore(); // skip ","
+		ss >> y;     // Y
+		printf("[Window Pos] %d,%d\n", x, y);
+	}
+	TheWindow = SDL_CreateWindow(win_title, x, y,
 	                             Video.WindowWidth, Video.WindowHeight, flags);
 	if (TheWindow == nullptr) {
 		ErrorPrint("Couldn't set %dx%dx%d video mode: %s\n",
