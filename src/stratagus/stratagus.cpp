@@ -213,6 +213,8 @@ extern void beos_init(int argc, char **argv);
 #include <SDL.h>
 #include <guisan.hpp>
 #include <string_view>
+#include <optional>
+#include <utility>
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>
@@ -521,7 +523,41 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	}
 	fprintf(stderr, "\n");
 #endif
-	char *sep;
+
+	const auto parseWindowSize = [](std::string_view size) -> std::optional<std::pair<int, int>> {
+		const size_t separator = size.find('x');
+		if (separator == std::string_view::npos || separator + 1 == size.size()) {
+			return {};
+		}
+		const int width = to_number(size.substr(0, separator));
+		const int height = to_number(size.substr(separator + 1));
+		if (!width || !height) {
+			return {};
+		}
+		return std::make_pair(width, height);
+	};
+
+	// POSIX getopt does not support optional arguments, so to support it only
+	// for -W, we scan once and remove the optional argument if it's given.
+	for (int i = 1; i < argc; ++i) {
+		std::string_view s = argv[i];
+		if (!s.empty() && s.front() == '-' && s.back() == 'W') {
+			int j = i + 1;
+			if (j < argc) {
+				auto sz = parseWindowSize(argv[i + 1]);
+				if (sz) {
+					Video.WindowWidth = sz.value().first;
+					Video.WindowHeight = sz.value().second;
+					for (; j + 1 < argc; ++j) {
+						argv[j] = argv[j + 1];
+					}
+					argv[j + 1] = NULL;
+					--argc;
+				}
+			}
+		}
+	}
+
 	for (;;) {
 		switch (getopt(argc, argv, "abc:d:D:eE:FgG:hiI:lN:oOP:prs:S:u:v:W?-")) {
 			case 'a':
@@ -595,47 +631,18 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					optarg == std::string_view("userhome") ? "" : optarg);
 				continue;
 			case 'v': {
-				sep = strchr(optarg, 'x');
-				if (!sep || !*(sep + 1)) {
-					ErrorPrint(
-						"%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
-					Usage();
-					exit(-1);
-				}
-				Video.Height = to_number(sep + 1);
-				*sep = 0;
-				Video.Width = to_number(optarg);
-				if (!Video.Height || !Video.Width) {
-					ErrorPrint("%s: incorrect format of video mode resolution -- '%sx%s'\n",
-					           argv[0],
-					           optarg,
-					           sep + 1);
+				auto sz = parseWindowSize(optarg);
+				if (sz) {
+					Video.Width = sz.value().first;
+					Video.Height = sz.value().second;
+				} else {
+					ErrorPrint("%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
 					exit(-1);
 				}
 				continue;
 			}
 			case 'W':
-				if (optind < argc && argv[optind] && argv[optind][0] != '-') {
-					// allow -W to take an optional argument in a POSIX compliant way
-					optarg = argv[optind];
-					sep = strchr(optarg, 'x');
-					if (!sep || !*(sep + 1)) {
-						ErrorPrint("%s: incorrect window size -- '%s'\n", argv[0], optarg);
-						Usage();
-						exit(-1);
-					}
-					Video.WindowHeight = to_number(sep + 1);
-					*sep = 0;
-					Video.WindowWidth = to_number(optarg);
-					if (!Video.WindowHeight || !Video.WindowWidth) {
-						ErrorPrint(
-							"%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
-						Usage();
-						exit(-1);
-					}
-					optind += 1; // skip the optional window size argument
-				}
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
