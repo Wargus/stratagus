@@ -45,8 +45,9 @@ def _absolute_existing_path(path: str) -> str:
     return str(candidate.resolve()) if candidate.exists() else path
 
 
+_CACHED_AUTO_PARTICIPANTS = None
 def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]:
-    configured = os.environ.get("STRATAGUS_PARTICIPANTS")
+    configured = os.environ.get("STRATAGUS_PARTICIPANTS", "auto")
     if configured and configured != "auto":
         data = json.loads(configured)
         participants = []
@@ -60,6 +61,9 @@ def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]
         return participants
 
     if configured == "auto":
+        global _CACHED_AUTO_PARTICIPANTS
+        if _CACHED_AUTO_PARTICIPANTS:
+            return _CACHED_AUTO_PARTICIPANTS
         candidates = [
             ("native-debug", [str(repo_root / "build" / "stratagus-dbg")]),
             ("native-release", [str(repo_root / "build-release" / "stratagus")]),
@@ -73,12 +77,13 @@ def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]
                 ],
             ),
         ]
-        if os.environ.get("STRATAGUS_INCLUDE_WINE") == "1":
+        if os.environ.get("STRATAGUS_INCLUDE_WINE", "1") == "1":
             wine = _wine_participant(repo_root)
             if wine:
                 candidates.append(wine)
         participants = [{"name": name, "argv": argv} for name, argv in candidates if _existing_argv(argv)]
         if participants:
+            _CACHED_AUTO_PARTICIPANTS = participants
             return participants
 
     fallback = os.environ.get("STRATAGUS_BIN") or str(repo_root / "build" / "stratagus-dbg")
@@ -399,7 +404,7 @@ def timeless_tales_data(repo_root: Path) -> Path:
 
 
 @pytest.fixture
-def gui_env(repo_root: Path, tmp_path: Path):
+def gui_env(stratagus_pair: tuple[dict, dict], repo_root: Path, tmp_path: Path):
     if os.environ.get("WARGUS_GUI_TESTS", "1") != "1":
         # Explicit GUI tests skip
         pytest.skip("Set WARGUS_GUI_TESTS=1 to run GUI tests")
@@ -425,6 +430,8 @@ def gui_env(repo_root: Path, tmp_path: Path):
         if proc.poll() is not None:
             pytest.fail(f"Xvfb exited early; see {log}")
     elif not (os.environ.get("WAYLAND_DISPLAY") or os.environ.get("DISPLAY")):
+        env["SDL_VIDEODRIVER"] = "dummy"
+    elif any(any(a.startswith("qemu") for a in p["argv"]) for p in stratagus_pair):
         env["SDL_VIDEODRIVER"] = "dummy"
 
     env["SDL_AUDIODRIVER"] = "dummy"
