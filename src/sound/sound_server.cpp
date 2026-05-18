@@ -119,7 +119,7 @@ static void KillPlayingProcess() {
 }
 
 static bool External_Play(const std::string &file) {
-	static bool useNativeMidi = !Mix_HasMusicDecoder("TIMIDITY") || SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE);
+	static bool useNativeMidi = (!Mix_HasMusicDecoder("TIMIDITY") || SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE)) && strcmp(SDL_GetHint("SDL_AUDIODRIVER"), "dummy");
 	if (!useNativeMidi) {
 		return false;
 	}
