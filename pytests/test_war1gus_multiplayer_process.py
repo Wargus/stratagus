@@ -50,7 +50,7 @@ def _participant_cmd(participant: dict, args: list[str]) -> list[str]:
 def test_war1gus_command_line_multiplayer_host_and_client_run_sync_stress_map(
     stratagus_pair: tuple[dict, dict],
     extracted_war1gus_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_participant, client_participant = stratagus_pair
@@ -59,7 +59,7 @@ def test_war1gus_command_line_multiplayer_host_and_client_run_sync_stress_map(
     client_user = tmp_path / "client-user"
     write_war1gus_preferences(host_user)
     write_war1gus_preferences(client_user)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     host_out = tmp_path / "host.stdout"

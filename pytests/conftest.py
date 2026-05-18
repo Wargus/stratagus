@@ -399,7 +399,7 @@ def timeless_tales_data(repo_root: Path) -> Path:
 
 
 @pytest.fixture
-def xvfb_env(repo_root: Path, tmp_path: Path):
+def gui_env(repo_root: Path, tmp_path: Path):
     if os.environ.get("WARGUS_GUI_TESTS", "1") != "1":
         # Explicit GUI tests skip
         pytest.skip("Set WARGUS_GUI_TESTS=1 to run GUI tests")

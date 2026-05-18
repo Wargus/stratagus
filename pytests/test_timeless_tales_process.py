@@ -139,14 +139,14 @@ def _run_single_player_map(
     *,
     participant: dict,
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     map_name: str,
     run_seconds: float,
 ) -> tuple[Path, Path]:
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     stdout = tmp_path / "single-player.stdout"
@@ -186,7 +186,7 @@ def _run_timeless_tales_script(
     *,
     participant: dict,
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     script: Path,
     ready_marker: str,
@@ -194,7 +194,7 @@ def _run_timeless_tales_script(
 ) -> tuple[Path, Path]:
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     stdout = tmp_path / "script.stdout"
@@ -233,7 +233,7 @@ def _run_command_line_multiplayer(
     *,
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     map_name: str = "maps/test/(2)pytest-sync-stress.smp",
     run_after_start_seconds: float = 8,
@@ -250,7 +250,7 @@ def _run_command_line_multiplayer(
     client_user = tmp_path / "client-user"
     write_timeless_tales_preferences(host_user, host_preferences)
     write_timeless_tales_preferences(client_user, client_preferences)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     host_out = tmp_path / "host.stdout"
@@ -349,7 +349,7 @@ def test_timeless_tales_map_png_previews_are_valid(timeless_tales_data: Path):
 def test_timeless_tales_data_tree_starts_to_main_menu(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     participant, unused_client_participant = stratagus_pair
@@ -358,7 +358,7 @@ def test_timeless_tales_data_tree_starts_to_main_menu(
 
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     stdout = tmp_path / "timeless.stdout"
@@ -399,7 +399,7 @@ def test_timeless_tales_data_tree_starts_to_main_menu(
 def test_timeless_tales_single_player_map_runs_without_crashing(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     participant, unused_client_participant = stratagus_pair
@@ -409,7 +409,7 @@ def test_timeless_tales_single_player_map_runs_without_crashing(
     _run_single_player_map(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name="maps/skirmish/(2)timeless-isle.smp.gz",
         run_seconds=20,
@@ -422,7 +422,7 @@ def test_timeless_tales_single_player_map_runs_without_crashing(
 def test_timeless_tales_for_the_motherland_map_runs_without_crashing(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     participant, unused_client_participant = stratagus_pair
@@ -432,7 +432,7 @@ def test_timeless_tales_for_the_motherland_map_runs_without_crashing(
     _run_single_player_map(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name="maps/ftm/(2)nicks-duel.smp",
         run_seconds=20,
@@ -445,7 +445,7 @@ def test_timeless_tales_for_the_motherland_map_runs_without_crashing(
 def test_timeless_tales_beethoven_day_wise_man_selection_survives(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
     repo_root: Path,
 ):
@@ -456,7 +456,7 @@ def test_timeless_tales_beethoven_day_wise_man_selection_survives(
     _run_timeless_tales_script(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         script=repo_root / "pytests" / "lua" / "timeless_tales_select_wiseman.lua",
         ready_marker="PYTEST_TIMELESS_SELECTED_WISEMAN",
@@ -470,7 +470,7 @@ def test_timeless_tales_beethoven_day_wise_man_selection_survives(
 def test_timeless_tales_editor_map_runs_without_crashing(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     participant, unused_client_participant = stratagus_pair
@@ -479,7 +479,7 @@ def test_timeless_tales_editor_map_runs_without_crashing(
 
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
-    test_env = dict(xvfb_env)
+    test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
     stdout = tmp_path / "editor.stdout"
@@ -521,13 +521,13 @@ def test_timeless_tales_editor_map_runs_without_crashing(
 def test_timeless_tales_command_line_multiplayer_runs_without_desync_or_crash(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_output, client_output = _run_command_line_multiplayer(
         stratagus_pair=stratagus_pair,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         run_after_start_seconds=0,
         host_markers=(
@@ -557,13 +557,13 @@ def test_timeless_tales_command_line_multiplayer_runs_without_desync_or_crash(
 def test_timeless_tales_multiplayer_uses_synchronized_settings_for_simulation_preferences(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_output, client_output = _run_command_line_multiplayer(
         stratagus_pair=stratagus_pair,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         host_preferences={"SimplifiedAutoTargeting": True},
         client_preferences={"SimplifiedAutoTargeting": False},
@@ -582,13 +582,13 @@ def test_timeless_tales_multiplayer_uses_synchronized_settings_for_simulation_pr
 def test_timeless_tales_multiplayer_real_map_runs_with_network_humans_and_ai(
     stratagus_pair: tuple[dict, dict],
     timeless_tales_data: Path,
-    xvfb_env,
+    gui_env,
     tmp_path: Path,
 ):
     host_output, _client_output = _run_command_line_multiplayer(
         stratagus_pair=stratagus_pair,
         timeless_tales_data=timeless_tales_data,
-        xvfb_env=xvfb_env,
+        gui_env=gui_env,
         tmp_path=tmp_path,
         map_name="maps/skirmish/New folder/(3)three-ways-to-cross.smp.gz",
         ai_players=1,
