@@ -435,6 +435,7 @@ def gui_env(stratagus_pair: tuple[dict, dict], repo_root: Path, tmp_path: Path):
         env["SDL_VIDEODRIVER"] = "dummy"
 
     env["SDL_AUDIODRIVER"] = "dummy"
+    env["SDL_VIDEO_WINDOW_POS"] = "0,0"
     try:
         yield env
     finally:

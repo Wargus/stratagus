@@ -22,7 +22,11 @@ def _free_udp_port() -> int:
 
 def _launch(cmd: list[str], *, cwd: Path, env: dict[str, str], stdout: Path, stderr: Path) -> subprocess.Popen:
     with stdout.open("wb") as out, stderr.open("wb") as err:
-        return subprocess.Popen(cmd, cwd=cwd, env=env, stdout=out, stderr=err)
+        try:
+            return subprocess.Popen(cmd, cwd=cwd, env=env, stdout=out, stderr=err)
+        finally:
+            if pos := env.get("SDL_VIDEO_WINDOW_POS"):
+                env["SDL_VIDEO_WINDOW_POS"] = ",".join(str(int(c) + 640) for c in pos.split(","))
 
 
 def _wait_for_log(path: Path, needle: str, proc: subprocess.Popen, timeout: float) -> bool:
