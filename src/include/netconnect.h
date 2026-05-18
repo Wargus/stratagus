@@ -113,6 +113,7 @@ extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of pl
 ----------------------------------------------------------------------------*/
 
 extern int FindHostIndexBy(const CHost &host);
+extern bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &setup);
 extern int NetworkGetPlayerIndexForHost(int hostIndex);
 extern bool NetworkIsLocalSetupInSync(const CServerSetup &state1,
                                       const CServerSetup &state2,
