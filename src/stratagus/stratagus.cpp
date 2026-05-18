@@ -522,6 +522,20 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	fprintf(stderr, "\n");
 #endif
 	char *sep;
+	const auto parseWindowSize = [](std::string_view size) {
+		const size_t separator = size.find('x');
+		if (separator == std::string_view::npos || separator + 1 == size.size()) {
+			return false;
+		}
+		const int width = to_number(size.substr(0, separator));
+		const int height = to_number(size.substr(separator + 1));
+		if (!width || !height) {
+			return false;
+		}
+		Video.WindowWidth = width;
+		Video.WindowHeight = height;
+		return true;
+	};
 	for (;;) {
 		switch (getopt(argc, argv, "abc:d:D:eE:FgG:hiI:lN:oOP:prs:S:u:v:W?-")) {
 			case 'a':
@@ -619,18 +633,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (optind < argc && argv[optind] && argv[optind][0] != '-') {
 					// allow -W to take an optional argument in a POSIX compliant way
 					optarg = argv[optind];
-					sep = strchr(optarg, 'x');
-					if (!sep || !*(sep + 1)) {
+					if (!parseWindowSize(optarg)) {
 						ErrorPrint("%s: incorrect window size -- '%s'\n", argv[0], optarg);
-						Usage();
-						exit(-1);
-					}
-					Video.WindowHeight = to_number(sep + 1);
-					*sep = 0;
-					Video.WindowWidth = to_number(optarg);
-					if (!Video.WindowHeight || !Video.WindowWidth) {
-						ErrorPrint(
-							"%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
 						Usage();
 						exit(-1);
 					}
@@ -648,6 +652,34 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				exit(-1);
 		}
 		break;
+	}
+
+	if (VideoForceFullScreen && argc - optind > 1) {
+		for (int i = optind; i < argc; ++i) {
+			if (parseWindowSize(argv[i])) {
+				for (int j = i; j + 1 < argc; ++j) {
+					argv[j] = argv[j + 1];
+				}
+				argc--;
+				break;
+			}
+		}
+	}
+
+	for (int i = optind + 1; i < argc;) {
+		if (argv[i] == std::string_view("-c") && i + 1 < argc) {
+			parameters.luaStartFilename = argv[i + 1];
+			if (parameters.luaStartFilename.extension() != ".lua") {
+				ErrorPrint("Please specify a Lua file\n");
+				ExitFatal(-1);
+			}
+			for (int j = i; j + 2 < argc; ++j) {
+				argv[j] = argv[j + 2];
+			}
+			argc -= 2;
+		} else {
+			i++;
+		}
 	}
 
 	if (argc - optind > 1) {
