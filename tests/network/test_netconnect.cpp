@@ -316,6 +316,39 @@ TEST_CASE("Client setup state changes ignore race updates for invalid host slots
 	CHECK(server.ServerGameSettings.Presets[4].Race == 1);
 }
 
+TEST_CASE("Dedicated server detection follows the host's assigned player slot")
+{
+	CNetworkHost host;
+	host.SetName("server");
+	host.PlyNr = 1;
+
+	CServerSetup setup;
+	setup.Clear();
+	setup.CompOpt[0] = SlotOption::Closed;
+	setup.CompOpt[1] = SlotOption::Available;
+
+	CHECK_FALSE(NetworkIsDedicatedServerHost(host, setup));
+
+	setup.CompOpt[1] = SlotOption::Closed;
+	CHECK(NetworkIsDedicatedServerHost(host, setup));
+}
+
+TEST_CASE("Dedicated server detection preserves slot zero dedicated setup")
+{
+	CNetworkHost host;
+	host.SetName("server");
+	host.PlyNr = 0;
+
+	CServerSetup setup;
+	setup.Clear();
+	setup.CompOpt[0] = SlotOption::Available;
+
+	CHECK_FALSE(NetworkIsDedicatedServerHost(host, setup));
+
+	setup.CompOpt[0] = SlotOption::Closed;
+	CHECK(NetworkIsDedicatedServerHost(host, setup));
+}
+
 TEST_CASE("Network host compaction preserves sparse host to player assignments")
 {
 	ClearNetworkHosts();
