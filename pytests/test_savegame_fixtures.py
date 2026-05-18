@@ -23,6 +23,7 @@ class SavegameCase:
     lua_epilogue: str = ""
     results_menu: bool = False
     expected_failure: str = ""
+    expected_marker: str = ""
 
 
 SAVEGAME_CASES = [
@@ -118,6 +119,31 @@ GameStarting = function()
   end
 end
 """,
+    ),
+    SavegameCase(
+        "wargus",
+        "stratagus-753-crash-after-camera-move.sav.gz",
+        "Wargus/stratagus#753",
+        "null construction pointer while drawing a fogged unit after moving the camera",
+        lua_epilogue="""
+local pytest_previous_game_starting = GameStarting
+GameStarting = function()
+  if pytest_previous_game_starting ~= nil then
+    pytest_previous_game_starting()
+  end
+  CenterMap(63, 63)
+  print("PYTEST_SAVEGAME_CAMERA_BOTTOM_RIGHT")
+  io.stdout:flush()
+end
+
+AddTrigger(
+  function() return GameCycle >= 5 end,
+  function()
+    StopGame(GameDraw)
+    return true
+  end)
+""",
+        expected_marker="PYTEST_SAVEGAME_CAMERA_BOTTOM_RIGHT",
     ),
 ]
 
@@ -220,4 +246,6 @@ def test_attached_savegame_loads_and_runs_without_crashing(
         pytest.xfail(f"{case.issue}: {case.expected_failure}")
     if case.results_menu:
         assert "PYTEST_SAVEGAME_RESULTS_START" in combined, combined
+    if case.expected_marker:
+        assert case.expected_marker in combined, combined
     assert proc.returncode in (0, -9), combined
