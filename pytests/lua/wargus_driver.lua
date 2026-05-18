@@ -28,14 +28,17 @@ CustomStartup = function()
     NetworkMapName = map
     NetworkInitServerConnect(4)
     local menu = CreateOnlineLobby(map, 4, true)
+    Hosts[0].PlyNr = 2
 
     menu.option_dedicated_ai_server:setMarked(true)
     menu.option_dedicated_ai_server.callback(menu.option_dedicated_ai_server)
-    expect(ServerSetupState.CompOpt[0] == 2, "dedicated callback did not close host slot")
+    expect(ServerSetupState.CompOpt[2] == 2, "dedicated callback did not close host player slot")
+    expect(ServerSetupState.CompOpt[0] ~= 2, "dedicated callback closed host index instead of player slot")
 
     menu.option_race:setSelected(2)
     menu.option_race.callback(menu.option_race)
-    expect(ServerSetupState.Race[0] == 1, "server race callback did not update host player slot")
+    expect(ServerSetupState.Race[2] == 1, "server race callback did not update host player slot")
+    expect(ServerSetupState.Race[0] ~= 1, "server race callback updated host index instead of player slot")
 
     menu:updateOptions()
     print("PYTEST_WARGUS_SERVER_LOBBY_CALLBACKS_OK")
