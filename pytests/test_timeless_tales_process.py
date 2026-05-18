@@ -82,6 +82,19 @@ def _setting_value(settings: str, name: str) -> str:
     raise AssertionError(f"Missing setting {name} in:\n{settings}")
 
 
+def _network_setup_lines(output: str) -> list[str]:
+    marker = "FINAL NETWORK GAME SETUP\n"
+    assert marker in output
+    block = output.split(marker, 1)[1]
+    lines = []
+    for line in block.splitlines():
+        if line.startswith("FINAL NETWORK GAME SETTINGS"):
+            break
+        if line:
+            lines.append(line)
+    return lines
+
+
 def _assert_no_runtime_failures(combined: str) -> None:
     for marker in (
         "Network out of sync",
@@ -600,3 +613,6 @@ def test_timeless_tales_multiplayer_real_map_runs_with_network_humans_and_ai(
     )
 
     assert "FINAL NETWORK GAME SETUP" in host_output
+    setup_lines = _network_setup_lines(host_output)
+    assert sum("CO: 0" in line and "Host:" in line for line in setup_lines) == 2
+    assert "pytest-timeless-host" in host_output
