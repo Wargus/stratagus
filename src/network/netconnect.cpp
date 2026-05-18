@@ -1715,7 +1715,9 @@ int FindHostIndexBy(const CHost &host)
 
 bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &setup)
 {
-	return host.IsValid() && host.PlyNr < PlayerMax && setup.CompOpt[host.PlyNr] == SlotOption::Closed;
+	return host.IsValid() && host.PlyNr < PlayerMax
+	       && Map.Info.PlayerType[host.PlyNr] == PlayerTypes::PlayerPerson
+	       && setup.CompOpt[host.PlyNr] == SlotOption::Closed;
 }
 
 void NetworkCompactHosts()
@@ -1790,6 +1792,21 @@ void NetworkServerStartGame()
 
 	printf("INITIAL ServerSetupState:\n");
 	NetPlayers = 0;
+	if (Hosts[0].IsValid() && Hosts[0].PlyNr < PlayerMax
+	    && Map.Info.PlayerType[Hosts[0].PlyNr] != PlayerTypes::PlayerPerson) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson
+			    && ServerSetupState.CompOpt[i] == SlotOption::Available) {
+				const bool occupied = std::any_of(Hosts + 1, Hosts + PlayerMax, [i](const CNetworkHost &host) {
+					return host.IsValid() && host.PlyNr == i;
+				});
+				if (!occupied) {
+					Hosts[0].PlyNr = i;
+					break;
+				}
+			}
+		}
+	}
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
 	const bool dedicatedServer = NetworkIsDedicatedServerHost(Hosts[0], ServerSetupState);
 	const auto isHumanHostForPlayer = [dedicatedServer](const int hostIndex, const int playerIndex) {
