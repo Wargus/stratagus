@@ -1716,7 +1716,6 @@ int FindHostIndexBy(const CHost &host)
 bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &setup)
 {
 	return host.IsValid() && host.PlyNr < PlayerMax
-	       && Map.Info.PlayerType[host.PlyNr] == PlayerTypes::PlayerPerson
 	       && setup.CompOpt[host.PlyNr] == SlotOption::Closed;
 }
 
