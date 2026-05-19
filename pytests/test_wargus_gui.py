@@ -213,7 +213,7 @@ def test_wargus_join_without_server_selection_stays_alive(
     try:
         time.sleep(5)
         assert proc.poll() is None, "Wargus exited before menu interaction"
-        if gui_env.get("SDL_VIDEODRIVER") != "x11":
+        if gui_env.get("SDL_VIDEODRIVER") == "dummy" or not gui_env.get("DISPLAY"):
             pytest.skip("interactive click test requires an SDL build with the x11 video driver")
 
         # RunJoinIpMenu creates a 352x352 panel centered in a 640x480 window.
