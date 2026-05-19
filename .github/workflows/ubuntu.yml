@@ -77,8 +77,7 @@ jobs:
 
     - name: Run Timeless Tales process tests
       env:
-        WARGUS_GUI_TESTS: "1"
         PYTEST_SDL_VIDEODRIVER: dummy
         STRATAGUS_BIN: ./build/stratagus
         TIMELESS_TALES_DATA_DIR: ./games/timeless-tales
-      run: python3 -m pytest --basetemp=/tmp/stratagus-timeless -q pytests/test_timeless_tales_process.py
+      run: python3 -m pytest --basetemp=/tmp/stratagus-timeless -q pytests/
