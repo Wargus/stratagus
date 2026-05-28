@@ -196,20 +196,29 @@ UiCenterOnGroup(unsigned group,
                 EGroupSelectionMode mode = EGroupSelectionMode::SelectableByRectangleOnly)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
-	PixelPos pos(-1, -1);
+	int selectableUnitCountByMode = 0;
+	int selectableUnitCount = 0;
+	PixelPos pos(0, 0);
+	PixelPos fallbackPos(0, 0);
 
-	// FIXME: what should we do with the removed units? ignore?
 	for (CUnit *unit : units) {
-		if (unit->Type && unit->Type->CanSelect(mode)) {
-			if (pos.x != -1) {
-				pos += (unit->GetMapPixelPosCenter() - pos) / 2;
-			} else {
-				pos = unit->GetMapPixelPosCenter();
+		if (unit->Type && unit->IsAliveOnMap()) {
+			if (unit->Type->CanSelect(mode)) {
+				++selectableUnitCountByMode;
+				pos += unit->GetMapPixelPosCenter();
+			} else if (mode != EGroupSelectionMode::SelectAll && !selectableUnitCountByMode && unit->Type->CanSelect(EGroupSelectionMode::SelectAll)) {
+				// in case there are no units in the group we would center on
+				// with the requested mode, we consider the others for
+				// centering
+				++selectableUnitCount;
+				fallbackPos += unit->GetMapPixelPosCenter();
 			}
 		}
 	}
-	if (pos.x != -1) {
-		UI.SelectedViewport->Center(pos);
+	if (selectableUnitCountByMode) {
+		UI.SelectedViewport->Center(pos / selectableUnitCountByMode);
+	} else if (selectableUnitCount) {
+		UI.SelectedViewport->Center(fallbackPos / selectableUnitCount);
 	}
 }
 
