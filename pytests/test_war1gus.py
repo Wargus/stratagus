@@ -48,20 +48,10 @@ def _participant_cmd(participant: dict, args: list[str]) -> list[str]:
     return [*participant["argv"], *args]
 
 
-@pytest.mark.gui
-@pytest.mark.cross
-@pytest.mark.slow
-def test_war1gus_elwynn_forest(
-    stratagus_player: dict,
-    extracted_war1gus_data: Path,
-    gui_env,
-    tmp_path: Path,
-):
-    write_war1gus_preferences(tmp_path)
-    startup = tmp_path / "start.lua"
-    startup.write_text("""
+def write_war1gus_campaign_start(startup, race, i):
+    startup.write_text(f"""
     Load("scripts/stratagus.lua")
-    SetTitleScreens({})
+    SetTitleScreens({{}})
     local function log(message)
       if not (os and os.getenv and os.getenv("STRATAGUS_UNBUFFERED_STDIO")) then
         return
@@ -73,19 +63,19 @@ def test_war1gus_elwynn_forest(
     end
     CustomStartup = function()
       Load("scripts/campaigns.lua")
-      race = "human"
+      race = "{race}"
       campaign = CreateCampaign(race)
-      position = 5
+      position = {i}
       currentCampaign = campaign
       currentRace = race
-      currentState = 5
+      currentState = {i}
       RunResultsMenu = function()
         if GameResult == GameVictory then
-          log("PYTEST_WAR1_ELWYNN_WON")
+          log("PYTEST_WAR1_WON")
         end
         return
       end
-      for i=6,14,1 do
+      for i={i + 1},14,1 do
         campaign.steps[i] = function() end
       end
       Briefing = function(title, objs, bgImg, mapbg, mapVideo, text, voices) end
@@ -93,47 +83,32 @@ def test_war1gus_elwynn_forest(
       AddTrigger(
         function() return GameCycle > 25 end,
         function()
-          log("PYTEST_WAR1_ELWYNN_LOADED")
-          CreateUnit("unit-knight", 0, {12, 15})
-          CreateUnit("unit-knight", 0, {20, 15})
-          CreateUnit("unit-knight", 0, {12, 11})
-          CreateUnit("unit-knight", 0, {16, 15})
-          CreateUnit("unit-knight", 0, {16, 12})
-          CreateUnit("unit-knight", 0, {23, 12})
-          CreateUnit("unit-knight", 0, {20, 12})
-          CreateUnit("unit-knight", 0, {11, 19})
-          CreateUnit("unit-knight", 0, {14, 19})
-          CreateUnit("unit-knight", 0, {17, 19})
-          CreateUnit("unit-knight", 0, {20, 19})
-          CreateUnit("unit-knight", 0, {34, 29})
-          CreateUnit("unit-knight", 0, {22, 18})
-          CreateUnit("unit-knight", 0, {31, 26})
-          CreateUnit("unit-knight", 0, {33, 11})
-          CreateUnit("unit-knight", 0, {16, 18})
-          CreateUnit("unit-knight", 0, {34, 25})
-          CreateUnit("unit-knight", 0, {35, 26})
-          CreateUnit("unit-knight", 0, {32, 25})
-          CreateUnit("unit-knight", 0, {34, 27})
-          CreateUnit("unit-knight", 0, {35, 28})
-          CreateUnit("unit-knight", 0, {9, 6})
-          CreateUnit("unit-knight", 0, {19, 18})
-          CreateUnit("unit-knight", 0, {19, 14})
-          CreateUnit("unit-knight", 0, {23, 14})
-          CreateUnit("unit-knight", 0, {33, 26})
-          CreateUnit("unit-knight", 0, {17, 27})
-          CreateUnit("unit-knight", 0, {18, 22})
-          CreateUnit("unit-knight", 0, {9, 21})
-          CreateUnit("unit-knight", 0, {7, 7})
-          CreateUnit("unit-knight", 0, {22, 11})
-          CreateUnit("unit-knight", 0, {28, 21})
-          CreateUnit("unit-knight", 0, {31, 19})
-          CreateUnit("unit-knight", 0, {9, 14})
-          CreateUnit("unit-knight", 0, {11, 14})
-          CreateUnit("unit-knight", 0, {15, 14})
+          log("PYTEST_WAR1_LOADED")
+          for x=3,63,4 do
+            for y=3,63,4 do
+              CreateUnit("unit-knight", 0, {{x, y}})
+            end
+          end
         end)
       RunCampaign(campaign)
     end
     """)
+
+
+@pytest.mark.gui
+@pytest.mark.cross
+@pytest.mark.slow
+@pytest.mark.parametrize("sets", (("human", 5), ("human", 6), ("orc", 5)), ids=["elwynn", "northshire-abbey", "redridge-mountains"])
+def test_war1gus_campaign_maps(
+    stratagus_player: dict,
+    extracted_war1gus_data: Path,
+    sets,
+    gui_env,
+    tmp_path: Path,
+):
+    write_war1gus_preferences(tmp_path)
+    startup = tmp_path / "start.lua"
+    write_war1gus_campaign_start(startup, *sets)
     test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
@@ -171,8 +146,8 @@ def test_war1gus_elwynn_forest(
         terminate_process(host)
 
     combined = _combined_logs(logs)
-    assert "PYTEST_WAR1_ELWYNN_LOADED" in _read(host_out), _combined_logs((host_out, host_err))
-    assert "PYTEST_WAR1_ELWYNN_WON" in _read(host_out), _combined_logs((host_out, host_err))
+    assert "PYTEST_WAR1_LOADED" in _read(host_out), _combined_logs((host_out, host_err))
+    assert "PYTEST_WAR1_WON" in _read(host_out), _combined_logs((host_out, host_err))
     for marker in (
         "Network out of sync",
         "sent bad command",
