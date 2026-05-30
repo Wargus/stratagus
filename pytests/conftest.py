@@ -19,13 +19,14 @@ def pytest_configure(config):
 
 
 def pytest_generate_tests(metafunc):
-    if "stratagus_pair" not in metafunc.fixturenames:
-        return
-
     participants = _stratagus_participants(Path(metafunc.config.rootpath))
-    pairs = list(itertools.product(participants, repeat=2))
-    ids = [f"{host['name']}-host__{client['name']}-client" for host, client in pairs]
-    metafunc.parametrize("stratagus_pair", pairs, ids=ids)
+    if "stratagus_pair" in metafunc.fixturenames:
+        pairs = list(itertools.product(participants, repeat=2))
+        ids = [f"{host['name']}-host__{client['name']}-client" for host, client in pairs]
+        metafunc.parametrize("stratagus_pair", pairs, ids=ids)
+    if "stratagus_player" in metafunc.fixturenames:
+        ids = [f"{p['name']}-player" for p in participants]
+        metafunc.parametrize("stratagus_player", participants, ids=ids)
 
 
 @pytest.fixture(scope="session")
@@ -94,6 +95,7 @@ def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]
     if Path(fallback).exists():
         return [{"name": "default", "argv": [_absolute_existing_path(fallback)]}]
     pytest.skip("Stratagus binary not found; set STRATAGUS_BIN or STRATAGUS_PARTICIPANTS")
+    return []
 
 
 def _wine_participant(repo_root: Path) -> tuple[str, list[str]] | None:
@@ -130,6 +132,7 @@ def lua51(repo_root: Path) -> str:
         if candidate and Path(candidate).exists():
             return _absolute_existing_path(candidate)
     pytest.skip("Lua 5.1 interpreter not found; set LUA51 or build vendored Lua")
+    return ""
 
 
 @pytest.fixture(scope="session")
@@ -144,6 +147,7 @@ def stratagus_bin(repo_root: Path) -> str:
         if candidate and Path(candidate).exists():
             return candidate
     pytest.skip("Stratagus binary not found; set STRATAGUS_BIN or build the stratagus target")
+    return ""
 
 
 def _has_asset_markers(data_dir: Path) -> bool:
@@ -163,10 +167,11 @@ def _file_signature(path: Path) -> str:
     return f"{path.resolve()}\n{stat.st_size}\n{stat.st_mtime_ns}\n"
 
 
-def _unpack_iso(repo_root: Path, iso: Path, output_dir: Path) -> Path:
+def _unpack_iso(repo_root: Path, iso: Path, output_dir: Path) -> Path | None:
     seven_zip = shutil.which("7z") or shutil.which("7zz")
     if not seven_zip:
         pytest.skip("7z/7zz not found; cannot unpack game ISO")
+        return
 
     marker = output_dir / ".source-iso"
     signature = _file_signature(iso)
@@ -263,7 +268,7 @@ def _build_game_tool(repo_root: Path, game: str, tool: str, stratagus_bin: str) 
     return tool_path
 
 
-def _find_iso(repo_root: Path, env_name: str, names: tuple[str, ...]) -> Path:
+def _find_iso(repo_root: Path, env_name: str, names: tuple[str, ...]) -> Path | None:
     override = os.environ.get(env_name)
     candidates = [Path(override)] if override else []
     candidates.extend(repo_root / "games" / name for name in names)
@@ -271,6 +276,7 @@ def _find_iso(repo_root: Path, env_name: str, names: tuple[str, ...]) -> Path:
         if candidate.exists():
             return candidate
     pytest.skip(f"Game ISO not found; set {env_name} or place one of {', '.join(names)} in games/")
+    return None
 
 
 def _extract_game_data(
@@ -288,6 +294,7 @@ def _extract_game_data(
         return data_dir
 
     iso = _find_iso(repo_root, iso_env, iso_names)
+    assert iso
     iso_dir = _unpack_iso(repo_root, iso, repo_root / "games" / ".pytest-data" / f"{game}-iso")
     tool_path = _build_game_tool(repo_root, game, tool, stratagus_bin)
 
@@ -334,13 +341,6 @@ def _copy_wargus_runtime_data(source_dir: Path, data_dir: Path) -> None:
         if source.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
-
-
-def _sdl_x11_available(repo_root: Path) -> bool:
-    cache = repo_root / "build" / "SDL2" / "src" / "SDL2-build" / "CMakeCache.txt"
-    if cache.exists() and "X11_LIB:FILEPATH=X11_LIB-NOTFOUND" in cache.read_text(errors="replace"):
-        return False
-    return True
 
 
 @pytest.fixture(scope="session")
@@ -404,10 +404,11 @@ def timeless_tales_data(repo_root: Path) -> Path:
 
 
 @pytest.fixture
-def gui_env(stratagus_pair: tuple[dict, dict], repo_root: Path, tmp_path: Path):
+def gui_env(stratagus_pair: tuple[dict, dict], tmp_path: Path):
     if os.environ.get("WARGUS_GUI_TESTS", "1") != "1":
         # Explicit GUI tests skip
         pytest.skip("Set WARGUS_GUI_TESTS=1 to run GUI tests")
+        return
 
     env = os.environ.copy()
     video_driver = os.environ.get("PYTEST_SDL_VIDEODRIVER")
@@ -418,7 +419,9 @@ def gui_env(stratagus_pair: tuple[dict, dict], repo_root: Path, tmp_path: Path):
         xvfb = shutil.which("Xvfb")
         if not xvfb:
             pytest.skip("Xvfb not found")
-        env["DISPLAY"] = os.environ.get("PYTEST_XVFB_DISPLAY", f":{90 + (os.getpid() % 9)}")
+            return
+        display = os.environ.get("PYTEST_XVFB_DISPLAY", f":{90 + (os.getpid() % 9)}")
+        env["DISPLAY"] = display
         log = tmp_path / "xvfb.log"
         with log.open("wb") as out:
             proc = subprocess.Popen(

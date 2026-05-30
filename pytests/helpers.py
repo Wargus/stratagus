@@ -63,15 +63,17 @@ def write_war1gus_preferences(user_dir: Path, preferences: dict[str, Any] | None
     preferences_path.parent.mkdir(parents=True, exist_ok=True)
     custom = preferences or {}
     extra = "".join(f"wc1.preferences.{key} = {_lua_value(value)}\n" for key, value in custom.items())
-    preferences_path.write_text(
-        "wc1 = wc1 or {}\n"
-        "wc1.preferences = wc1.preferences or {}\n"
-        "wc1.preferences.EnableMouseScrolling = false\n"
-        "wc1.preferences.MusicEnabled = false\n"
-        "wc1.preferences.PauseOnLeave = false\n"
-        "wc1.preferences.ShowTips = false\n"
-        "wc1.preferences.VideoFullScreen = false\n"
-        "wc1.preferences.VideoHeight = 480\n"
-        "wc1.preferences.VideoWidth = 640\n"
-        f"{extra}"
-    )
+    preferences_path.write_text(f"""
+        wc1 = wc1 or {{}}
+        wc1.preferences = wc1.preferences or {{}}
+        wc1.preferences.EnableMouseScrolling = false
+        wc1.preferences.MusicEnabled = false
+        wc1.preferences.PauseOnLeave = false
+        wc1.preferences.ShowTips = false
+        wc1.preferences.VideoFullScreen = false
+        wc1.preferences.VideoHeight = 480
+        wc1.preferences.VideoWidth = 640
+        wc1.preferences.CampaignOrc = 12
+        wc1.preferences.CampaignHuman = 12
+        {extra}
+    """)
