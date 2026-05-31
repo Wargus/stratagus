@@ -67,7 +67,9 @@ def _stratagus_participants(repo_root: Path) -> list[dict[str, list[str] | str]]
             return _CACHED_AUTO_PARTICIPANTS
         candidates = [
             ("native-debug", [str(repo_root / "build" / "stratagus-dbg")]),
+            ("native-debug-exe", [str(repo_root / "build" / "stratagus-dbg.exe")]),
             ("native-release", [str(repo_root / "build-release" / "stratagus")]),
+            ("native-release-exe", [str(repo_root / "build-release" / "stratagus.exe")]),
             (
                 "linux-aarch64",
                 [
