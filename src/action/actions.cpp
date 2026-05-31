@@ -463,10 +463,20 @@ static void HandleUnitAction(CUnit &unit)
 			}
 		}
 		if (unit.CurrentResource) {
-			const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
-			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitAction::Resource) {
-				unit.CurrentResource = 0;
-				unit.ResourcesHeld = 0;
+			if (unit.Type->ResInfo[unit.CurrentResource] != nullptr) {
+				// this may be a nullptr iff the unit was upgraded to a type
+				// that does not permit harvesting resources but *at the same
+				// time* the unit was not declared to lose resources (meaning
+				// when the upgrade action happened, the resources stayed). We
+				// are taking this to be on purpose, i.e., the upgraded unit
+				// keeps the resource and might be able to do something with
+				// that when it is upgraded again (or downgraded?) to a type
+				// that once again can harvest resources
+				const auto resinfo = *unit.Type->ResInfo[unit.CurrentResource];
+				if (resinfo.LoseResources && unit.Orders[0]->Action != UnitAction::Resource) {
+					unit.CurrentResource = 0;
+					unit.ResourcesHeld = 0;
+				}
 			}
 		}
 	}
