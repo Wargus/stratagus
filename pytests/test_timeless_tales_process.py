@@ -160,14 +160,22 @@ def _run_single_player_map(
     tmp_path: Path,
     map_name: str,
     run_seconds: float,
+    extra_script: str = ""
 ) -> tuple[Path, Path]:
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
     test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
+    testscript = tmp_path / "test.lua"
     stdout = tmp_path / "single-player.stdout"
     stderr = tmp_path / "single-player.stderr"
+
+    testscript.write_text(f"""
+    Load("scripts/stratagus.lua")
+    {extra_script}
+    """)
+
     cmd = _participant_cmd(
         participant,
         [
@@ -181,7 +189,7 @@ def _run_single_player_map(
             "640x480",
             "-g",
             "-c",
-            "scripts/stratagus.lua",
+            str(testscript),
             map_name,
         ],
     )
@@ -364,14 +372,12 @@ def test_timeless_tales_map_png_previews_are_valid(timeless_tales_data: Path):
 @pytest.mark.cross
 @pytest.mark.slow
 def test_timeless_tales_data_tree_starts_to_main_menu(
-    stratagus_pair: tuple[dict, dict],
+    stratagus_player: dict,
     timeless_tales_data: Path,
     gui_env,
     tmp_path: Path,
 ):
-    participant, unused_client_participant = stratagus_pair
-    if participant["name"] != unused_client_participant["name"]:
-        pytest.skip("Timeless Tales startup uses one Stratagus process; self-pairs cover each participant")
+    participant = stratagus_player
 
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
@@ -414,15 +420,12 @@ def test_timeless_tales_data_tree_starts_to_main_menu(
 @pytest.mark.cross
 @pytest.mark.slow
 def test_timeless_tales_single_player_map_runs_without_crashing(
-    stratagus_pair: tuple[dict, dict],
+    stratagus_player: dict,
     timeless_tales_data: Path,
     gui_env,
     tmp_path: Path,
 ):
-    participant, unused_client_participant = stratagus_pair
-    if participant["name"] != unused_client_participant["name"]:
-        pytest.skip("Timeless Tales single-player startup uses one process; self-pairs cover each participant")
-
+    participant = stratagus_player
     _run_single_player_map(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
@@ -437,15 +440,12 @@ def test_timeless_tales_single_player_map_runs_without_crashing(
 @pytest.mark.cross
 @pytest.mark.slow
 def test_timeless_tales_for_the_motherland_map_runs_without_crashing(
-    stratagus_pair: tuple[dict, dict],
+    stratagus_player: dict,
     timeless_tales_data: Path,
     gui_env,
     tmp_path: Path,
 ):
-    participant, unused_client_participant = stratagus_pair
-    if participant["name"] != unused_client_participant["name"]:
-        pytest.skip("Timeless Tales single-player startup uses one process; self-pairs cover each participant")
-
+    participant = stratagus_player
     _run_single_player_map(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
@@ -460,16 +460,13 @@ def test_timeless_tales_for_the_motherland_map_runs_without_crashing(
 @pytest.mark.cross
 @pytest.mark.slow
 def test_timeless_tales_beethoven_day_wise_man_selection_survives(
-    stratagus_pair: tuple[dict, dict],
+    stratagus_player: dict,
     timeless_tales_data: Path,
     gui_env,
     tmp_path: Path,
     repo_root: Path,
 ):
-    participant, unused_client_participant = stratagus_pair
-    if participant["name"] != unused_client_participant["name"]:
-        pytest.skip("Timeless Tales single-player startup uses one process; self-pairs cover each participant")
-
+    participant = stratagus_player
     _run_timeless_tales_script(
         participant=participant,
         timeless_tales_data=timeless_tales_data,
@@ -485,14 +482,12 @@ def test_timeless_tales_beethoven_day_wise_man_selection_survives(
 @pytest.mark.cross
 @pytest.mark.slow
 def test_timeless_tales_editor_map_runs_without_crashing(
-    stratagus_pair: tuple[dict, dict],
+    stratagus_player: dict,
     timeless_tales_data: Path,
     gui_env,
     tmp_path: Path,
 ):
-    participant, unused_client_participant = stratagus_pair
-    if participant["name"] != unused_client_participant["name"]:
-        pytest.skip("Timeless Tales editor startup uses one process; self-pairs cover each participant")
+    participant = stratagus_player
 
     user_dir = tmp_path / "user"
     write_timeless_tales_preferences(user_dir)
@@ -616,3 +611,62 @@ def test_timeless_tales_multiplayer_real_map_runs_with_network_humans_and_ai(
     setup_lines = _network_setup_lines(host_output)
     assert sum("CO: 0" in line and "Host:" in line for line in setup_lines) == 2
     assert "pytest-timeless-host" in host_output
+
+
+@pytest.mark.gui
+@pytest.mark.cross
+@pytest.mark.slow
+def test_unit_upgrade_while_carrying_works(
+    stratagus_player: dict,
+    timeless_tales_data: Path,
+    gui_env,
+    tmp_path: Path,
+):
+    participant = stratagus_player
+    logs = _run_single_player_map(
+        participant=participant,
+        timeless_tales_data=timeless_tales_data,
+        gui_env=gui_env,
+        tmp_path=tmp_path,
+        map_name="maps/skirmish/(2)timeless-isle.smp.gz",
+        run_seconds=20,
+        extra_script="""
+        SetTitleScreens({})
+        local function log(message)
+          if not (os and os.getenv and os.getenv("STRATAGUS_UNBUFFERED_STDIO")) then
+            return
+          end
+          print(message)
+          if io and io.stdout then
+            io.stdout:flush()
+          end
+        end
+        CustomStartup = function()
+          AddTrigger(
+            function() return GameCycle > 1 end,
+            function()
+              mine = CreateUnit("unit-gold-mine", 15, {0, 0})
+              SetResourcesHeld(mine, 90)
+              peon = CreateUnit("unit-peasant", 0, {GetUnitVariable(mine, "PosX"), GetUnitVariable(mine, "PosY")})
+              OrderUnit(0, "unit-peasant", {GetUnitVariable(peon, "PosX"), GetUnitVariable(peon, "PosY")}, {GetUnitVariable(mine, "PosX"), GetUnitVariable(mine, "PosY")}, "resource")
+              log("ordered to get gold")
+            end)
+          AddTrigger(
+            function() return GameCycle > 200 end,
+            function()
+              log("Peon carries " .. tostring(GetUnitVariable(peon, "ResourcesHeld")) .. " gold")
+              TransformUnit(peon, "unit-footman")
+            end)
+          AddTrigger(
+            function() return GameCycle > 400 end,
+            function()
+              log("Did not crash")
+              log("Unit is a " .. GetUnitVariable(peon, "Name"))
+              ActionVictory()
+            end)
+          RunMap(CliMapName)
+        end
+        """
+    )
+    assert "Peon carries 90 gold" in _combined_logs(logs)
+    assert "Unit is a Footman" in _combined_logs(logs)
