@@ -99,7 +99,7 @@ def write_war1gus_campaign_start(startup, race, i, extra=""):
 @pytest.mark.gui
 @pytest.mark.cross
 @pytest.mark.slow
-@pytest.mark.parametrize("sets", (("human", 5), ("human", 6), ("orc", 5), ("orc", 6)), ids=["elwynn", "northshire-abbey", "redridge-mountains", "sunnyglade"])
+@pytest.mark.parametrize("sets", (("orc", 2), ("orc", 3), ("human", 5), ("human", 6), ("orc", 5), ("orc", 6)), ids=["orc2", "orc3", "elwynn", "northshire-abbey", "redridge-mountains", "sunnyglade"])
 def test_war1gus_campaign_maps(
     stratagus_player: dict,
     extracted_war1gus_data: Path,

@@ -406,7 +406,7 @@ def timeless_tales_data(repo_root: Path) -> Path:
 
 
 @pytest.fixture
-def gui_env(stratagus_pair: tuple[dict, dict], tmp_path: Path):
+def gui_env(tmp_path: Path):
     if os.environ.get("WARGUS_GUI_TESTS", "1") != "1":
         # Explicit GUI tests skip
         pytest.skip("Set WARGUS_GUI_TESTS=1 to run GUI tests")
@@ -434,9 +434,9 @@ def gui_env(stratagus_pair: tuple[dict, dict], tmp_path: Path):
         time.sleep(0.5)
         if proc.poll() is not None:
             pytest.fail(f"Xvfb exited early; see {log}")
+    elif video_driver:
+        env["SDL_VIDEODRIVER"] = video_driver
     elif not (os.environ.get("WAYLAND_DISPLAY") or os.environ.get("DISPLAY")):
-        env["SDL_VIDEODRIVER"] = "dummy"
-    elif any(any(a.startswith("qemu") for a in p["argv"]) for p in stratagus_pair):
         env["SDL_VIDEODRIVER"] = "dummy"
 
     env["SDL_AUDIODRIVER"] = "dummy"
