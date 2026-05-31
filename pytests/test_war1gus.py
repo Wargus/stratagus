@@ -48,7 +48,7 @@ def _participant_cmd(participant: dict, args: list[str]) -> list[str]:
     return [*participant["argv"], *args]
 
 
-def write_war1gus_campaign_start(startup, race, i):
+def write_war1gus_campaign_start(startup, race, i, extra=""):
     startup.write_text(f"""
     Load("scripts/stratagus.lua")
     SetTitleScreens({{}})
@@ -90,6 +90,7 @@ def write_war1gus_campaign_start(startup, race, i):
             end
           end
         end)
+      {extra}
       RunCampaign(campaign)
     end
     """)
@@ -98,7 +99,7 @@ def write_war1gus_campaign_start(startup, race, i):
 @pytest.mark.gui
 @pytest.mark.cross
 @pytest.mark.slow
-@pytest.mark.parametrize("sets", (("human", 5), ("human", 6), ("orc", 5)), ids=["elwynn", "northshire-abbey", "redridge-mountains"])
+@pytest.mark.parametrize("sets", (("human", 5), ("human", 6), ("orc", 5), ("orc", 6)), ids=["elwynn", "northshire-abbey", "redridge-mountains", "sunnyglade"])
 def test_war1gus_campaign_maps(
     stratagus_player: dict,
     extracted_war1gus_data: Path,
@@ -108,7 +109,28 @@ def test_war1gus_campaign_maps(
 ):
     write_war1gus_preferences(tmp_path)
     startup = tmp_path / "start.lua"
-    write_war1gus_campaign_start(startup, *sets)
+
+    extra = ""
+    if sets == ("orc", 6):
+        # the human tower must survive in this mission
+        extra = """
+        AddTrigger(
+          function() return GameCycle >= 1 end,
+          function()
+            for i,unit in ipairs(GetUnits(1)) do
+              local ident = GetUnitVariable(unit, "Ident")
+              if ident == "unit-human-tower" then
+                local tower = unit
+                AddTrigger(function()
+                    SetUnitVariable(tower, "HitPoints", 3000)
+                  end,
+                  function() return true end)
+              end
+            end
+          end)
+        """
+
+    write_war1gus_campaign_start(startup, sets[0], sets[1], extra)
     test_env = dict(gui_env)
     test_env["STRATAGUS_UNBUFFERED_STDIO"] = "1"
 
