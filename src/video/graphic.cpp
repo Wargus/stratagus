@@ -50,7 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 static int HashCount;
-static std::map<fs::path, std::weak_ptr<CGraphic>> GraphicHash;
+static std::map<fs::path, std::shared_ptr<CGraphic>> GraphicHash;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -420,7 +420,7 @@ std::shared_ptr<CGraphic> CGraphic::New(const std::string &filename, const int w
 
 	const fs::path file = LibraryFileName(filename);
 	auto &cache = GraphicHash[file];
-	auto res = cache.lock();
+	auto res = cache;
 	if (res == nullptr) {
 		res = std::make_shared<CGraphic>();
 		// FIXME: use a constructor for this
@@ -453,8 +453,8 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string 
 	}
 
 	const fs::path file = LibraryFileName(filename);
-	auto& cache = GraphicHash[file];
-	auto res = std::dynamic_pointer_cast<CPlayerColorGraphic>(cache.lock());
+	auto &cache = GraphicHash[file];
+	auto res = std::dynamic_pointer_cast<CPlayerColorGraphic>(cache);
 	if (res == nullptr) {
 		res = std::make_shared<CPlayerColorGraphic>();
 		// FIXME: use a constructor for this
@@ -522,7 +522,7 @@ std::shared_ptr<CGraphic> CGraphic::Get(const std::string &filename)
 	const fs::path file = LibraryFileName(filename);
 	auto &cache = GraphicHash[file];
 
-	return cache.lock();
+	return cache;
 }
 
 /**
@@ -541,7 +541,7 @@ std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::Get(const std::string 
 	const fs::path file = LibraryFileName(filename);
 	auto cache = GraphicHash[file];
 
-	return std::dynamic_pointer_cast<CPlayerColorGraphic>(cache.lock());
+	return std::dynamic_pointer_cast<CPlayerColorGraphic>(cache);
 }
 
 /**
