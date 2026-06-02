@@ -69,21 +69,6 @@ static void WarnInvalidGraphicFrame(const CGraphic &graphic, unsigned frame, boo
 	           available);
 }
 
-static void WarnInvalidGraphicFrame(const CGraphic &graphic, unsigned frame, bool flipped)
-{
-	static std::set<std::tuple<fs::path, unsigned, bool>> warnedFrames;
-	if (!warnedFrames.insert({graphic.File, frame, flipped}).second) {
-		return;
-	}
-	const size_t available = flipped ? graphic.frameFlip_map.size() : graphic.frame_map.size();
-	ErrorPrint("Warning: graphic '%s' requested %sframe %u but only %zu frames are available; "
-	           "skipping draw\n",
-	           graphic.File.string().c_str(),
-	           flipped ? "flipped " : "",
-	           frame,
-	           available);
-}
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
