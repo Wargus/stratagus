@@ -142,7 +142,7 @@ void StartMap(const std::string &filename, bool clean)
 	SetMessage("%s", _("Do it! Do it now!"));
 
 	//  Play the game.
-	GameMainLoop();
+	GameMainLoop(clean);
 
 	//  Clear screen
 	Video.ClearScreen();

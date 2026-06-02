@@ -204,7 +204,7 @@ extern void Exit(int err);                  /// Exit
 [[noreturn]] void ExitFatal(int err); /// Exit with fatal error
 
 extern void UpdateDisplay();            /// Game display update
-extern void GameMainLoop();             /// Game main loop
+extern void GameMainLoop(bool clean);            /// Game main loop
 extern int stratagusMain(int argc, char **argv); /// main entry
 
 //@}

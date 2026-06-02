@@ -387,7 +387,7 @@ static void SingleGameLoop()
 **  Display update.
 **  Input/Network/Sound.
 */
-void GameMainLoop()
+void GameMainLoop(bool clean)
 {
 	const EventCallback *old_callbacks;
 
@@ -398,7 +398,9 @@ void GameMainLoop()
 
 	SetVideoSync();
 	GameCursor = UI.Point.Cursor;
-	GameCycle = 0;
+	if (clean) {
+		GameCycle = 0;
+	}
 	GameRunning = true;
 
 	CParticleManager::init();
