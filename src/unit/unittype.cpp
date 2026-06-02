@@ -573,8 +573,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	if (type.BoolFlag[NONSOLID_INDEX].value) {
 		if (type.Building) {
 			if (type.BoolFlag[DECORATION_INDEX].value && type.MapDefaultStat.Variables[HP_INDEX].Max == 0) {
-				// special case, a decoration with no HP can always be built over
-				type.MovementMask = MapFieldNoBuilding;
+				// special case, a decoration with no HP
+				// it cannot be placed *over* walls, rocks, forests, *under* buildings, or where no buildings are allowed
+				type.MovementMask = MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding | MapFieldNoBuilding;
+				// it does not influence the field (anything can overbuild it later)
 				type.FieldFlags = 0;
 			} else {
 				type.MovementMask = MapFieldLandUnit |
