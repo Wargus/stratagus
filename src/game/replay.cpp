@@ -590,6 +590,7 @@ static void LoadReplay(const fs::path &name)
 {
 	CleanReplayLog();
 	ReplayGameType = EReplayType::SinglePlayer;
+	GameCycle = 0;
 	LuaLoadFile(name);
 
 	NextLogCycle = ~0UL;
