@@ -889,8 +889,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 */
 void NetworkEvent()
 {
-	static constexpr size_t networkEventBufferSize =
-		CInitMessage_State::Size() > 1024 ? CInitMessage_State::Size() : 1024;
+	static constexpr size_t networkEventBufferSize = std::max(CInitMessage_State::Size(), static_cast<decltype(CInitMessage_State::Size())>(1024));
 
 	if (!IsNetworkGame()) {
 		NetworkInSync = true;

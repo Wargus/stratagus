@@ -1723,16 +1723,11 @@ void NetworkCompactHosts()
 {
 	for (int i = 0; i < PlayerMax; i++) {
 		if (!Hosts[i].IsValid()) {
-			bool anyMoreHosts = false;
-			for (int j = i + 1; j < PlayerMax; j++) {
-				if (Hosts[j].IsValid()) {
-					Hosts[i] = Hosts[j];
-					Hosts[j].Clear();
-					anyMoreHosts = true;
-					break;
-				}
-			}
-			if (!anyMoreHosts) {
+			auto it = std::find_if(Hosts + i + 1, Hosts + PlayerMax, [](CNetworkHost &h) { return h.IsValid(); });
+			if (it != Hosts + PlayerMax) {
+				Hosts[i] = *it;
+				it->Clear();
+			} else {
 				break;
 			}
 		}
@@ -1957,7 +1952,7 @@ void NetworkServerStartGame()
 	// Send all clients host:ports to all clients.
 	while (hostsToAck) {
 breakout:
-		// Send to all clients, skip ourselves (the server) host in Hosts[0]
+		// Send to all clients
 		for (const int i : remoteHostIndices) {
 			if (Hosts[i].IsValid()) {
 				const CHost host(message.hosts[i].Host, message.hosts[i].Port);
