@@ -59,14 +59,16 @@ enum {
 	SUB_STILL_ATTACK
 };
 
+static bool CheckInvalidAutoCastVectors(const CUnit &unit)
+{
+	return ((unit.AutoCastSpell.empty() && unit.Type->CanCastSpell.empty())
+			|| (!unit.AutoCastSpell.empty() && !unit.Type->CanCastSpell.empty()
+				&& unit.AutoCastSpell.size() == unit.Type->CanCastSpell.size()));
+}
+
 static void WarnInvalidAutoCastVectors(const CUnit &unit, const char *context)
 {
 	static std::set<std::string> warned;
-	if ((unit.AutoCastSpell.empty() && unit.Type->CanCastSpell.empty())
-	    || (!unit.AutoCastSpell.empty() && !unit.Type->CanCastSpell.empty()
-	        && unit.AutoCastSpell.size() == unit.Type->CanCastSpell.size())) {
-		return;
-	}
 	const std::string key = unit.Type->Ident + ":" + context;
 	if (!warned.insert(key).second) {
 		return;
@@ -249,7 +251,9 @@ static bool MoveRandomly(CUnit &unit)
 */
 bool AutoCast(CUnit &unit)
 {
-	WarnInvalidAutoCastVectors(unit, "AutoCast");
+	if (CheckInvalidAutoCastVectors(unit)) {
+		WarnInvalidAutoCastVectors(unit, "AutoCast");
+	}
 	if (!unit.Type->CanCastSpell.empty() && !unit.AutoCastSpell.empty() && !unit.Removed) { // Removed units can't cast any spells, from bunker)
 		const size_t spellCount = std::min({SpellTypeTable.size(), unit.Type->CanCastSpell.size(), unit.AutoCastSpell.size()});
 		for (size_t i = 0; i < spellCount; ++i) {
@@ -364,7 +368,9 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 
 bool COrder_Still::AutoCastStand(CUnit &unit)
 {
-	WarnInvalidAutoCastVectors(unit, "AutoCastStand");
+	if (CheckInvalidAutoCastVectors(unit)) {
+		WarnInvalidAutoCastVectors(unit, "AutoCastStand");
+	}
 	if (!unit.Type->CanCastSpell.empty() && !unit.AutoCastSpell.empty() && !unit.Removed) { // Removed units can't cast any spells, from bunker)
 		const size_t spellCount = std::min({SpellTypeTable.size(), unit.Type->CanCastSpell.size(), unit.AutoCastSpell.size()});
 		for (size_t i = 0; i < spellCount; ++i) {
