@@ -244,7 +244,7 @@ TEST_CASE("Network setup sync tracks ready by host and race by assigned player s
 	SetHost(3, 7, "client");
 
 	CServerSetup server;
-	CServerSetup local = server;
+	CServerSetup local;
 	server.Ready[3] = 1;
 	local.Ready[3] = 1;
 	server.ServerGameSettings.Presets[7].Race = 1;
@@ -269,7 +269,7 @@ TEST_CASE("Network setup sync handles invalid host slots without reading player 
 	ClearNetworkHosts();
 
 	CServerSetup server;
-	CServerSetup local = server;
+	CServerSetup local;
 
 	local.ServerGameSettings.Presets[4].Race = 2;
 	CHECK(NetworkGetPlayerIndexForHost(4) == -1);
@@ -285,7 +285,7 @@ TEST_CASE("Client setup state changes apply host-indexed ready and player-indexe
 	SetHost(5, 2, "client");
 
 	CServerSetup server;
-	CServerSetup client = server;
+	CServerSetup client;
 	server.Ready[5] = 0;
 	server.ServerGameSettings.Presets[2].Race = 1;
 	server.ServerGameSettings.Presets[5].Race = 4;
@@ -305,7 +305,7 @@ TEST_CASE("Client setup state changes ignore race updates for invalid host slots
 	ClearNetworkHosts();
 
 	CServerSetup server;
-	CServerSetup client = server;
+	CServerSetup client;
 	server.ServerGameSettings.Presets[4].Race = 1;
 	client.Ready[4] = 1;
 	client.ServerGameSettings.Presets[4].Race = 3;
