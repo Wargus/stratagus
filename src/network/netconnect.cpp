@@ -1721,16 +1721,9 @@ bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &
 
 void NetworkCompactHosts()
 {
-	for (int i = 0; i < PlayerMax; i++) {
-		if (!Hosts[i].IsValid()) {
-			auto it = std::find_if(Hosts + i + 1, Hosts + PlayerMax, [](CNetworkHost &h) { return h.IsValid(); });
-			if (it != Hosts + PlayerMax) {
-				Hosts[i] = *it;
-				it->Clear();
-			} else {
-				break;
-			}
-		}
+	const auto endValid = std::remove_if(Hosts, Hosts + PlayerMax, [](const auto& host){ return !host.IsValid(); });
+	for (auto it = endValid; it != Hosts + PlayerMax; ++it) {
+		it->Clear();
 	}
 }
 
