@@ -240,80 +240,89 @@ TEST_CASE("Settings bitfield preserves simulation-affecting flags")
 
 TEST_CASE("Network setup sync tracks ready by host and race by assigned player slot")
 {
+	constexpr auto hostIndex = 3;
+	constexpr auto playerIndex = 7;
 	ClearNetworkHosts();
-	SetHost(3, 7, "client");
+	SetHost(hostIndex, playerIndex, "client");
 
 	CServerSetup server;
 	CServerSetup local;
-	server.Ready[3] = 1;
-	local.Ready[3] = 1;
-	server.ServerGameSettings.Presets[7].Race = 1;
-	local.ServerGameSettings.Presets[7].Race = 1;
+	server.Ready[hostIndex] = 1;
+	local.Ready[hostIndex] = 1;
+	server.ServerGameSettings.Presets[playerIndex].Race = 1;
+	local.ServerGameSettings.Presets[playerIndex].Race = 1;
 
-	CHECK(NetworkGetPlayerIndexForHost(3) == 7);
-	CHECK(NetworkIsLocalSetupInSync(server, local, 3));
+	CHECK(NetworkGetPlayerIndexForHost(hostIndex) == playerIndex);
+	CHECK(NetworkIsLocalSetupInSync(server, local, hostIndex));
 
-	local.ServerGameSettings.Presets[3].Race = 2;
-	CHECK(NetworkIsLocalSetupInSync(server, local, 3));
+	local.ServerGameSettings.Presets[hostIndex].Race = 2;
+	CHECK(NetworkIsLocalSetupInSync(server, local, hostIndex));
 
-	local.ServerGameSettings.Presets[7].Race = 3;
-	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 3));
+	local.ServerGameSettings.Presets[playerIndex].Race = 3;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, hostIndex));
 
-	local.ServerGameSettings.Presets[7].Race = 1;
-	local.Ready[3] = 0;
-	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 3));
+	local.ServerGameSettings.Presets[playerIndex].Race = 1;
+	local.Ready[hostIndex] = 0;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, hostIndex));
 }
 
 TEST_CASE("Network setup sync handles invalid host slots without reading player presets")
 {
+	constexpr auto hostIndex = 4;
+	constexpr auto playerIndex = 4;
 	ClearNetworkHosts();
 
 	CServerSetup server;
 	CServerSetup local;
 
-	local.ServerGameSettings.Presets[4].Race = 2;
-	CHECK(NetworkGetPlayerIndexForHost(4) == -1);
-	CHECK(NetworkIsLocalSetupInSync(server, local, 4));
+	local.ServerGameSettings.Presets[playerIndex].Race = 2;
+	CHECK(NetworkGetPlayerIndexForHost(hostIndex) == -1);
+	CHECK(NetworkIsLocalSetupInSync(server, local, hostIndex));
 
-	local.Ready[4] = 1;
-	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, 4));
+	local.Ready[hostIndex] = 1;
+	CHECK_FALSE(NetworkIsLocalSetupInSync(server, local, hostIndex));
 }
 
 TEST_CASE("Client setup state changes apply host-indexed ready and player-indexed race")
 {
+	constexpr auto hostIndex = 5;
+	constexpr auto playerIndex = 2;
+	constexpr auto playerIndex2 = 5;
 	ClearNetworkHosts();
-	SetHost(5, 2, "client");
+	SetHost(hostIndex, playerIndex, "client");
 
 	CServerSetup server;
 	CServerSetup client;
-	server.Ready[5] = 0;
-	server.ServerGameSettings.Presets[2].Race = 1;
-	server.ServerGameSettings.Presets[5].Race = 4;
-	client.Ready[5] = 1;
-	client.ServerGameSettings.Presets[2].Race = 3;
-	client.ServerGameSettings.Presets[5].Race = 8;
+	server.Ready[hostIndex] = 0;
+	server.ServerGameSettings.Presets[playerIndex].Race = 1;
+	server.ServerGameSettings.Presets[playerIndex2].Race = 4;
+	client.Ready[hostIndex] = 1;
+	client.ServerGameSettings.Presets[playerIndex].Race = 3;
+	client.ServerGameSettings.Presets[playerIndex2].Race = 8;
 
-	NetworkApplyClientSetupStateChange(server, client, 5);
+	NetworkApplyClientSetupStateChange(server, client, hostIndex);
 
-	CHECK(server.Ready[5] == 1);
-	CHECK(server.ServerGameSettings.Presets[2].Race == 3);
-	CHECK(server.ServerGameSettings.Presets[5].Race == 4);
+	CHECK(server.Ready[hostIndex] == 1);
+	CHECK(server.ServerGameSettings.Presets[playerIndex].Race == 3);
+	CHECK(server.ServerGameSettings.Presets[playerIndex2].Race == 4);
 }
 
 TEST_CASE("Client setup state changes ignore race updates for invalid host slots")
 {
+	constexpr auto hostIndex = 4;
+	constexpr auto playerIndex = 4;
 	ClearNetworkHosts();
 
 	CServerSetup server;
 	CServerSetup client;
-	server.ServerGameSettings.Presets[4].Race = 1;
-	client.Ready[4] = 1;
-	client.ServerGameSettings.Presets[4].Race = 3;
+	server.ServerGameSettings.Presets[playerIndex].Race = 1;
+	client.Ready[hostIndex] = 1;
+	client.ServerGameSettings.Presets[playerIndex].Race = 3;
 
-	NetworkApplyClientSetupStateChange(server, client, 4);
+	NetworkApplyClientSetupStateChange(server, client, hostIndex);
 
-	CHECK(server.Ready[4] == 1);
-	CHECK(server.ServerGameSettings.Presets[4].Race == 1);
+	CHECK(server.Ready[hostIndex] == 1);
+	CHECK(server.ServerGameSettings.Presets[playerIndex].Race == 1);
 }
 
 TEST_CASE("Dedicated server detection follows the host's assigned player slot")
@@ -351,22 +360,30 @@ TEST_CASE("Dedicated server detection preserves slot zero dedicated setup")
 
 TEST_CASE("Network host compaction preserves sparse host to player assignments")
 {
+	constexpr auto hostIndexA = 0;
+	constexpr auto hostIndexB = 3;
+	constexpr auto hostIndexC = 9;
+	constexpr auto hostIndexD = PlayerMax - 1;
+	constexpr auto playerIndexA = 0;
+	constexpr auto playerIndexB = 7;
+	constexpr auto playerIndexC = 2;
+	constexpr auto playerIndexD = 11;
 	ClearNetworkHosts();
-	SetHost(0, 0, "server");
-	SetHost(3, 7, "client-a");
-	SetHost(9, 2, "client-b");
-	SetHost(PlayerMax - 1, 11, "client-c");
+	SetHost(hostIndexA, playerIndexA, "server");
+	SetHost(hostIndexB, playerIndexB, "client-a");
+	SetHost(hostIndexC, playerIndexC, "client-b");
+	SetHost(hostIndexD, playerIndexD, "client-c");
 
 	NetworkCompactHosts();
 
 	CHECK(Hosts[0].IsValid());
-	CHECK(Hosts[0].PlyNr == 0);
+	CHECK(Hosts[0].PlyNr == playerIndexA);
 	CHECK(Hosts[1].IsValid());
-	CHECK(Hosts[1].PlyNr == 7);
+	CHECK(Hosts[1].PlyNr == playerIndexB);
 	CHECK(Hosts[2].IsValid());
-	CHECK(Hosts[2].PlyNr == 2);
+	CHECK(Hosts[2].PlyNr == playerIndexC);
 	CHECK(Hosts[3].IsValid());
-	CHECK(Hosts[3].PlyNr == 11);
+	CHECK(Hosts[3].PlyNr == playerIndexD);
 	for (int i = 4; i < PlayerMax; ++i) {
 		CHECK_FALSE(Hosts[i].IsValid());
 	}
@@ -374,16 +391,22 @@ TEST_CASE("Network host compaction preserves sparse host to player assignments")
 
 TEST_CASE("Network remote host indices include only compact valid clients")
 {
+	constexpr auto hostIndexA = 0;
+	constexpr auto hostIndexB = 1;
+	constexpr auto hostIndexC = 2;
+	constexpr auto playerIndexA = 0;
+	constexpr auto playerIndexB = 4;
+	constexpr auto playerIndexC = 8;
 	ClearNetworkHosts();
-	SetHost(0, 0, "server");
-	SetHost(1, 4, "client-a");
-	SetHost(2, 8, "client-b");
+	SetHost(hostIndexA, playerIndexA, "server");
+	SetHost(hostIndexB, playerIndexB, "client-a");
+	SetHost(hostIndexC, playerIndexC, "client-b");
 
 	const std::vector<int> remoteHostIndices = NetworkRemoteHostIndices();
 
 	REQUIRE(remoteHostIndices.size() == 2);
-	CHECK(remoteHostIndices[0] == 1);
-	CHECK(remoteHostIndices[1] == 2);
+	CHECK(remoteHostIndices[0] == hostIndexB);
+	CHECK(remoteHostIndices[1] == hostIndexC);
 }
 
 TEST_CASE("CInitMessage_Header")
