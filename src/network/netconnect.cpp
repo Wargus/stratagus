@@ -432,17 +432,51 @@ bool CClient::Update_connected(unsigned long tick)
 	}
 }
 
-static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int index)
+int NetworkGetPlayerIndexForHost(int hostIndex)
 {
-	return (state1.ServerGameSettings.Presets[index].Race == state2.ServerGameSettings.Presets[index].Race
-			&& state1.Ready[index] == state2.Ready[index]);
+	if (hostIndex < 0 || hostIndex >= PlayerMax || !Hosts[hostIndex].IsValid()) {
+		return -1;
+	}
+	if (Hosts[hostIndex].PlyNr >= PlayerMax) {
+		return -1;
+	}
+	return Hosts[hostIndex].PlyNr;
+}
+
+bool NetworkIsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int hostIndex)
+{
+	if (hostIndex < 0 || hostIndex >= PlayerMax) {
+		return true;
+	}
+	const int playerIndex = NetworkGetPlayerIndexForHost(hostIndex);
+	if (playerIndex == -1) {
+		return state1.Ready[hostIndex] == state2.Ready[hostIndex];
+	}
+	return (state1.ServerGameSettings.Presets[playerIndex].Race
+	            == state2.ServerGameSettings.Presets[playerIndex].Race
+	        && state1.Ready[hostIndex] == state2.Ready[hostIndex]);
+}
+
+void NetworkApplyClientSetupStateChange(CServerSetup &serverSetup,
+                                        const CServerSetup &clientSetup,
+                                        int hostIndex)
+{
+	if (hostIndex < 0 || hostIndex >= PlayerMax) {
+		return;
+	}
+	const int playerIndex = NetworkGetPlayerIndexForHost(hostIndex);
+	serverSetup.Ready[hostIndex] = clientSetup.Ready[hostIndex];
+	if (playerIndex != -1) {
+		serverSetup.ServerGameSettings.Presets[playerIndex].Race =
+			clientSetup.ServerGameSettings.Presets[playerIndex].Race;
+	}
 }
 
 bool CClient::Update_synced(unsigned long tick)
 {
 	Assert(networkState.State == ccs_synced);
 
-	if (IsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
+	if (NetworkIsLocalSetupInSync(*serverSetup, *localSetup, NetLocalHostsSlot) == false) {
 		networkState.State = ccs_changed;
 		networkState.MsgCnt = 0;
 		return Update(tick);
@@ -1024,9 +1058,12 @@ void CClient::Parse_AreYouThere()
 void CServer::KickClient(int c)
 {
 	DebugPrint("kicking client %d, player number %d\n", c, Hosts[c].PlyNr);
+	const int playerIndex = NetworkGetPlayerIndexForHost(c);
 	Hosts[c].Clear();
 	serverSetup->Ready[c] = 0;
-	serverSetup->ServerGameSettings.Presets[c].Race = 0;
+	if (playerIndex != -1) {
+		serverSetup->ServerGameSettings.Presets[playerIndex].Race = 0;
+	}
 	networkStates[c].Clear();
 	// Resync other clients
 	for (int n = 1; n < PlayerMax; ++n) {
@@ -1332,8 +1369,8 @@ void CServer::Parse_Waiting(const int h)
 		case ccs_mapinfo:
 			networkStates[h].State = ccs_synced;
 			networkStates[h].MsgCnt = 0;
-			for (int i = 1; i < PlayerMax - 1; ++i) {
-				if (i != h && Hosts[i].PlyNr) {
+			for (int i = 1; i < PlayerMax; ++i) {
+				if (i != h && Hosts[i].IsValid()) {
 					// Notify other clients
 					networkStates[i].State = ccs_async;
 				}
@@ -1375,6 +1412,7 @@ void CServer::Parse_Map(const int h)
 	switch (networkStates[h].State) {
 		// client has recvd map info waiting for state info
 		case ccs_connected:
+		case ccs_async:
 			networkStates[h].State = ccs_mapinfo;
 			networkStates[h].MsgCnt = 0;
 			[[fallthrough]];
@@ -1430,22 +1468,22 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 		case ccs_mapinfo:
 		// User State Change right after connect - should not happen, but..
 			[[fallthrough]];
-		case ccs_synced:
+		case ccs_synced: {
 			// Default case: Client is in sync with us, but notes a local change
 			// networkStates[h].State = ccs_async;
 			networkStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
-			serverSetup->Ready[h] = msg.State.Ready[h];
-			serverSetup->ServerGameSettings.Presets[h].Race = msg.State.ServerGameSettings.Presets[h].Race;
+			NetworkApplyClientSetupStateChange(*serverSetup, msg.State, h);
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
-			for (int i = 1; i < PlayerMax - 1; ++i) {
-				if (Hosts[i].PlyNr) {
+			for (int i = 1; i < PlayerMax; ++i) {
+				if (Hosts[i].IsValid()) {
 					networkStates[i].State = ccs_async;
 				}
 			}
 			[[fallthrough]];
+		}
 		case ccs_async: {
 			// this code path happens until client acknowledges the state change reply
 			// by sending ICMResync
@@ -1675,6 +1713,31 @@ int FindHostIndexBy(const CHost &host)
 	return -1;
 }
 
+bool NetworkIsDedicatedServerHost(const CNetworkHost &host, const CServerSetup &setup)
+{
+	return host.IsValid() && host.PlyNr < PlayerMax
+	       && setup.CompOpt[host.PlyNr] == SlotOption::Closed;
+}
+
+void NetworkCompactHosts()
+{
+	const auto endValid = std::remove_if(Hosts, Hosts + PlayerMax, [](const auto& host){ return !host.IsValid(); });
+	for (auto it = endValid; it != Hosts + PlayerMax; ++it) {
+		it->Clear();
+	}
+}
+
+std::vector<int> NetworkRemoteHostIndices()
+{
+	std::vector<int> remoteHostIndices;
+	for (int i = 1; i < PlayerMax; ++i) {
+		if (Hosts[i].IsValid()) {
+			remoteHostIndices.push_back(i);
+		}
+	}
+	return remoteHostIndices;
+}
+
 /**
 ** Server Menu Loop: Send out server request messages
 */
@@ -1716,7 +1779,29 @@ void NetworkServerStartGame()
 
 	printf("INITIAL ServerSetupState:\n");
 	NetPlayers = 0;
+	if (Hosts[0].IsValid() && Hosts[0].PlyNr < PlayerMax
+	    && Map.Info.PlayerType[Hosts[0].PlyNr] != PlayerTypes::PlayerPerson) {
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson
+			    && ServerSetupState.CompOpt[i] == SlotOption::Available) {
+				const bool occupied = std::any_of(Hosts + 1, Hosts + PlayerMax, [i](const CNetworkHost &host) {
+					return host.IsValid() && host.PlyNr == i;
+				});
+				if (!occupied) {
+					Hosts[0].PlyNr = i;
+					break;
+				}
+			}
+		}
+	}
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
+	const bool dedicatedServer = NetworkIsDedicatedServerHost(Hosts[0], ServerSetupState);
+	const auto isHumanHostForPlayer = [dedicatedServer](const int hostIndex, const int playerIndex) {
+		if (dedicatedServer && hostIndex == 0) {
+			return false;
+		}
+		return Hosts[hostIndex].IsValid() && Hosts[hostIndex].PlyNr == playerIndex;
+	};
 
 	// most game settings are already fine, that is, they are on default. however, for human player slots, we need
 	// to adapt the game settings from their defaults to either set the type to person if a human player is assigned,
@@ -1725,8 +1810,9 @@ void NetworkServerStartGame()
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			bool hasHumanPlayer = false;
-			for (auto &h : Hosts) {
-				if (h.IsValid() && h.PlyNr == i) {
+			for (int hostIndex = 0; hostIndex < PlayerMax; ++hostIndex) {
+				if (isHumanHostForPlayer(hostIndex, i)) {
+					const CNetworkHost &h = Hosts[hostIndex];
 					NetPlayers++;
 					hasHumanPlayer = true;
 					ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerPerson;
@@ -1755,8 +1841,8 @@ void NetworkServerStartGame()
 		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 			if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 				bool hasHumanPlayer = false;
-				for (auto &h : Hosts) {
-					if ((hasHumanPlayer = (h.PlyNr == i))) {
+				for (int hostIndex = 0; hostIndex < PlayerMax; ++hostIndex) {
+					if ((hasHumanPlayer = isHumanHostForPlayer(hostIndex, i))) {
 						break;
 					}
 				}
@@ -1771,35 +1857,49 @@ void NetworkServerStartGame()
 		// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
 		DebugPrint("Randomizing player index assignments\n");
 		std::vector<int> humanSlotIndices;
+		std::vector<int> humanHostIndices;
 		for (int i = 0; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson
+			    && ServerSetupState.CompOpt[i] != SlotOption::Closed) {
 				humanSlotIndices.push_back(i);
 			}
+			if ((!dedicatedServer || i != 0) && Hosts[i].IsValid() && Hosts[i].PlyNr < PlayerMax
+			    && ServerSetupState.CompOpt[Hosts[i].PlyNr] == SlotOption::Available
+			    && ServerSetupState.ServerGameSettings.Presets[Hosts[i].PlyNr].Type
+			           == PlayerTypes::PlayerPerson) {
+				humanHostIndices.push_back(i);
+			}
 		}
-		std::random_device dev;
-		std::mt19937 rng_engine(dev());
-		for (int i = 0; i < 100; i++) {
-			std::shuffle(humanSlotIndices.begin(), humanSlotIndices.end(), rng_engine);
-			auto &h = Hosts[MyRand() % NetPlayers];
-			int newPlyNr = humanSlotIndices.front();
-			int oldPlyNr = h.PlyNr;
-			if (oldPlyNr == newPlyNr) {
-				continue;
-			}
-			if (ServerSetupState.CompOpt[newPlyNr] == SlotOption::Available) {
-				// a human host is currently assigned to this new player number, swap with it
-				for (auto &otherH : Hosts) {
-					if (otherH.PlyNr == newPlyNr) {
-						std::swap(h.PlyNr, otherH.PlyNr);
-						break;
-					}
+		if (humanSlotIndices.empty() || humanHostIndices.empty()) {
+			DebugPrint("Skipping random player assignment: no human slots or hosts\n");
+		} else {
+			std::random_device dev;
+			std::mt19937 rng_engine(dev());
+			std::uniform_int_distribution<size_t> hostDist(0, humanHostIndices.size() - 1);
+			for (int i = 0; i < 100; i++) {
+				std::shuffle(humanSlotIndices.begin(), humanSlotIndices.end(), rng_engine);
+				auto &h = Hosts[humanHostIndices[hostDist(rng_engine)]];
+				int newPlyNr = humanSlotIndices.front();
+				int oldPlyNr = h.PlyNr;
+				if (oldPlyNr == newPlyNr) {
+					continue;
 				}
-			} else {
-				// this newPlyNr was currently used by an AI or no one
-				h.PlyNr = newPlyNr;
+				if (ServerSetupState.CompOpt[newPlyNr] == SlotOption::Available) {
+					// a human host is currently assigned to this new player number, swap with it
+					for (auto &otherH : Hosts) {
+						if (otherH.PlyNr == newPlyNr) {
+							std::swap(h.PlyNr, otherH.PlyNr);
+							break;
+						}
+					}
+				} else {
+					// this newPlyNr was currently used by an AI or no one
+					h.PlyNr = newPlyNr;
+				}
+				std::swap(ServerSetupState.CompOpt[oldPlyNr], ServerSetupState.CompOpt[newPlyNr]);
+				std::swap(ServerSetupState.ServerGameSettings.Presets[oldPlyNr],
+				          ServerSetupState.ServerGameSettings.Presets[newPlyNr]);
 			}
-			std::swap(ServerSetupState.CompOpt[oldPlyNr], ServerSetupState.CompOpt[newPlyNr]);
-			std::swap(ServerSetupState.ServerGameSettings.Presets[oldPlyNr], ServerSetupState.ServerGameSettings.Presets[newPlyNr]);
 		}
 	}
 
@@ -1809,26 +1909,23 @@ void NetworkServerStartGame()
 	std::fill_n(waitingForInitAck, PlayerMax, false);
 
 	// Send all clients host:ports to all clients.
-	// Slot 0 is the server!
+	// Slot 0 is the server.
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
-
-	// compact hosts array
-	for (int i = 0; i < PlayerMax; i++) {
-		if (!Hosts[i].IsValid()) {
-			bool any_more_hosts = false;
-			for (int j = i + 1; j < PlayerMax; j++) {
-				if (Hosts[j].IsValid()) {
-					Hosts[i] = Hosts[j];
-					Hosts[j].Clear();
-					any_more_hosts = true;
-					break;
-				}
-			}
-			if (!any_more_hosts) {
+	if (dedicatedServer) {
+		bool foundLocalPlayer = false;
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (ServerSetupState.CompOpt[i] == SlotOption::Computer
+			    && ServerSetupState.ServerGameSettings.Presets[i].Type == PlayerTypes::PlayerComputer) {
+				Hosts[0].PlyNr = i;
+				NetLocalPlayerNumber = i;
+				foundLocalPlayer = true;
 				break;
 			}
 		}
+		Assert(foundLocalPlayer);
 	}
+
+	NetworkCompactHosts();
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
@@ -1842,13 +1939,14 @@ void NetworkServerStartGame()
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
-	int hostsToAck = std::max(NetPlayers - 1, 0);
+	const std::vector<int> remoteHostIndices = NetworkRemoteHostIndices();
+	int hostsToAck = remoteHostIndices.size();
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n", hostsToAck);
 	// Send all clients host:ports to all clients.
 	while (hostsToAck) {
 breakout:
-		// Send to all clients, skip ourselves (the server) host in Hosts[0]
-		for (int i = 1; i <= PlayerMax; ++i) {
+		// Send to all clients
+		for (const int i : remoteHostIndices) {
 			if (Hosts[i].IsValid()) {
 				const CHost host(message.hosts[i].Host, message.hosts[i].Port);
 				if (waitingForConfigAck[i]) { // not acknowledged yet
@@ -1863,17 +1961,17 @@ breakout:
 		}
 
 		// Wait for acknowledge
-		unsigned char buf[1024];
+		std::array<unsigned char, CInitMessage_State::Size()> buf;
 		while (hostsToAck && NetworkFildes.HasDataToRead(1000)) {
 			CHost host;
-			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
+			const int len = NetworkFildes.Recv(buf.data(), buf.size(), &host);
 			if (len < 0) {
 				const std::string hostStr = host.toString();
 				DebugPrint("*Receive ack failed: (%d) from %s\n", len, hostStr.c_str());
 				continue;
 			}
 			CInitMessage_Header header;
-			header.Deserialize(buf);
+			header.Deserialize(buf.data());
 			const unsigned char type = header.GetType();
 			const unsigned char subtype = header.GetSubType();
 
@@ -1922,7 +2020,7 @@ breakout:
 
 	// Give clients a quick-start kick..
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
-	for (int i = 0; i < NetPlayers; ++i) {
+	for (const int i : remoteHostIndices) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
 		NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}

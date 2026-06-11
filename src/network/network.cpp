@@ -241,6 +241,7 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <array>
 #include <cstddef>
 #include <deque>
 #include <list>
@@ -716,6 +717,10 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 
 static void ParseResendCommand(const CNetworkPacket &packet)
 {
+	if (!ThisPlayer) {
+		DebugPrint("Ignoring resend command before local player is initialized\n");
+		return;
+	}
 	// Destination cycle (time to execute).
 	unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
 	if (n > GameCycle + 128) {
@@ -798,6 +803,10 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 
 static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHost &host)
 {
+	if (!ThisPlayer) {
+		DebugPrint("Ignoring in-game network event before local player is initialized\n");
+		return;
+	}
 	CNetworkPacket packet;
 	int commands;
 	packet.Deserialize(buf, len, &commands);
@@ -880,14 +889,16 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 */
 void NetworkEvent()
 {
+	static constexpr size_t networkEventBufferSize = std::max(CInitMessage_State::Size(), static_cast<decltype(CInitMessage_State::Size())>(1024));
+
 	if (!IsNetworkGame()) {
 		NetworkInSync = true;
 		return;
 	}
 	// Read the packet.
-	unsigned char buf[1024];
+	std::array<unsigned char, networkEventBufferSize> buf;
 	CHost host;
-	int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
+	int len = NetworkFildes.Recv(buf.data(), buf.size(), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
@@ -895,13 +906,13 @@ void NetworkEvent()
 		return;
 	}
 
-	if (OnlineContextHandler->handleUDP(buf, len, host)) {
+	if (OnlineContextHandler->handleUDP(buf.data(), len, host)) {
 		return;
 	}
 
 	// Setup messages
 	if (NetConnectRunning) {
-		if (NetworkParseSetupEvent(buf, len, host)) {
+		if (NetworkParseSetupEvent(buf.data(), len, host)) {
 			return;
 		}
 	}
@@ -909,7 +920,7 @@ void NetworkEvent()
 	if (msgtype == MessageInit_FromClient || msgtype == MessageInit_FromServer) {
 		return;
 	}
-	NetworkParseInGameEvent(buf, len, host);
+	NetworkParseInGameEvent(buf.data(), len, host);
 }
 
 /**

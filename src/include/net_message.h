@@ -47,6 +47,8 @@
  */
 #define NetPlayerNameSize 16
 
+#define NetAIScriptNameSize 64
+
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
 /**
@@ -59,7 +61,7 @@ public:
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	void Clear();
-	static size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
+	static constexpr size_t Size() { return 4 + 2 + 2 + NetPlayerNameSize; }
 
 	void SetName(const char *name);
 
@@ -111,7 +113,7 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() {
+	static constexpr size_t Size() {
 		// This must be kept in sync with GameSettings
 		return \
 		1 + // DefeatReveal
@@ -123,7 +125,7 @@ public:
 		1 + // Resources
 		1 + // RevealMap
 		4 + // Bitfield
-		4 * PlayerMax + // Races, PlayerColors, Teams, Types
+		(4 + NetAIScriptNameSize) * PlayerMax + // Races, PlayerColors, Teams, Types, AIScripts
 		1 * PlayerMax + // CompOpt
 		1 * PlayerMax; // Ready
 	}
@@ -214,7 +216,7 @@ public:
 
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 2; }
+	static constexpr size_t Size() { return 2; }
 private:
 	unsigned char type = 0;
 	unsigned char subtype = 0;
@@ -340,7 +342,7 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
+	static constexpr size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
 private:
 	CInitMessage_Header header;
 public:
