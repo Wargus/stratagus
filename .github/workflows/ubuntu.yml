@@ -48,3 +48,36 @@ jobs:
       run: |
         cd build
         ctest --output-on-failure
+
+  timeless-tales:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Stratagus
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Checkout Timeless Tales
+      uses: actions/checkout@v6
+      with:
+        repository: Wargus/timeless-tales
+        path: games/timeless-tales
+        ssh-key: ${{ secrets.TIMELESS_TALES_SSH_KEY }}
+
+    - name: Install test dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pytest xvfb
+
+    - name: Build Stratagus
+      run: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DBUILD_TESTING=1 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+        cmake --build build --config Release --target stratagus
+
+    - name: Run Timeless Tales process tests
+      env:
+        PYTEST_SDL_VIDEODRIVER: dummy
+        STRATAGUS_BIN: ./build/stratagus
+        TIMELESS_TALES_DATA_DIR: ./games/timeless-tales
+      run: python3 -m pytest --basetemp=/tmp/stratagus-timeless -q pytests/

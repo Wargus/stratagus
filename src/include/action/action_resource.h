@@ -34,11 +34,14 @@
 
 //@{
 
+struct ResourceOrderTestAccess;
+
 class COrder_Resource : public COrder
 {
 	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
 	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine);
 	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	friend struct ResourceOrderTestAccess;
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester) {}

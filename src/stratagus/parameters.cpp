@@ -37,7 +37,7 @@
 #include <cstdlib>
 
 #ifdef USE_WIN32
-#include <Shlobj.h>
+#include <shlobj.h>
 #endif
 
 /* static */ Parameters Parameters::Instance;
