@@ -821,9 +821,13 @@ if(WIN32)
 	add_definitions(-DUSE_WIN32 -DNTDDI_VERSION=0x05010200 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501)
 	set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/src/include -I${CMAKE_CURRENT_BINARY_DIR}")
 	set(stratagus_SRCS ${stratagus_SRCS} ${win32_SRCS})
-	set(stratagus_LIBS ${stratagus_LIBS}
-		user32 gdi32 winmm imm32 ole32 oleaut32 version uuid advapi32
-		setupapi shell32 dsound ws2_32 iphlpapi dbghelp)
+	if(MSVC)
+		set(stratagus_LIBS ${stratagus_LIBS} dsound winmm ws2_32 dbghelp)
+	else()
+		set(stratagus_LIBS ${stratagus_LIBS}
+			user32 gdi32 winmm imm32 ole32 oleaut32 version uuid advapi32
+			setupapi shell32 dsound ws2_32 iphlpapi dbghelp)
+	endif()
 endif()
 
 if (WIN32 AND MSVC)
