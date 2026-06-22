@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         submodules: recursive
 
@@ -54,12 +54,12 @@ jobs:
 
     steps:
     - name: Checkout Stratagus
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         submodules: recursive
 
     - name: Checkout Timeless Tales
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: Wargus/timeless-tales
         path: games/timeless-tales
