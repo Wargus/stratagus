@@ -357,7 +357,32 @@ static void ExtractData(char *extractor_tool,
 			std::wstring file = innoextractPath.wstring();
 			std::vector<std::wstring> argv = {L"-i", fs::path(datafile).wstring()};
 #else
-			const char *file = "innoextract";
+			// When launched from a GUI (e.g. the macOS Finder), the process PATH is
+			// the minimal launchd default and does NOT include Homebrew/MacPorts
+			// directories, so a bare "innoextract" would not be found even when it is
+			// installed. Resolve it explicitly: next to our own executable (so it can
+			// be bundled), then the common package-manager locations, finally falling
+			// back to a bare name so execvp still searches PATH when run from a shell.
+			std::string innoextractExe = "innoextract";
+			{
+				std::vector<std::string> candidates;
+				if (argv0 && strchr(argv0, SLASH[0])) {
+					char selfdir[BUFF_SIZE] = {'\0'};
+					strncpy(selfdir, argv0, sizeof(selfdir) - 1);
+					parentdir(selfdir);
+					candidates.push_back(std::string(selfdir) + SLASH "innoextract");
+				}
+				candidates.push_back("/opt/homebrew/bin/innoextract"); // Apple Silicon Homebrew
+				candidates.push_back("/usr/local/bin/innoextract");    // Intel Homebrew / manual
+				candidates.push_back("/opt/local/bin/innoextract");    // MacPorts
+				for (const std::string &candidate : candidates) {
+					if (fs::exists(candidate)) {
+						innoextractExe = candidate;
+						break;
+					}
+				}
+			}
+			const char *file = innoextractExe.c_str();
 			char *argv[] = {"-i", (char *) datafile.c_str(), nullptr, nullptr, nullptr};
 #endif
 			if (runCommand(file, argv) == 0) {
