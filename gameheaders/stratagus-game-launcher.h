@@ -369,9 +369,13 @@ static void ExtractData(char *extractor_tool,
 #ifdef WIN32
 				argv[0] = L"-m";
 #else
+				// Keep the output-dir string alive for the duration of the
+				// runCommand call: tmpp.string() returns a temporary whose
+				// c_str() would otherwise dangle (use-after-free).
+				std::string tmppStr = tmpp.string();
 				argv[0] = "-m";
 				argv[1] = "-d";
-				argv[2] = (char *) tmpp.string().c_str();
+				argv[2] = (char *) tmppStr.c_str();
 				argv[3] = (char *) datafile.c_str();
 #endif
 				if (runCommand(file, argv) != 0) {
