@@ -648,10 +648,15 @@ int main(int argc, char *argv[])
 		}
 #endif
 		if (fs::exists(extractor_path)) {
-#ifndef WIN32
+#if !defined(WIN32) && !defined(USE_MAC)
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
 			// bytes. Then we add the arguments.
+			// NOTE: not on macOS. There the extractor path is used as a filesystem
+			// path (fs::path(extractor_tool) when locating the bundled scripts/contrib
+			// dirs and when building the osascript command), and embedded quote
+			// characters would make those paths invalid, aborting extraction with a
+			// "could not discover scripts path" error.
 			extractor_path[strlen(extractor_path) + 1] = '\0';
 			memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
 			extractor_path[0] = QUOTE[0];
