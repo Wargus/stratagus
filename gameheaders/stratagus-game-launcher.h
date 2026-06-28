@@ -460,7 +460,14 @@ static void ExtractData(char *extractor_tool,
 		return;
 	}
 
-	if (force != 2) {
+	// force == 2 is used both for the "extract more" expansion recursion (which
+	// must NOT re-copy the contrib dirs, as copy_dir() wipes its target before
+	// copying and the expansion pass does not re-extract the base graphics) and
+	// for a user-supplied installer/data file passed on the command line. The
+	// latter can be a *first* extraction, which still needs the contrib dirs
+	// (scripts, UI graphics, shaders, ...) or the engine cannot start. Tell the
+	// two apart by datafileCstr: the expansion recursion passes none.
+	if (force != 2 || datafileCstr != nullptr) {
 		fs::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
