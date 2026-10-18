@@ -57,7 +57,7 @@ public:
 
 namespace {
 	std::vector<CConstructionFrame> makeFrames(
-		const std::vector<std::pair<int, int>>& vec)
+		const std::vector<std::pair<float, int>>& vec)
 	{
 		std::vector<CConstructionFrame> cframes;
 		const std::size_t size = vec.size();
@@ -98,7 +98,7 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("size=1") {
 		frames = makeFrames({
-			{0, 0},
+			{0.F, 0},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit,   0) == 0);
@@ -108,8 +108,8 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("large steps") {
 		frames = makeFrames({
-			{ 0, 100},
-			{50, 110},
+			{ 0.F, 100},
+			{50.F, 110},
 		});
 
 		SUBCASE("normal") {
@@ -136,14 +136,14 @@ TEST_CASE("COrder_Built Frame")
 	SUBCASE("partially dense")
 	{
 		frames = makeFrames({
-			{  0, 0},
-			{  1, 1},
-			{  2, 2},
-			{ 65, 3},
-			{ 66, 4},
-			{ 67, 5},
-			{ 99, 6},
-			{100, 7},
+			{  0.F, 0},
+			{  1.F, 1},
+			{  2.F, 2},
+			{ 65.F, 3},
+			{ 66.F, 4},
+			{ 67.F, 5},
+			{ 99.F, 6},
+			{100.F, 7},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit,   0) == 0);
@@ -177,9 +177,9 @@ TEST_CASE("COrder_Built Frame")
 	SUBCASE("repeated values")
 	{
 		frames = makeFrames({
-			{  0, 8},
-			{ 80, 1},
-			{ 90, 8},
+			{  0.F, 8},
+			{ 80.F, 1},
+			{ 90.F, 8},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit, 79) == 8);
@@ -190,7 +190,7 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("first key larger") {
 		frames = makeFrames({
-			{ 10, 5},
+			{ 10.F, 5},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit,  9) == 5);
@@ -200,10 +200,10 @@ TEST_CASE("COrder_Built Frame")
 	SUBCASE("duplicate keys")
 	{
 		frames = makeFrames({
-			{  0, 0},
-			{ 20, 1},
-			{ 20, 2},
-			{ 60, 3},
+			{  0.F, 0},
+			{ 20.F, 1},
+			{ 20.F, 2},
+			{ 60.F, 3},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit, 19) == 0);
@@ -213,9 +213,9 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("wrong key order") {
 		frames = makeFrames({
-			{ 75, 9},
-			{ 50, 8},
-			{  0, 7},
+			{ 75.F, 9},
+			{ 50.F, 8},
+			{  0.F, 7},
 		});
 
 		CHECK_FALSE(ranges::is_sorted(frames, std::less<>{}, &CConstructionFrame::Percent));
@@ -231,8 +231,8 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("too small key value") {
 		frames = makeFrames({
-			{ -1, 7},
-			{100, 8},
+			{ -1.F, 7},
+			{100.F, 8},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit,   0) == 7);
@@ -243,8 +243,8 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("too large key value") {
 		frames = makeFrames({
-			{  0, 7},
-			{101, 8},
+			{  0.F, 7},
+			{101.F, 8},
 		});
 
 		CHECK(order.testUpdateConstrFrame_Percent(unit,   0) == 7);

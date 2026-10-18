@@ -2829,8 +2829,8 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 
 static void HitUnit_Burning(CUnit &target)
 {
-	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
-	MissileType *fire = MissileBurningBuilding(f);
+	const float percent = (100.F * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
+	MissileType *fire = MissileBurningBuilding(percent);
 
 	if (fire) {
 		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();

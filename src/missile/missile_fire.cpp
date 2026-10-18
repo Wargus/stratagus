@@ -54,8 +54,8 @@ void MissileFire::Action() /* override */
 	}
 	if (this->NextMissileFrame(1, 0)) {
 		this->SpriteFrame = 0;
-		const int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
-		MissileType *fire = MissileBurningBuilding(f);
+		const float percent = (100.F * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+		MissileType *fire = MissileBurningBuilding(percent);
 
 		if (!fire) {
 			this->TTL = 0;

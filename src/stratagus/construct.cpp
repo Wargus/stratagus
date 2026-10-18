@@ -223,7 +223,7 @@ static int CclDefineConstruction(lua_State *l)
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent = 0;
 				ConstructionFileType file = ConstructionFileType::Construction;
-				int frame = 0;
+				float frame = 0.F;
 
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -234,7 +234,7 @@ static int CclDefineConstruction(lua_State *l)
 					const std::string_view value = LuaToString(l, -2);
 
 					if (value == "Percent") {
-						percent = LuaToNumber(l, -1);
+						percent = LuaToFloat(l, -1);
 					} else if (value == "File") {
 						const std::string_view value = LuaToString(l, -1);
 

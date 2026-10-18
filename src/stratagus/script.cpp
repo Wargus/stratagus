@@ -423,6 +423,15 @@ int LuaToNumber(lua_State *l, int index, int subIndex)
 	return res;
 }
 
+float LuaToFloat(lua_State *l, int index, int subIndex)
+{
+	luaL_checktype(l, index, LUA_TTABLE);
+	lua_rawgeti(l, index, subIndex);
+	const float res = LuaToFloat(l, -1);
+	lua_pop(l, 1);
+	return res;
+}
+
 unsigned int LuaToUnsignedNumber(lua_State *l, int index, int subIndex)
 {
 	luaL_checktype(l, index, LUA_TTABLE);

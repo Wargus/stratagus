@@ -321,7 +321,7 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 }
 
 
-static std::optional<std::size_t> FindCFramePercent(const std::vector<CConstructionFrame> &cframes, int percent)
+static std::optional<std::size_t> FindCFramePercent(const std::vector<CConstructionFrame> &cframes, float percent)
 {
 	if (cframes.empty())
 	{
@@ -341,7 +341,7 @@ static std::optional<std::size_t> FindCFramePercent(const std::vector<CConstruct
 void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
-	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
+	const float percent = static_cast<float>(this->ProgressCounter) / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	const auto index = FindCFramePercent(type.Construction->Frames, percent);
 
 	if (index.has_value() && index.value() != this->Frame) {

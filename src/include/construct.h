@@ -116,7 +116,7 @@ class CConstructionFrame
 public:
 	CConstructionFrame() : File(ConstructionFileType::Construction) {}
 
-	int Percent = 0;                    /// Percent complete
+	float Percent = 0.F;                /// Percent complete
 	ConstructionFileType File;          /// Graphic to use
 	int Frame = 0;                      /// Frame number
 };

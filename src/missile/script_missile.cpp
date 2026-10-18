@@ -350,7 +350,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 			++k;
 
 			if (value == "percent") {
-				frame.Percent = LuaToNumber(l, j + 1, k + 1);
+				frame.Percent = LuaToFloat(l, j + 1, k + 1);
 			} else if (value == "missile") {
 				frame.Missile = &MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
