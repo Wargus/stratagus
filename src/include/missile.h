@@ -571,7 +571,7 @@ class BurningBuildingFrame
 public:
 	BurningBuildingFrame() = default;
 
-	int Percent = 0; /// HP percent
+	float Percent = 0.F; /// HP percent
 	MissileType *Missile = nullptr; /// Missile to draw
 } ;
 
@@ -616,7 +616,7 @@ extern void MissileActions();
 extern int ViewPointDistanceToMissile(const Missile &missile);
 
 /// Get the burning building missile based on hp percent
-extern MissileType *MissileBurningBuilding(int percent);
+extern MissileType *MissileBurningBuilding(float percent);
 
 /// Save missiles
 extern void SaveMissiles(CFile &file);

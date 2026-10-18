@@ -38,7 +38,7 @@ namespace {
 		return reinterpret_cast<MissileType*>(0x10000 + m);
 	}
 
-	void setFrames(const std::vector<std::pair<int, MissileType*>>& frames)
+	void setFrames(const std::vector<std::pair<float, MissileType*>>& frames)
 	{
 		const std::size_t size = frames.size();
 		BurningBuildingFrames.resize(size);
@@ -69,119 +69,119 @@ TEST_CASE("missile_fire")
 		setFrames({});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding(  0) == nullptr);
+		CHECK(MissileBurningBuilding(  0.F) == nullptr);
 	}
 
 	SUBCASE("size=1") {
 		setFrames({
-			{  0, m0},
+			{  0.F, m0},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding(  0) == m0);
-		CHECK(MissileBurningBuilding(  1) == m0);
-		CHECK(MissileBurningBuilding(100) == m0);
+		CHECK(MissileBurningBuilding(  0.F) == m0);
+		CHECK(MissileBurningBuilding(  1.F) == m0);
+		CHECK(MissileBurningBuilding(100.F) == m0);
 	}
 
 	SUBCASE("large steps") {
 		setFrames({
-			{  0, m0},
-			{ 50, m1},
+			{  0.F, m0},
+			{ 50.F, m1},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
 		SUBCASE("normal") {
-			CHECK(MissileBurningBuilding(  0) == m0);
-			CHECK(MissileBurningBuilding(  1) == m0);
-			CHECK(MissileBurningBuilding( 49) == m0);
-			CHECK(MissileBurningBuilding( 50) == m1);
-			CHECK(MissileBurningBuilding( 51) == m1);
-			CHECK(MissileBurningBuilding(100) == m1);
+			CHECK(MissileBurningBuilding(  0.F) == m0);
+			CHECK(MissileBurningBuilding(  1.F) == m0);
+			CHECK(MissileBurningBuilding( 49.F) == m0);
+			CHECK(MissileBurningBuilding( 50.F) == m1);
+			CHECK(MissileBurningBuilding( 51.F) == m1);
+			CHECK(MissileBurningBuilding(100.F) == m1);
 		}
 
 		SUBCASE("out of bounds") {
-			CHECK(MissileBurningBuilding( -1) == nullptr);
-			CHECK(MissileBurningBuilding(101) == m1);
+			CHECK(MissileBurningBuilding( -1.F) == nullptr);
+			CHECK(MissileBurningBuilding(101.F) == m1);
 		}
 	}
 
 	SUBCASE("partially dense")
 	{
 		setFrames({
-			{  0, m0},
-			{  1, m1},
-			{  2, m2},
-			{ 65, m3},
-			{ 66, m4},
-			{ 67, m5},
-			{ 99, m6},
-			{100, m7},
+			{  0.F, m0},
+			{ 0.5F, m1},
+			{  1.F, m2},
+			{ 65.F, m3},
+			{ 66.F, m4},
+			{ 67.F, m5},
+			{ 99.F, m6},
+			{100.F, m7},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding(  0) == m0);
-		CHECK(MissileBurningBuilding(  1) == m1);
-		CHECK(MissileBurningBuilding(  2) == m2);
-		CHECK(MissileBurningBuilding(  3) == m2);
+		CHECK(MissileBurningBuilding(  0.F) == m0);
+		CHECK(MissileBurningBuilding( 0.5F) == m1);
+		CHECK(MissileBurningBuilding(  1.F) == m2);
+		CHECK(MissileBurningBuilding(  2.F) == m2);
 
-		CHECK(MissileBurningBuilding( 50) == m2);
+		CHECK(MissileBurningBuilding( 50.F) == m2);
 
-		CHECK(MissileBurningBuilding( 64) == m2);
-		CHECK(MissileBurningBuilding( 65) == m3);
-		CHECK(MissileBurningBuilding( 66) == m4);
-		CHECK(MissileBurningBuilding( 67) == m5);
-		CHECK(MissileBurningBuilding( 68) == m5);
+		CHECK(MissileBurningBuilding( 64.F) == m2);
+		CHECK(MissileBurningBuilding( 65.F) == m3);
+		CHECK(MissileBurningBuilding( 66.F) == m4);
+		CHECK(MissileBurningBuilding( 67.F) == m5);
+		CHECK(MissileBurningBuilding( 68.F) == m5);
 
-		CHECK(MissileBurningBuilding( 98) == m5);
-		CHECK(MissileBurningBuilding( 99) == m6);
-		CHECK(MissileBurningBuilding(100) == m7);
+		CHECK(MissileBurningBuilding( 98.F) == m5);
+		CHECK(MissileBurningBuilding( 99.F) == m6);
+		CHECK(MissileBurningBuilding(100.F) == m7);
 	}
 
 	SUBCASE("repeated values and null")
 	{
 		setFrames({
-			{  0, m8},
-			{ 80, nullptr},
-			{ 90, m8},
+			{  0.F, m8},
+			{ 80.F, nullptr},
+			{ 90.F, m8},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding( 79) == m8);
-		CHECK(MissileBurningBuilding( 80) == nullptr);
-		CHECK(MissileBurningBuilding( 89) == nullptr);
-		CHECK(MissileBurningBuilding( 90) == m8);
+		CHECK(MissileBurningBuilding( 79.F) == m8);
+		CHECK(MissileBurningBuilding( 80.F) == nullptr);
+		CHECK(MissileBurningBuilding( 89.F) == nullptr);
+		CHECK(MissileBurningBuilding( 90.F) == m8);
 	}
 
 	SUBCASE("first key larger") {
 		setFrames({
-			{ 10, m5},
+			{ 10.F, m5},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding( 9) == nullptr);
-		CHECK(MissileBurningBuilding(10) == m5);
+		CHECK(MissileBurningBuilding( 9.F) == nullptr);
+		CHECK(MissileBurningBuilding(10.F) == m5);
 	}
 
 	SUBCASE("duplicate keys")
 	{
 		setFrames({
-			{  0, m0},
-			{ 20, m1},
-			{ 20, m2},
-			{ 60, m3},
+			{  0.F, m0},
+			{ 20.F, m1},
+			{ 20.F, m2},
+			{ 60.F, m3},
 		});
 		CHECK(IsBurningBuildingFramesValid());
 
-		CHECK(MissileBurningBuilding(19) == m0);
-		CHECK(MissileBurningBuilding(20) == m2);
-		CHECK(MissileBurningBuilding(21) == m2);
+		CHECK(MissileBurningBuilding(19.F) == m0);
+		CHECK(MissileBurningBuilding(20.F) == m2);
+		CHECK(MissileBurningBuilding(21.F) == m2);
 	}
 
 	SUBCASE("wrong key order") {
 		setFrames({
-			{ 75, m9},
-			{ 50, m8},
-			{  0, m7},
+			{ 75.F, m9},
+			{ 50.F, m8},
+			{  0.F, m7},
 		});
 
 		CHECK_FALSE(IsBurningBuildingFramesValid());
@@ -189,8 +189,8 @@ TEST_CASE("missile_fire")
 
 	SUBCASE("too small key value") {
 		setFrames({
-			{ -1, m7},
-			{100, m8},
+			{ -1.F, m7},
+			{100.F, m8},
 		});
 
 		CHECK_FALSE(IsBurningBuildingFramesValid());
@@ -198,8 +198,8 @@ TEST_CASE("missile_fire")
 
 	SUBCASE("too large key value") {
 		setFrames({
-			{  0, m7},
-			{101, m8},
+			{  0.F, m7},
+			{101.F, m8},
 		});
 
 		CHECK_FALSE(IsBurningBuildingFramesValid());

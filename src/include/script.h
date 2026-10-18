@@ -509,6 +509,7 @@ extern bool LuaToBoolean(lua_State *l, int narg);
 
 extern std::string_view LuaToString(lua_State *l, int index, int subIndex);
 extern int LuaToNumber(lua_State *l, int index, int subIndex);
+extern float LuaToFloat(lua_State *l, int index, int subIndex);
 extern unsigned int LuaToUnsignedNumber(lua_State *l, int index, int subIndex);
 extern bool LuaToBoolean(lua_State *l, int index, int subIndex);
 

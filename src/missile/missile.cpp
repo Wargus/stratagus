@@ -1186,7 +1186,7 @@ int ViewPointDistanceToMissile(const Missile &missile)
 **
 **  @return  the missile used for burning.
 */
-MissileType *MissileBurningBuilding(int percent)
+MissileType *MissileBurningBuilding(float percent)
 {
 	const auto it = ranges::upper_bound(
 		std::begin(BurningBuildingFrames),
