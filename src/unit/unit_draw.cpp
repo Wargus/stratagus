@@ -928,7 +928,7 @@ void CUnit::Draw(const CViewport &vp) const
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	UnitAction action = this->CurrentAction();
 	PixelPos screenPos;
-	if (ReplayRevealMap || IsVisible) {
+	if (ReplayRevealMap || IsVisible || this->Seen.Type == nullptr) {
 		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
 		frame = this->Frame;
