@@ -1466,6 +1466,7 @@ void OnlineState::handleChatevent(Context &ctx)
 		case 0x03: // user left channel
 			ctx.removeUser(username);
 			ctx.showInfo(username + " left");
+			break;
 		case 0x04: // recv whisper
 			if (!text.empty()) {
 				std::string prefix = "/udppunch ";
