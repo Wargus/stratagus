@@ -11,6 +11,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "network/netsockets.h"
+#include <charconv>
 #include "parameters.h"
 #include "script.h"
 #include "settings.h"
@@ -681,6 +682,81 @@ private:
 };
 
 class Context;
+
+namespace {
+
+/**
+ * Parse the "<ipv4>:<port>" target of a "/udppunch " whisper.
+ *
+ * Strict on purpose: exactly four decimal octets (0-255) and a numeric port
+ * (1-65535). Anything else - partial addresses, junk suffixes, out-of-range
+ * values - returns false so the whisper is displayed as a normal message.
+ * Loopback/link-local/multicast/reserved targets are refused: a channel
+ * member must not be able to make this host shoot UDP packets at them.
+ */
+bool parsePunchTarget(const std::string_view arg, std::string &hostOut, int &portOut)
+{
+	const size_t sep = arg.rfind(':');
+	if (arg.empty() || sep == std::string_view::npos || sep == 0 || sep + 1 >= arg.size()) {
+		return false;
+	}
+
+	const std::string_view portStr = arg.substr(sep + 1);
+	if (portStr.size() > 5) {
+		return false;
+	}
+	int port = 0;
+	if (std::from_chars(portStr.data(), portStr.data() + portStr.size(), port).ptr
+	    != portStr.data() + portStr.size()
+	    || port <= 0 || port > 65535) {
+		return false;
+	}
+
+	unsigned int octets[4] = {0, 0, 0, 0};
+	size_t pos = 0;
+	for (unsigned int i = 0; i < 4; ++i) {
+		const size_t dot = arg.find('.', pos);
+		// the address part never crosses the ':' separator
+		const size_t end = (i == 3 ? sep : std::min(dot, sep));
+		if (i < 3 && (dot == std::string_view::npos || dot > sep)) {
+			return false; // fewer than four octets
+		}
+		const std::string_view part = arg.substr(pos, end - pos);
+		if (part.empty() || part.size() > 3) {
+			return false;
+		}
+		unsigned int value = 0;
+		if (std::from_chars(part.data(), part.data() + part.size(), value).ptr
+		    != part.data() + part.size()
+		    || value > 255) {
+			return false;
+		}
+		octets[i] = value;
+		pos = end + 1;
+	}
+	if (pos != sep + 1) {
+		return false; // host part not fully consumed before the ':'
+	}
+
+	// Refuse addresses we should never punch towards.
+	const bool unspecified = (octets[0] | octets[1] | octets[2] | octets[3]) == 0;
+	const bool loopback = octets[0] == 127;
+	const bool linkLocal = octets[0] == 169 && octets[1] == 254;
+	const bool multicast = octets[0] >= 224 && octets[0] <= 239;
+	const bool reserved = octets[0] >= 240; // includes 255.255.255.255 broadcast
+	if (unspecified || loopback || linkLocal || multicast || reserved) {
+		return false;
+	}
+
+	char buf[16]; // 255.255.255.255
+	snprintf(buf, sizeof(buf), "%u.%u.%u.%u", octets[0], octets[1], octets[2], octets[3]);
+	hostOut = buf;
+	portOut = port;
+	return true;
+}
+
+} // namespace
+
 
 class OnlineState
 {
@@ -1469,31 +1545,23 @@ void OnlineState::handleChatevent(Context &ctx)
 			break;
 		case 0x04: // recv whisper
 			if (!text.empty()) {
-				std::string prefix = "/udppunch ";
-				unsigned int a, b, c, d, ip, port;
-				if (text.size() > prefix.size() && text.rfind(prefix, 0) != std::string::npos) {
-					int res = sscanf(text.substr(prefix.size()).c_str(),
-					                 "%d.%d.%d.%d:%d",
-					                 &a,
-					                 &b,
-					                 &c,
-					                 &d,
-					                 &port);
-					if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port >= 1024) {
-						ip = a | b << 8 | c << 16 | d << 24;
+				const std::string prefix = "/udppunch ";
+				if (text.size() > prefix.size() && text.compare(0, prefix.size(), prefix) == 0) {
+					std::string punchHost;
+					int punchPort = 0;
+					if (parsePunchTarget(std::string_view(text).substr(prefix.size()), punchHost, punchPort)) {
 						if (NetConnectType == 1
 						    && !GameRunning) { // the server, waiting for clients
 							const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
-							NetworkSendICMessage(ctx.getUDPSocket(), CHost(ip, port), message);
-							DebugPrint("UDP Sent: UDP punch\n");
+							NetworkSendICMessage(ctx.getUDPSocket(), CHost(punchHost, punchPort), message);
+							DebugPrint("UDP Sent: UDP punch to %s:%d\n", punchHost.c_str(), punchPort);
 						} else {
 							// the client will connect now and send packages, anyway.
 							// any other state shouldn't try to udp hole punch at this stage
 						}
 						return;
-					} else {
-						// incorrect format, fall through and treat as normal whisper;
 					}
+					// incorrect format, fall through and treat as normal whisper;
 				}
 			}
 			ctx.showChat(username + " whispers " + text);
