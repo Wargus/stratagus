@@ -11,6 +11,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "network/netsockets.h"
+#include <algorithm>
 #include <charconv>
 #include <chrono>
 #include "parameters.h"
@@ -942,6 +943,15 @@ public:
 	{
 		if (externalAddress.isValid()) {
 			sendText("/whisper " + username + " /udppunch " + externalAddress.toString());
+			return;
+		}
+		// Our public address is discovered via the fake-game gamelist and may
+		// not be known yet when the UI asks to punch. Queue it; setGamelist()
+		// flushes the queue as soon as we learn the address.
+		if (!username.empty()
+		    && std::find(pendingPunches.begin(), pendingPunches.end(), username) == pendingPunches.end()) {
+			pendingPunches.push_back(username);
+			showInfo("Waiting for NAT punch to " + username + " (detecting our public address...)");
 		}
 	}
 
@@ -1188,6 +1198,13 @@ public:
 					DebugPrint("My external address is %s\n", externalAddress.toString().c_str());
 					showInfo("Your external route is " + externalAddress.toString());
 					stopAdvertising();
+					if (!pendingPunches.empty()) {
+						auto queued = std::move(pendingPunches);
+						pendingPunches.clear();
+						for (const auto &user : queued) {
+							punchNAT(user);
+						}
+					}
 					break;
 				}
 			}
@@ -1452,6 +1469,7 @@ private:
 
 	bool requestedAddress = false;
 	CHost externalAddress;
+	std::vector<std::string> pendingPunches;
 
 	std::string lastError;
 
