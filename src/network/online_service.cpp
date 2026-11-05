@@ -12,6 +12,7 @@
 #include "network.h"
 #include "network/netsockets.h"
 #include <charconv>
+#include <chrono>
 #include "parameters.h"
 #include "script.h"
 #include "settings.h"
@@ -755,6 +756,20 @@ bool parsePunchTarget(const std::string_view arg, std::string &hostOut, int &por
 	return true;
 }
 
+// Queue of short ICMAYT bursts towards "/udppunch" targets (host side).
+// One packet opens a NAT mapping only if it lands in exactly the right
+// millisecond; several over a few seconds are much more reliable, both for
+// loss and for stateful firewalls that need sustained traffic to keep the
+// mapping alive while the joiner keeps retrying its Hello.
+struct PendingPunchBurst
+{
+	std::string host;
+	int port = 0;
+	int remaining = 0;
+	std::chrono::steady_clock::time_point nextAt{};
+};
+PendingPunchBurst punchBurst;
+
 } // namespace
 
 
@@ -1345,7 +1360,30 @@ public:
 
 	void doOneStep() override
 	{
+		tickPunchBurst();
 		if (this->state != nullptr) this->state->doOneStep(*this);
+	}
+
+	void tickPunchBurst()
+	{
+		if (punchBurst.remaining <= 0) {
+			return;
+		}
+		if (NetConnectType != 1 || GameRunning) {
+			// no longer the waiting server: drop the pending burst
+			punchBurst.remaining = 0;
+			punchBurst.host.clear();
+			return;
+		}
+		const auto now = std::chrono::steady_clock::now();
+		if (punchBurst.nextAt != std::chrono::steady_clock::time_point{} && now < punchBurst.nextAt) {
+			return;
+		}
+		const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
+		NetworkSendICMessage(getUDPSocket(), CHost(punchBurst.host, punchBurst.port), message);
+		--punchBurst.remaining;
+		punchBurst.nextAt = now + std::chrono::milliseconds(400);
+		DebugPrint("UDP Sent: UDP punch (%d left)\n", punchBurst.remaining);
 	}
 
 	bool handleUDP(const unsigned char *buffer, int len, CHost host) override
@@ -1552,9 +1590,14 @@ void OnlineState::handleChatevent(Context &ctx)
 					if (parsePunchTarget(std::string_view(text).substr(prefix.size()), punchHost, punchPort)) {
 						if (NetConnectType == 1
 						    && !GameRunning) { // the server, waiting for clients
-							const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
-							NetworkSendICMessage(ctx.getUDPSocket(), CHost(punchHost, punchPort), message);
-							DebugPrint("UDP Sent: UDP punch to %s:%d\n", punchHost.c_str(), punchPort);
+							// Burst a few ICMAYT packets over a few seconds;
+							// a single datagram is too easy to lose and NAT
+							// mappings like to see several packets.
+							punchBurst.host = std::move(punchHost);
+							punchBurst.port = punchPort;
+							punchBurst.remaining = 8;
+							punchBurst.nextAt = std::chrono::steady_clock::time_point{};
+							DebugPrint("UDP punch queued for %s:%d\n", punchBurst.host.c_str(), punchBurst.port);
 						} else {
 							// the client will connect now and send packages, anyway.
 							// any other state shouldn't try to udp hole punch at this stage
