@@ -1192,8 +1192,6 @@ public:
 				const auto &game = games[i];
 				if (game->isValid() && game->getCreator() == getUsername()
 				    && game->getMap() == "udp") {
-					// our fake game, remove and break;
-					games.erase(games.begin() + i);
 					externalAddress = game->getHost();
 					DebugPrint("My external address is %s\n", externalAddress.toString().c_str());
 					showInfo("Your external route is " + externalAddress.toString());
@@ -1205,6 +1203,8 @@ public:
 							punchNAT(user);
 						}
 					}
+					// our fake game, remove and break;
+					games.erase(games.begin() + i);
 					break;
 				}
 			}
