@@ -357,7 +357,32 @@ static void ExtractData(char *extractor_tool,
 			std::wstring file = innoextractPath.wstring();
 			std::vector<std::wstring> argv = {L"-i", fs::path(datafile).wstring()};
 #else
-			const char *file = "innoextract";
+			// When launched from a GUI (e.g. the macOS Finder), the process PATH is
+			// the minimal launchd default and does NOT include Homebrew/MacPorts
+			// directories, so a bare "innoextract" would not be found even when it is
+			// installed. Resolve it explicitly: next to our own executable (so it can
+			// be bundled), then the common package-manager locations, finally falling
+			// back to a bare name so execvp still searches PATH when run from a shell.
+			std::string innoextractExe = "innoextract";
+			{
+				std::vector<std::string> candidates;
+				if (argv0 && strchr(argv0, SLASH[0])) {
+					char selfdir[BUFF_SIZE] = {'\0'};
+					strncpy(selfdir, argv0, sizeof(selfdir) - 1);
+					parentdir(selfdir);
+					candidates.push_back(std::string(selfdir) + SLASH "innoextract");
+				}
+				candidates.push_back("/opt/homebrew/bin/innoextract"); // Apple Silicon Homebrew
+				candidates.push_back("/usr/local/bin/innoextract");    // Intel Homebrew / manual
+				candidates.push_back("/opt/local/bin/innoextract");    // MacPorts
+				for (const std::string &candidate : candidates) {
+					if (fs::exists(candidate)) {
+						innoextractExe = candidate;
+						break;
+					}
+				}
+			}
+			const char *file = innoextractExe.c_str();
 			char *argv[] = {"-i", (char *) datafile.c_str(), nullptr, nullptr, nullptr};
 #endif
 			if (runCommand(file, argv) == 0) {
@@ -369,9 +394,13 @@ static void ExtractData(char *extractor_tool,
 #ifdef WIN32
 				argv[0] = L"-m";
 #else
+				// Keep the output-dir string alive for the duration of the
+				// runCommand call: tmpp.string() returns a temporary whose
+				// c_str() would otherwise dangle (use-after-free).
+				std::string tmppStr = tmpp.string();
 				argv[0] = "-m";
 				argv[1] = "-d";
-				argv[2] = (char *) tmpp.string().c_str();
+				argv[2] = (char *) tmppStr.c_str();
 				argv[3] = (char *) datafile.c_str();
 #endif
 				if (runCommand(file, argv) != 0) {
@@ -456,7 +485,14 @@ static void ExtractData(char *extractor_tool,
 		return;
 	}
 
-	if (force != 2) {
+	// force == 2 is used both for the "extract more" expansion recursion (which
+	// must NOT re-copy the contrib dirs, as copy_dir() wipes its target before
+	// copying and the expansion pass does not re-extract the base graphics) and
+	// for a user-supplied installer/data file passed on the command line. The
+	// latter can be a *first* extraction, which still needs the contrib dirs
+	// (scripts, UI graphics, shaders, ...) or the engine cannot start. Tell the
+	// two apart by datafileCstr: the expansion recursion passes none.
+	if (force != 2 || datafileCstr != nullptr) {
 		fs::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
@@ -644,10 +680,15 @@ int main(int argc, char *argv[])
 		}
 #endif
 		if (fs::exists(extractor_path)) {
-#ifndef WIN32
+#if !defined(WIN32) && !defined(USE_MAC)
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
 			// bytes. Then we add the arguments.
+			// NOTE: not on macOS. There the extractor path is used as a filesystem
+			// path (fs::path(extractor_tool) when locating the bundled scripts/contrib
+			// dirs and when building the osascript command), and embedded quote
+			// characters would make those paths invalid, aborting extraction with a
+			// "could not discover scripts path" error.
 			extractor_path[strlen(extractor_path) + 1] = '\0';
 			memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
 			extractor_path[0] = QUOTE[0];

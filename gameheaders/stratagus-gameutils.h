@@ -324,6 +324,18 @@ int runCommand(const char *file,
                bool echo = false,
                std::string *outputCommandline = nullptr)
 {
+	// execvp uses argv[0] as the program-name slot and starts option
+	// parsing at argv[1], so the caller-supplied arguments (which, to match
+	// the Windows overload, do not include the program name) must be shifted
+	// behind `file`. Without this, the first real argument is swallowed as
+	// argv[0], e.g. `innoextract -i <file>` would run as `innoextract <file>`.
+	std::vector<char *> childArgv;
+	childArgv.push_back(const_cast<char *>(file));
+	for (int i = 0; argv[i] != nullptr; i++) {
+		childArgv.push_back(argv[i]);
+	}
+	childArgv.push_back(nullptr);
+
 	pid_t pid = fork();
 
 	if (echo || outputCommandline) {
@@ -345,7 +357,7 @@ int runCommand(const char *file,
 
 	if (pid == 0) {
 		// child
-		exit(execvp(file, argv));
+		exit(execvp(file, childArgv.data()));
 	} else {
 		int status;
 		waitpid(pid, &status, 0);
