@@ -5504,10 +5504,15 @@ char *tinyfd_saveFileDialog(
         }
         if (aNumOfFilterPatterns > 0) {
             strcat(lDialogString, " --file-filter='") ;
-            if (aSingleFilterDescription && strlen(aSingleFilterDescription)) {
-                strcat(lDialogString, aSingleFilterDescription) ;
-                strcat(lDialogString, " |") ;
+            if (aSingleFilterDescription && strlen(aSingleFilterDescription))
+            {
+                strcat(lDialogString, aSingleFilterDescription);
             }
+            else
+            {
+                strcat(lDialogString, "Supported files");
+            }
+            strcat(lDialogString, " |");
             for (i = 0 ; i < aNumOfFilterPatterns ; i ++) {
                 strcat(lDialogString, " ") ;
                 strcat(lDialogString, aFilterPatterns[i]) ;
@@ -5530,10 +5535,15 @@ char *tinyfd_saveFileDialog(
         }
         if (aNumOfFilterPatterns > 0) {
             strcat(lDialogString, " --file-filter='");
-            if (aSingleFilterDescription && strlen(aSingleFilterDescription)) {
+            if (aSingleFilterDescription && strlen(aSingleFilterDescription))
+            {
                 strcat(lDialogString, aSingleFilterDescription);
-                strcat(lDialogString, " |");
             }
+            else
+            {
+                strcat(lDialogString, "Supported files");
+            }
+            strcat(lDialogString, " |");
             for (i = 0; i < aNumOfFilterPatterns; i++) {
                 strcat(lDialogString, " ");
                 strcat(lDialogString, aFilterPatterns[i]);
@@ -5918,10 +5928,15 @@ char *tinyfd_openFileDialog(
         }
         if (aNumOfFilterPatterns > 0) {
             strcat(lDialogString, " --file-filter='") ;
-            if (aSingleFilterDescription && strlen(aSingleFilterDescription)) {
-                strcat(lDialogString, aSingleFilterDescription) ;
-                strcat(lDialogString, " |") ;
-			}
+            if (aSingleFilterDescription && strlen(aSingleFilterDescription))
+            {
+                strcat(lDialogString, aSingleFilterDescription);
+            }
+            else
+            {
+                strcat(lDialogString, "Supported files");
+            }
+            strcat(lDialogString, " |");
             for (i = 0 ; i < aNumOfFilterPatterns ; i ++) {
                 strcat(lDialogString, " ") ;
                 strcat(lDialogString, aFilterPatterns[i]) ;
@@ -5947,10 +5962,15 @@ char *tinyfd_openFileDialog(
         }
         if (aNumOfFilterPatterns > 0) {
             strcat(lDialogString, " --file-filter='");
-            if (aSingleFilterDescription && strlen(aSingleFilterDescription)) {
+            if (aSingleFilterDescription && strlen(aSingleFilterDescription))
+            {
                 strcat(lDialogString, aSingleFilterDescription);
-                strcat(lDialogString, " |");
             }
+            else
+            {
+                strcat(lDialogString, "Supported files");
+            }
+            strcat(lDialogString, " |");
             for (i = 0; i < aNumOfFilterPatterns; i++) {
                 strcat(lDialogString, " ");
                 strcat(lDialogString, aFilterPatterns[i]);
