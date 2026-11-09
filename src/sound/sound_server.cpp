@@ -367,6 +367,9 @@ Mix_Chunk *GetChannelSample(int channel)
 */
 void StopChannel(int channel)
 {
+	if (channel >= 0 && channel < MaxChannels) {
+		Channels[channel].FinishedCallback = nullptr;
+	}
 	Mix_HaltChannel(channel);
 }
 
@@ -375,6 +378,9 @@ void StopChannel(int channel)
 */
 void StopAllChannels()
 {
+	for (int i = 0; i < MaxChannels; ++i) {
+		Channels[i].FinishedCallback = nullptr;
+	}
 	Mix_HaltChannel(-1);
 }
 
