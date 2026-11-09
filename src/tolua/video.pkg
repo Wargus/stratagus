@@ -106,4 +106,5 @@ public:
         Movie();
         bool Load(const std::string name, int w, int h);
         bool IsPlaying();
+        void SetLoop(bool value);
 }
