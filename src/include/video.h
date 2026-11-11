@@ -41,6 +41,7 @@
 #include "vec2i.h"
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <guisan.hpp>
 #include <guisan/sdl/sdlimage.hpp>
 #include <memory>
@@ -212,28 +213,22 @@ public:
 	std::shared_ptr<CPlayerColorGraphic> Clone(bool grayscale = false) const;
 };
 
-#ifdef USE_MNG
-#ifdef WIN32
-#ifdef HAVE_STDDEF_H
-#undef HAVE_STDDEF_H
-#endif
-#endif
-#include <libmng.h>
-#ifdef WIN32
-#ifndef HAVE_STDDEF_H
-#undef HAVE_STDDEF_H
-#endif
-#endif
-
-class Mng : public gcn::SDLImage
+/**
+**  An animated image
+**
+**  Which format the file uses is up to the file: SDL2_image decodes animated
+**  WebP, animated GIF and anything else it grows support for, so the game data
+**  can pick whatever is smaller without the engine caring.
+*/
+class Animation : public gcn::SDLImage
 {
 public:
-	Mng() : gcn::SDLImage(nullptr, true) {}
-	~Mng();
-	Mng(const Mng &) = delete;
-	Mng &operator=(const Mng &) = delete;
+	Animation() : gcn::SDLImage(nullptr, true) {}
+	~Animation();
+	Animation(const Animation &) = delete;
+	Animation &operator=(const Animation &) = delete;
 
-	static std::shared_ptr<Mng> New(const std::string &name);
+	static std::shared_ptr<Animation> New(const std::string &name);
 
 	bool Load();
 	void Reset();
@@ -244,44 +239,18 @@ public:
 	//guichan
 	SDL_Surface* getSurface() const override;
 
-	friend struct MngWrapper;
-
 public:
 	static uint32_t MaxFPS;
 
 private:
+	void advance() const;
+
 	std::string name;
-	FILE *fd = nullptr;
-	mng_handle handle = nullptr;
-	std::vector<unsigned char> buffer;
-	unsigned long ticks = 0;
-	int iteration = 0;
+	IMG_Animation *anim = nullptr;		// frames and delays, as decoded by SDL2_image
+	mutable unsigned long ticks = 0;	// time the frame currently shown has to stay on screen
+	mutable int frame = 0;			// number of the next frame to show
+	mutable int iteration = 0;				// number of loops played so far
 };
-#else
-/// empty class for lua scripts
-class Mng : public gcn::Image
-{
-public:
-	Mng() {}
-	~Mng() {}
-
-	static std::shared_ptr<Mng> New(const std::string &name) { return nullptr; }
-
-	bool Load() { return false; }
-	void Reset() {}
-	void Draw(int x, int y) {}
-
-	//guichan
-	int getWidth() const override { return 0; }
-	int getHeight() const override { return 0; }
-	void free() override { throw "unimplemented"; }
-	gcn::Color getPixel(int x, int y) override { throw "unimplemented"; }
-	void putPixel(int x, int y, const gcn::Color &color) override { throw "unimplemented"; }
-	void convertToDisplayFormat() override { throw "unimplemented"; }
-
-	static inline uint32_t MaxFPS = 15;
-};
-#endif
 
 /**
 **  Event call back.

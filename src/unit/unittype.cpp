@@ -943,17 +943,15 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 	}
 
-#ifdef USE_MNG
-	if (!type.Portrait.Mngs.empty()) {
-		for (size_t i = 0; i < type.Portrait.Mngs.size(); ++i) {
-			type.Portrait.Mngs[i] = Mng::New(type.Portrait.Files[i]);
-			type.Portrait.Mngs[i]->Load();
+	if (!type.Portrait.Anims.empty()) {
+		for (size_t i = 0; i < type.Portrait.Anims.size(); ++i) {
+			type.Portrait.Anims[i] = Animation::New(type.Portrait.Files[i]);
+			type.Portrait.Anims[i]->Load();
 		}
 		// FIXME: should be configurable
-		type.Portrait.CurrMng = 0;
+		type.Portrait.CurrAnim = 0;
 		type.Portrait.NumIterations = MyRand() % 16 + 1;
 	}
-#endif
 }
 
 /**

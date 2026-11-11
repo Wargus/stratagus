@@ -19,7 +19,6 @@ addons:
       - libtheora-dev
       - libvorbis-dev
       - libogg-dev
-      - libmng-dev
       - libpng-dev
       - zlib1g-dev
 before_script:

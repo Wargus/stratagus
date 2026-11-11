@@ -333,7 +333,7 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/mng.cpp
+	src/video/animation.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
@@ -661,14 +661,12 @@ if(BUILD_VENDORED_MEDIA_LIBS)
 	vendored_zlib()
 	vendored_png()
 	vendored_bzip2()
-	vendored_mng()
 	vendored_oggvorbis()
 	vendored_theora()
 else()
 	find_package(PNG REQUIRED)
 	find_package(ZLIB REQUIRED)
 	find_package(BZip2)
-	find_package(MNG)
 	find_package(OggVorbis)
 	find_package(Theora)
 endif()
@@ -736,7 +734,6 @@ option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 option(EAGER_LOAD "Load all game data at startup, may avoid stutter during gameplay at the cost of memory" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
-option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
@@ -787,13 +784,6 @@ if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
 	include_directories(SYSTEM ${BZIP2_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
-endif()
-
-if(WITH_MNG AND MNG_FOUND)
-	add_definitions(-DUSE_MNG)
-	include_directories(SYSTEM ${MNG_INCLUDE_DIR})
-	add_definitions(${MNG_DEFINITIONS})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
 endif()
 
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
@@ -1082,7 +1072,6 @@ else()
 endif()
 
 log_package("Bzip2" "BZIP2")
-log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
@@ -1229,7 +1218,6 @@ if(BUILD_VENDORED_MEDIA_LIBS)
 	add_dependencies(stratagus_lib zlib)
 	add_dependencies(stratagus_lib png)
 	add_dependencies(stratagus_lib bzip2)
-	add_dependencies(stratagus_lib mng)
 	add_dependencies(stratagus_lib ogg)
 	add_dependencies(stratagus_lib vorbis)
 	add_dependencies(stratagus_lib theora)
