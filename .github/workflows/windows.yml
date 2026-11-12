@@ -3,8 +3,9 @@ name: windows
 on:
   workflow_dispatch:
   push:
-    # Tag pushes build the release assets for that tag; path filters are not
-    # evaluated for tags, so keep both refs here when adding filters.
+    # The branches filter is required: a tags filter on its own would stop
+    # branch pushes, i.e. the daily installers. Tags are filtered so that only
+    # version tags get a release.
     branches: ['**']
     tags: ['v*', '[0-9]*']
     paths:
@@ -87,12 +88,6 @@ jobs:
         Compress-Archive -Path $binaries -DestinationPath release-assets/compiled-binaries.zip
         Get-ChildItem release-assets | Format-Table Name, Length
 
-    - name: Upload binaries
-      uses: actions/upload-artifact@v7
-      with:
-        name: stratagus
-        path: build/Release/**.*
-
     - name: Upload installer and symbols
       uses: actions/upload-artifact@v7
       with:
@@ -115,7 +110,6 @@ jobs:
             gh release create $tag --target $env:GITHUB_SHA --title $tag --notes "Stratagus $tag"
           }
         } else {
-          # Continuous builds of the engine, same release as the old Appveyor deploys.
           $tag = 'master-builds'
         }
         $assets = @(Get-ChildItem release-assets -File | ForEach-Object { $_.FullName })
