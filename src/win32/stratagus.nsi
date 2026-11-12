@@ -51,9 +51,9 @@
 
 ;--------------------------------
 
-; makensis does not look for relative paths in the build directory, so the
-; build passes these in as absolute paths. The defaults are for a manual run
-; of makensis next to the files it packages.
+; makensis resolves a relative path against the directory of this script, so
+; the build passes these in as absolute paths. The defaults are for a manual
+; run of makensis next to the files it packages.
 !ifdef ICON_FILE
 !define ICON "${ICON_FILE}"
 !else
@@ -65,6 +65,10 @@
 ; directory that holds stratagus.exe and stratagus-midiplayer.exe
 !ifndef BINARY_DIR
 !define BINARY_DIR "."
+!endif
+; directory the finished installer is written to
+!ifndef OUT_DIR
+!define OUT_DIR "."
 !endif
 !define EXE "stratagus.exe"
 
@@ -139,7 +143,7 @@ SetCompressor lzma
 
 Name "${NAME}"
 Icon "${ICON}"
-OutFile "${INSTALLER}"
+OutFile "${OUT_DIR}\${INSTALLER}"
 InstallDir "${INSTALLDIR}"
 InstallDirRegKey HKLM "${REGKEY}" "InstallLocation"
 
