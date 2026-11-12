@@ -59,10 +59,8 @@
 !else
 !define ICON "stratagus.ico"
 !endif
-!ifdef LICENSE_FILE
-!define LICENSE "${LICENSE_FILE}"
-!else
-!define LICENSE "COPYING"
+!ifndef LICENSE_FILE
+!define LICENSE_FILE "COPYING"
 !endif
 ; directory that holds stratagus.exe and stratagus-midiplayer.exe
 !ifndef BINARY_DIR
@@ -125,7 +123,7 @@ SetCompressor lzma
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${LICENSE}"
+!insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
