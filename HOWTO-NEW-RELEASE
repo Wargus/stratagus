@@ -29,10 +29,12 @@ and wait for it to run through on the Appveyor CI. This will automatically
 cause a release with the tag name to be created, and the windows dependencies
 will be uploaded there.
 
-Tag the new release here and wait for it to run through the CIs. Appveyor and
-Travis will upload new versions for Windows and OSX.
+Tag the new release here (as v<version>) and wait for it to run through the
+CIs. Github Actions uploads the Windows installer, the engine binaries and the
+matching debug symbols to the release with that tag name. Pass --generate-notes
+to gh release edit, or write the notes yourself, once the assets are there.
  git commit -a -m "Release version <version>"
- git tag <version>
+ git tag v<version>
  git push --tags origin master
 
 Go to Launchpad to trigger building new debian packages.
