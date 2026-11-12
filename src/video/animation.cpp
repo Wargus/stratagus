@@ -68,7 +68,7 @@ Animation::~Animation()
 **  ahead to catch up after the engine stalled would leave that picture
 **  unfinished, so one call shows at most one frame.
 */
-void Animation::advance() const
+void Animation::advance()
 {
 	if (anim == nullptr || ticks > GetTicks()) {
 		return;
@@ -176,7 +176,7 @@ void Animation::Reset()
 
 SDL_Surface *Animation::getSurface() const
 {
-	advance();
+	const_cast<Animation *>(this)->advance();
 	return mSurface;
 }
 

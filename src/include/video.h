@@ -243,13 +243,13 @@ public:
 	static uint32_t MaxFPS;
 
 private:
-	void advance() const;
+	void advance();
 
 	std::string name;
 	IMG_Animation *anim = nullptr;		// frames and delays, as decoded by SDL2_image
-	mutable unsigned long ticks = 0;	// time the frame currently shown has to stay on screen
-	mutable int frame = 0;			// number of the next frame to show
-	mutable int iteration = 0;				// number of loops played so far
+	unsigned long ticks = 0;		// time the frame currently shown has to stay on screen
+	int frame = 0;				// number of the next frame to show
+	int iteration = 0;			// number of loops played so far
 };
 
 /**
