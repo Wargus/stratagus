@@ -1317,13 +1317,10 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	# ship our DLLs
 	file(GLOB WINDLLS ${CMAKE_PREFIX_PATH}/bin/*.dll)
 	file(COPY ${WINDLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	# The installer script refers to the license, icon and executables by
-	# relative path, so stage those files in the build directory and run
-	# makensis from there instead of relying on the generator working directory.
+	# Pass absolute paths for everything the installer packages, as makensis
+	# does not resolve the relative ones against the build directory.
 	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/COPYING ${CMAKE_CURRENT_BINARY_DIR}/COPYING
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico ${CMAKE_CURRENT_BINARY_DIR}/stratagus.ico
-		COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${MAKENSIS} ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
+		COMMAND ${MAKENSIS} ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} -DLICENSE_FILE=${CMAKE_CURRENT_SOURCE_DIR}/COPYING -DICON_FILE=${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico -DBINARY_DIR=$<TARGET_FILE_DIR:stratagus> ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
 		DEPENDS src/win32/stratagus.nsi stratagus COPYING
 		COMMENT "Generating Stratagus Windows NSIS Installer"
 		VERBATIM

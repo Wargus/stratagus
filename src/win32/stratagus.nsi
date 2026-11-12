@@ -51,11 +51,24 @@
 
 ;--------------------------------
 
+; makensis does not look for relative paths in the build directory, so the
+; build passes these in as absolute paths. The defaults are for a manual run
+; of makensis next to the files it packages.
+!ifdef ICON_FILE
+!define ICON "${ICON_FILE}"
+!else
 !define ICON "stratagus.ico"
+!endif
+!ifdef LICENSE_FILE
+!define LICENSE "${LICENSE_FILE}"
+!else
+!define LICENSE "COPYING"
+!endif
+; directory that holds stratagus.exe and stratagus-midiplayer.exe
+!ifndef BINARY_DIR
+!define BINARY_DIR "."
+!endif
 !define EXE "stratagus.exe"
-; copy, in case VS put the exe under Release or Debug
-!system "powershell -Command $\"& {cp **\${EXE} ${EXE}}$\""
-!system "powershell -Command $\"& {cp **\stratagus-midiplayer.exe stratagus-midiplayer.exe}$\""
 
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
@@ -112,7 +125,7 @@ SetCompressor lzma
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "COPYING"
+!insertmacro MUI_PAGE_LICENSE "${LICENSE}"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -214,8 +227,8 @@ Section "${NAME}"
 	SectionIn RO
 
 	SetOutPath $INSTDIR
-	File "${EXE}"
-	File stratagus-midiplayer.exe
+	File "${BINARY_DIR}\${EXE}"
+	File "${BINARY_DIR}\stratagus-midiplayer.exe"
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
 	WriteRegStr HKLM "${REGKEY}" "QuietUninstallString" "$\"$INSTDIR\${UNINSTALL}$\" /S"
