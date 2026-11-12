@@ -3,6 +3,10 @@ name: windows
 on:
   workflow_dispatch:
   push:
+    # Tag pushes build the release assets for that tag; path filters are not
+    # evaluated for tags, so keep both refs here when adding filters.
+    branches: ['**']
+    tags: ['v*', '[0-9]*']
     paths:
       - '**'
       - '!.github/**'
@@ -22,6 +26,9 @@ on:
       - '!.vscode/**'
       - '!doc/**'
 
+permissions:
+  contents: write
+
 jobs:
   windows:
     runs-on: windows-latest
@@ -35,31 +42,81 @@ jobs:
     - name: cmake --version
       run: cmake --version
 
+    - name: install NSIS
+      shell: pwsh
+      run: |
+        $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
+        if (-not (Test-Path $makensis)) {
+          choco install nsis --yes --no-progress
+        }
+        if (-not (Test-Path $makensis)) {
+          throw "did not find makensis.exe at $makensis"
+        }
+        & $makensis -VERSION
+
     - name: build stratagus
-      run: | # -DENABLE_NSIS=ON
+      run: |
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_TESTING=1 "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_NSIS=ON -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_TESTING=1 "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
         cmake --build . --config Release
-        
+
     - name: run tests
       run: |
         cd build
         ctest --output-on-failure
 
-    - name: Upload installer
+    - name: collect release assets
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        New-Item -ItemType Directory -Path release-assets | Out-Null
+        $installers = @(Get-ChildItem build -Filter 'Stratagus-*.exe' -File)
+        if ($installers.Count -eq 0) {
+          throw 'the NSIS installer was not built'
+        }
+        Copy-Item $installers.FullName -Destination release-assets
+        Copy-Item build/Release/stratagus-midiplayer.exe -Destination release-assets
+        # Bundle the binaries with their debug symbols, so a crash log from a
+        # download of this build can be analysed.
+        $binaries = @(Get-ChildItem build/Release -File | Where-Object {
+            $_.Extension -eq '.pdb' -or $_.Name -in 'stratagus.exe', 'stratagus-midiplayer.exe'
+          } | ForEach-Object { $_.FullName })
+        if ($binaries.Count -eq 0) {
+          throw 'no executables or debug symbols to package'
+        }
+        Compress-Archive -Path $binaries -DestinationPath release-assets/compiled-binaries.zip
+        Get-ChildItem release-assets | Format-Table Name, Length
+
+    - name: Upload binaries
       uses: actions/upload-artifact@v7
       with:
         name: stratagus
         path: build/Release/**.*
 
-#    - name: Upload installer
-#      uses: actions/upload-artifact@v7
-#      with:
-#        name: stratagus-installer.exe
-#        path: build/**.exe
-#
-#    - name: Upload pdb files
-#      uses: actions/upload-artifact@v7
-#      with:
-#        name: stratagus_pdbs
-#        path: "**.pdb"
+    - name: Upload installer and symbols
+      uses: actions/upload-artifact@v7
+      with:
+        name: stratagus-release-assets
+        path: release-assets/*
+        retention-days: 90
+
+    - name: Upload to the matching GitHub release
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref_type == 'tag')
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        if ($env:GITHUB_REF_TYPE -eq 'tag') {
+          $tag = $env:GITHUB_REF_NAME
+          gh release view $tag --exit-status --json tagName | Out-Null
+          $found = $LASTEXITCODE -eq 0
+          if (-not $found) {
+            gh release create $tag --target $env:GITHUB_SHA --title $tag --notes "Stratagus $tag"
+          }
+        } else {
+          # Continuous builds of the engine, same release as the old Appveyor deploys.
+          $tag = 'master-builds'
+        }
+        $assets = @(Get-ChildItem release-assets -File | ForEach-Object { $_.FullName })
+        gh release upload $tag --clobber $assets
