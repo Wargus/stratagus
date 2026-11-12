@@ -38,11 +38,14 @@
 #include "video.h"
 
 #include <SDL_image.h>
+#include <map>
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 uint32_t Animation::MaxFPS = 15;
+
+static std::map<std::string, std::weak_ptr<Animation>> AnimationCache;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -61,7 +64,9 @@ Animation::~Animation()
 **  Show the frame which is due, if the current one has been displayed long enough
 **
 **  Frames are composited onto a persistent surface, so that animations made of
-**  partial frames (GIFs usually are) add up to the whole picture.
+**  partial frames (GIFs usually are) add up to the whole picture. Jumping
+**  ahead to catch up after the engine stalled would leave that picture
+**  unfinished, so one call shows at most one frame.
 */
 void Animation::advance() const
 {
@@ -91,8 +96,8 @@ void Animation::advance() const
 /**
 **  Display an animation
 **
-**  @param x  X coordinate
-**  @param y  Y coordinate
+**  @param x  X coordinate in screen pixels
+**  @param y  Y coordinate in screen pixels
 */
 void Animation::Draw(int x, int y)
 {
@@ -106,8 +111,6 @@ void Animation::Draw(int x, int y)
 					};
 	SDL_BlitSurface(mSurface, nullptr, TheScreen, &rect);
 }
-
-static std::map<std::string, std::weak_ptr<Animation>> AnimationCache;
 
 /**
 **  Get an animation, loading it on first use
