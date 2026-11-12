@@ -13,7 +13,7 @@
 
 [![Discord](https://img.shields.io/discord/780082494447288340?style=flat-square&logo=discord&label=discord)](https://discord.gg/dQGxaw3QfB)
 
-Windows: <a href="https://ci.appveyor.com/project/timfel/stratagus"><img width="100" src="https://ci.appveyor.com/api/projects/status/github/Wargus/stratagus?branch=master&svg=true"></a>
+Windows: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/windows.yml)
 
 Linux: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml)
 
@@ -26,6 +26,9 @@ For Mac OS X, Stratagus comes bundled in the app bundles for Wargus, Stargus, an
 
 The latest Linux dev builds come as [AppImage](https://appimage.org/):
   - Go to [our workflow](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml?query=branch%3Amaster+event%3Apush+is%3Asuccess), click the latest run, and scroll down to download the game you want.
+
+The latest Windows dev builds of the engine (executables, installer, debug symbols):
+  - Go to [our workflow](https://github.com/Wargus/stratagus/actions/workflows/windows.yml?query=branch%3Amaster+event%3Apush+is%3Asuccess), click the latest run, and download the artifacts, or take them from the [master-builds release](https://github.com/Wargus/stratagus/releases/tag/master-builds).
 
 For releases on Linux, you might want packages:
   - Ubuntu/Debian, you might want the deb packages:
@@ -46,7 +49,7 @@ Read 'doc/index.html' for general information and license information.
 Read 'doc/install.html' for Stratagus installation instructions.
 Read 'doc/changelog.html' for the Stratagus changelog.
 
-The Windows builds are done on Appveyor, Linux on Github Actions. The Ubuntu packages
+The Windows, macOS and Linux builds are all done on Github Actions. The Ubuntu packages
 are built on Launchpad:
   - https://code.launchpad.net/~stratagus/+recipe/stratagus-github
   - https://code.launchpad.net/~stratagus/+recipe/war1gus-github
