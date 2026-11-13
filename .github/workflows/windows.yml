@@ -3,9 +3,6 @@ name: windows
 on:
   workflow_dispatch:
   push:
-    # master and version tags only: a push to a branch with a pull request would
-    # build what the pull_request event already builds, and a branch that is
-    # neither released nor reviewed needs no artifacts of its own.
     branches: [master]
     tags: ['v*', '[0-9]*']
     paths:
@@ -54,10 +51,6 @@ jobs:
         cd build
         ctest --output-on-failure
 
-    # The games ship the installers players download, so what the engine
-    # publishes is only its own binaries together with the debug symbols that
-    # go with them: a crash log from any of the games can be analysed against
-    # the matching engine build.
     - name: collect release assets
       shell: pwsh
       run: |

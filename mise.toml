@@ -1,0 +1,3 @@
+[tools]
+act = "latest"
+meson = "latest"
