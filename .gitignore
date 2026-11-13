@@ -46,3 +46,7 @@ pytorchenv
 appbuild/
 games/
 .venv/
+.dir-locals.el
+.agent-shell/
+.agents/
+mise.toml

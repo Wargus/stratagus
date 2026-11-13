@@ -1,0 +1,54 @@
+name: Game engine check
+
+on:
+  workflow_call:
+    inputs:
+      game_id:
+        description: name of the game repository, whose master-builds release is checked
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  engine-changed:
+    name: Rebuild the master-builds artifacts when the engine moved
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+
+    steps:
+      - name: Check whether the engine moved since the artifacts went up
+        id: changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GAME: ${{ inputs.game_id }}
+        run: |
+          set -e
+          if ! engine=$(gh api repos/Wargus/stratagus/commits/master --jq .commit.committer.date); then
+            echo "could not read the engine master, building"
+            echo changed=true >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          published=$(gh api "repos/Wargus/$GAME/releases/tags/master-builds" \
+            --jq '[.assets[].updated_at] | max' 2>/dev/null || true)
+          if [ -z "$published" ] || [ "$published" = null ]; then
+            echo "nothing is in the master-builds release yet, building"
+            echo changed=true >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$(date -d "$engine" +%s)" -gt "$(date -d "$published" +%s)" ]; then
+            echo "the engine moved at $engine, the artifacts are from $published"
+            echo changed=true >> "$GITHUB_OUTPUT"
+          else
+            echo "the engine has not moved since the artifacts went up at $published"
+            echo changed=false >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ask the workflow that builds the artifacts to run
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run build.yml --ref master

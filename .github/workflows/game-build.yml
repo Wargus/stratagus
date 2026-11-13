@@ -1,0 +1,220 @@
+name: Game build
+
+on:
+  workflow_call:
+    inputs:
+      game_id:
+        description: name of the game repository, of its binary and of its data directory
+        required: true
+        type: string
+      game_name:
+        description: name of the game as it is shown to players
+        required: true
+        type: string
+      run_stratagus_tests:
+        description: whether to run Stratagus tests after building the engine
+        required: false
+        type: boolean
+        default: false
+      platform:
+        description: >-
+          what to build, and the mode to run tools/ci-build.sh of the game with:
+          linux, macos or windows
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ inputs.game_name }} for ${{ inputs.platform }}
+    runs-on: ${{ fromJSON('{"linux":"ubuntu-latest","macos":"macos-latest","windows":"windows-latest"}')[inputs.platform] }}
+    permissions:
+      contents: write
+
+    env:
+      GAME_SRC: ${{ inputs.game_id }}
+      ENGINE_SRC: stratagus
+      RELEASE_ASSETS: release-assets
+      PLATFORM: ${{ inputs.platform }}
+      build_testing: ${{ inputs.run_stratagus_tests }}
+      build_type: Release
+
+    steps:
+      - name: Checkout ${{ inputs.game_id }}
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          path: ${{ inputs.game_id }}
+
+      - name: Resolve which Stratagus to build against
+        if: inputs.game_id != 'stratagus'
+        id: stratagus
+        shell: bash
+        run: |
+          engine=https://github.com/Wargus/stratagus
+          name=${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            candidate=refs/tags/$name
+          else
+            candidate=refs/heads/$name
+          fi
+          if git ls-remote --exit-code --refs "$engine" "$candidate" > /dev/null; then
+            ref=$name
+            probe=$candidate
+          else
+            probe=refs/heads/master
+            if ! git ls-remote --exit-code --refs "$engine" "$probe" > /dev/null; then
+              echo "$engine has neither $candidate nor $probe" >&2
+              exit 1
+            fi
+            ref=master
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "building against ${engine}@${ref} ($probe)"
+
+      - name: Checkout Stratagus
+        uses: actions/checkout@v7
+        if: inputs.game_id != 'stratagus'
+        with:
+          repository: Wargus/stratagus
+          ref: ${{ steps.stratagus.outputs.ref }}
+          submodules: recursive
+          path: stratagus
+
+      - name: Install the headers the vendored dependencies build against
+        if: inputs.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yy \
+            build-essential cmake file pkg-config \
+            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxi-dev \
+            libxfixes-dev libxcursor-dev libxss-dev libxtst-dev libsm-dev \
+            libgl-dev libegl-dev libgles-dev libglx-dev \
+            libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev libdecor-0-dev \
+            libdrm-dev libgbm-dev libudev-dev libdbus-1-dev \
+            libasound2-dev libpulse-dev
+
+      - name: Install the libraries the engine is built against
+        if: inputs.platform == 'macos'
+        run: brew install dylibbundler sdl2 sdl2_mixer sdl2_image theora lua ffmpeg
+
+      - name: Install NSIS
+        if: inputs.platform == 'windows'
+        shell: pwsh
+        run: |
+          $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
+          if (-not (Test-Path $makensis)) {
+            choco install nsis --yes --no-progress
+          }
+          if (-not (Test-Path $makensis)) {
+            throw "did not find makensis.exe at $makensis"
+          }
+          & $makensis -VERSION
+
+      - name: Build Stratagus for Linux
+        if: inputs.platform == 'linux'
+        run: |
+          cmake -S $ENGINE_SRC -B $ENGINE_SRC/build \
+            -DCMAKE_BUILD_TYPE=$build_type \
+            -DBUILD_VENDORED_LUA=ON \
+            -DBUILD_VENDORED_SDL=ON \
+            -DBUILD_VENDORED_MEDIA_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DGAMEDIR=/usr/bin \
+            -DBUILD_TESTING=$build_testing \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build $ENGINE_SRC/build --config $build_type
+
+      - name: Build Stratagus for macOS
+        if: inputs.platform == 'macos'
+        run: |
+          cmake -S $ENGINE_SRC -B $ENGINE_SRC/build \
+            -DCMAKE_BUILD_TYPE=$build_type \
+            -DCMAKE_FIND_FRAMEWORK=LAST \
+            -DBUILD_VENDORED_LUA=ON \
+            -DBUILD_VENDORED_SDL=OFF \
+            -DBUILD_VENDORED_MEDIA_LIBS=OFF \
+            -DBUILD_TESTING=$build_testing \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build $ENGINE_SRC/build --config $build_type
+
+      - name: Build Stratagus for Windows
+        if: inputs.platform == 'windows'
+        run: |
+          cmake -S $env:ENGINE_SRC -B $env:ENGINE_SRC/build "-DCMAKE_BUILD_TYPE=$env:build_type" -DENABLE_STDIO_REDIRECT=ON -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DBUILD_TESTING=$env:build_testing"
+          cmake --build $env:ENGINE_SRC/build --config $env:build_type
+
+      - name: Run Stratagus tests on macOS and Linux
+        if: inputs.platform != 'windows' && inputs.run_stratagus_tests
+        run: |
+          cd $ENGINE_SRC/build
+          ctest --output-on-failure
+
+      - name: Run Stratagus tests on Windows
+        if: inputs.platform == 'windows' && inputs.run_stratagus_tests
+        run: |
+          cd $env:ENGINE_SRC/build
+          ctest --output-on-failure
+
+      - name: Run Timeless Tales tests for Stratagus jobs
+        if: inputs.platform == 'linux' && inputs.run_stratagus_tests
+        env:
+          PYTEST_SDL_VIDEODRIVER: dummy
+          STRATAGUS_BIN: ./build/stratagus
+          TIMELESS_TALES_DATA_DIR: ./games/timeless-tales
+        run: |
+          cd $ENGINE_SRC
+          mkdir -p games
+          git clone https://github.com/Wargus/timeless-tales games/timeless-tales
+          sudo apt-get update
+          sudo apt-get install -y python3-pytest xvfb
+          python3 -m pytest --basetemp=/tmp/stratagus-timeless -q pytests/
+
+      - name: Build the game
+        shell: bash
+        if: inputs.game_id != 'stratagus'
+        run: bash "$GAME_SRC/tools/ci-build.sh" "$PLATFORM"
+
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v7
+        if: inputs.game_id != 'stratagus'
+        with:
+          name: ${{ inputs.game_name }}-${{ inputs.platform }}
+          path: ${{ env.RELEASE_ASSETS }}/*
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload to the matching GitHub release
+        if: inputs.game_id != 'stratagus' && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref_type == 'tag')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ inputs.game_name }}
+        run: |
+          set -e
+          if [ ! -d "$RELEASE_ASSETS" ]; then
+            echo "$RELEASE_ASSETS does not exist" >&2
+            exit 1
+          fi
+          assets=("$RELEASE_ASSETS"/*)
+          if [ ! -f "${assets[0]}" ]; then
+            echo "$RELEASE_ASSETS is empty" >&2
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag=$GITHUB_REF_NAME
+            title=$tag
+            notes="$NAME $tag"
+          else
+            tag=master-builds
+            title="$NAME master builds"
+            notes="The artifacts of the current build of $NAME from its default branch."
+          fi
+          if ! gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1; then
+            # Platform builds may race
+            gh release create "$tag" --target "$GITHUB_SHA" --title "$title" --notes "$notes" \
+              || gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1
+          fi
+          gh release upload "$tag" --clobber "${assets[@]}"

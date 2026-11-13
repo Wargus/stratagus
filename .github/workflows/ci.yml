@@ -1,0 +1,32 @@
+name: Stratagus CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+
+  pull_request:
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux, macos, windows]
+    uses: $/.github/workflows/game-build.yml
+    with:
+      game_id: stratagus
+      game_name: Stratagus
+      platform: ${{ matrix.platform }}
+      run_stratagus_tests: true
+    secrets: inherit
