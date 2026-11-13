@@ -587,7 +587,6 @@ static int CclDefineUnitType(lua_State *l)
 				type->Icon.Load();
 			}
 		} else if (value == "Portrait") {
-#ifdef USE_MNG
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -601,7 +600,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			type->Portrait.Talking = 0;
 			type->Portrait.Files.resize(number);
-			type->Portrait.Mngs.resize(number);
+			type->Portrait.Anims.resize(number);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view s = LuaToString(l, -1, k + 1);
 				if ("talking" == s) {
@@ -610,7 +609,6 @@ static int CclDefineUnitType(lua_State *l)
 					type->Portrait.Files[k - (type->Portrait.Talking ? 1 : 0)] = s;
 				}
 			}
-#endif
 		} else if (value == "Costs") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1236,11 +1234,9 @@ static int CclCopyUnitType(lua_State *l)
 	to->Animations = from.Animations;
 	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
-#ifdef USE_MNG
 	to->Portrait.Talking = from.Portrait.Talking;
 	to->Portrait.Files = from.Portrait.Files;
-	to->Portrait.Mngs.resize(to->Portrait.Files.size());
-#endif
+	to->Portrait.Anims.resize(to->Portrait.Files.size());
 	ranges::copy(from.DefaultStat.Costs, std::begin(to->DefaultStat.Costs));
 	ranges::copy(from.DefaultStat.Storing, std::begin(to->DefaultStat.Storing));
 	ranges::copy(from.DefaultStat.ImproveIncomes, std::begin(to->DefaultStat.ImproveIncomes));

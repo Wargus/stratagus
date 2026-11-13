@@ -34,32 +34,61 @@
 #include "net_lowlevel.h"
 #include "network.h"
 
+#include <cstring>
+#include <vector>
+
 static int service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
                             uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
                             size_t size, size_t name_offset, size_t name_length, size_t record_offset,
                             size_t record_length, void* user_data) {
-    if (rtype == MDNS_RECORDTYPE_PTR && entry == MDNS_ENTRYTYPE_QUESTION) {
-        char namebuffer[256];
-        mdns_string_t service = mdns_record_parse_ptr(data, size, record_offset, record_length, namebuffer, sizeof(namebuffer));
-        std::string offeredService = GameName;
-        if (strncmp(offeredService.c_str(), service.str, offeredService.size()) == 0) {
-            uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
-            std::string hostname = NetGetHostname();
-            if (!unicast) {
-                addrlen = 0;
-            }
-            char buffer[256];
-            const auto ips = NetSocketAddr();
-            for (auto ip : ips) {
-                mdns_query_answer(sock, from, addrlen, buffer, sizeof(buffer), query_id,
-                                  offeredService.c_str(), offeredService.size(),
-                                  hostname.c_str(), hostname.size(),
-                                  ip, nullptr, CNetworkParameter::Instance.localPort,
-                                  nullptr, 0);
-            }
-        }
+    if (rtype != MDNS_RECORDTYPE_PTR || entry != MDNS_ENTRYTYPE_QUESTION) {
+        return 0;
     }
-    return 0;
+    char namebuffer[256];
+    mdns_string_t service = mdns_record_parse_ptr(data, size, record_offset, record_length, namebuffer, sizeof(namebuffer));
+    const std::string offeredService = GameName;
+    if (strncmp(offeredService.c_str(), service.str, offeredService.size()) != 0) {
+        return 0;
+    }
+
+    const std::string hostname = NetGetHostname() + ".local.";
+    const std::string instance = NetGetHostname() + "." + offeredService;
+
+    // Answer: PTR <service> -> <instance>
+    mdns_record_t answer;
+    memset(&answer, 0, sizeof(answer));
+    answer.type = MDNS_RECORDTYPE_PTR;
+    answer.name = { offeredService.c_str(), offeredService.size() };
+    answer.data.ptr.name = { instance.c_str(), instance.size() };
+
+    // Additional: one SRV for the game, and an A record per local interface
+    std::vector<mdns_record_t> additional;
+    for (unsigned long ip : NetSocketAddr()) {
+        mdns_record_t a;
+        memset(&a, 0, sizeof(a));
+        a.type = MDNS_RECORDTYPE_A;
+        a.name = { hostname.c_str(), hostname.size() };
+        a.data.a.addr.sin_family = AF_INET;
+        a.data.a.addr.sin_addr.s_addr = static_cast<uint32_t>(ip);
+        additional.push_back(a);
+    }
+    mdns_record_t srv;
+    memset(&srv, 0, sizeof(srv));
+    srv.type = MDNS_RECORDTYPE_SRV;
+    srv.name = { instance.c_str(), instance.size() };
+    srv.data.srv.port = CNetworkParameter::Instance.localPort;
+    srv.data.srv.name = { hostname.c_str(), hostname.size() };
+    additional.push_back(srv);
+
+    // mdns expects the packet buffer to be 32 bit aligned
+    alignas(4) char buffer[1024];
+    if (rclass & MDNS_UNICAST_RESPONSE) {
+        return mdns_query_answer_unicast(sock, from, addrlen, buffer, sizeof(buffer), query_id,
+                                         MDNS_RECORDTYPE_PTR, offeredService.c_str(), offeredService.size(),
+                                         answer, nullptr, 0, additional.data(), additional.size());
+    }
+    return mdns_query_answer_multicast(sock, buffer, sizeof(buffer), answer,
+                                      nullptr, 0, additional.data(), additional.size());
 }
 
 void MDNS::AnswerServerQueries() {

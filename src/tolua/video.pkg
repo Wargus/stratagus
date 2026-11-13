@@ -80,22 +80,22 @@ void ClearAllColorCyclingRange();
 void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);
 unsigned int SetColorCycleSpeed(unsigned int speed);
 
-$using MngPtr = std::shared_ptr<Mng>;
-$void Load(MngPtr* self) { (*self)->Load(); }
-$void Draw(MngPtr* self, int w, int h) { (*self)->Draw(w, h); }
-$void Reset(MngPtr* self) { (*self)->Reset(); }
+$using AnimationPtr = std::shared_ptr<Animation>;
+$void Load(AnimationPtr* self) { (*self)->Load(); }
+$void Draw(AnimationPtr* self, int w, int h) { (*self)->Draw(w, h); }
+$void Reset(AnimationPtr* self) { (*self)->Reset(); }
 
-struct MngPtr // std::shared_ptr<Mng>
+struct AnimationPtr // std::shared_ptr<Animation>
 {
 	tolua_outside void Load();
 	tolua_outside void Draw(int w, int h);
 	tolua_outside void Reset();
 };
 
-class Mng
+class Animation
 {
 public:
-	static MngPtr New(const std::string name);
+	static AnimationPtr New(const std::string name);
 
 	static int MaxFPS;
 }

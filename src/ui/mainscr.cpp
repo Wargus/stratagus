@@ -406,27 +406,26 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
-#ifdef USE_MNG
 static bool DrawTypePortrait(const CUnitType &type)
 {
-	if (UI.SingleSelectedButton && !type.Portrait.Mngs.empty()) {
+	if (UI.SingleSelectedButton && !type.Portrait.Anims.empty()) {
 #ifdef DYNAMIC_LOAD
 		if (!type.Sprite) {
 			LoadUnitTypeSprite(const_cast<CUnitType &>(type));
 		}
 #endif
-		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
+		type.Portrait.Anims[type.Portrait.CurrAnim]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		if (type.Portrait.Mngs[type.Portrait.CurrMng]->getIteration()
+		if (type.Portrait.Anims[type.Portrait.CurrAnim]->getIteration()
 		    == type.Portrait.NumIterations) {
-			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
+			type.Portrait.Anims[type.Portrait.CurrAnim]->Reset();
 			// FIXME: should be configurable
-			if (type.Portrait.CurrMng == 0 && type.Portrait.Mngs.size() > 1) {
+			if (type.Portrait.CurrAnim == 0 && type.Portrait.Anims.size() > 1) {
 				// choose only from before the talking portraits (from all, if no talking portrait offset is defined)
-				type.Portrait.CurrMng = MyRand() % ((type.Portrait.Talking ? type.Portrait.Talking : type.Portrait.Mngs.size()) - 1) + 1;
+				type.Portrait.CurrAnim = MyRand() % ((type.Portrait.Talking ? type.Portrait.Talking : type.Portrait.Anims.size()) - 1) + 1;
 				type.Portrait.NumIterations = 1;
 			} else {
-				type.Portrait.CurrMng = 0;
+				type.Portrait.CurrAnim = 0;
 				type.Portrait.NumIterations = MyRand() % 16 + 1;
 			}
 		}
@@ -434,16 +433,13 @@ static bool DrawTypePortrait(const CUnitType &type)
 	}
 	return false;
 }
-#endif
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
-#ifdef USE_MNG
 	if (DrawTypePortrait(type)) {
 		return;
 	}
-#endif
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		const int flag = (ButtonAreaUnderCursor == ButtonArea::Selected && ButtonUnderCursor == 0) ?
@@ -1098,11 +1094,9 @@ static void InfoPanel_draw_no_selection()
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(*UnitUnderCursor);
 	} else {
-#ifdef USE_MNG
 		if (UI.DefaultUnitPortrait.size() > 0) {
 			DrawTypePortrait(UnitTypeByIdent(UI.DefaultUnitPortrait));
 		}
-#endif
 		if (Preference.ShowNoSelectionStats) {
 			// FIXME: need some cool ideas for this.
 			int x = UI.InfoPanel.X + 16;
@@ -1175,11 +1169,9 @@ static void InfoPanel_draw_multiple_selection()
 	//  If there are more units selected draw their pictures and a health bar
 	DrawInfoPanelBackground(0);
 
-#ifdef USE_MNG
-	if (!Selected[0]->Type->Portrait.Mngs.empty()) {
+	if (!Selected[0]->Type->Portrait.Anims.empty()) {
 		DrawUnitInfo_portrait(*Selected[0]);
 	}
-#endif
 
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		const CIcon &icon = *Selected[i]->Type->Icon.Icon;

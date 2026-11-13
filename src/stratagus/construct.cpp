@@ -221,7 +221,7 @@ static int CclDefineConstruction(lua_State *l)
 			construction->Frames.reserve(subargs);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
-				int percent = 0;
+				float percent = 0.F;
 				ConstructionFileType file = ConstructionFileType::Construction;
 				float frame = 0.F;
 

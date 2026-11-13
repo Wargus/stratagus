@@ -268,14 +268,12 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 	}
 	SetChannelVolume(channel, VolumeForDistance(ViewPointDistanceToUnit(unit), sound->Range));
 	SetChannelStereo(channel, CalculateStereo(unit));
-#ifdef USE_MNG
 	const CUnitType &type = *unit.Type;
-	if (!type.Portrait.Mngs.empty() && type.Portrait.Talking && type.Portrait.Mngs[0]) {
-		type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
-		type.Portrait.CurrMng = (MyRand() % (type.Portrait.Mngs.size() - type.Portrait.Talking)) + type.Portrait.Talking;
+	if (!type.Portrait.Anims.empty() && type.Portrait.Talking && type.Portrait.Anims[0]) {
+		type.Portrait.Anims[type.Portrait.CurrAnim]->Reset();
+		type.Portrait.CurrAnim = (MyRand() % (type.Portrait.Anims.size() - type.Portrait.Talking)) + type.Portrait.Talking;
 		type.Portrait.NumIterations = 1;
 	}
-#endif
 }
 
 /**

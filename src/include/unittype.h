@@ -72,9 +72,7 @@ class CConstruction;
 class MissileType;
 class CFile;
 struct lua_State;
-#ifdef USE_MNG
-class Mng;
-#endif
+class Animation;
 
 #define UnitSides 8
 #define MaxAttackPos 5
@@ -598,15 +596,13 @@ public:
 	int StillFrame = 0;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
-#ifdef USE_MNG
 	struct _portrait_ {
 		std::vector<std::string> Files;
-		std::vector<std::shared_ptr<Mng>> Mngs;
+		std::vector<std::shared_ptr<Animation>> Anims;
 		int Talking = 0; /// offset into portraits for talking portraits
-		mutable int CurrMng = 0;
+		mutable int CurrAnim = 0;
 		mutable int NumIterations = 0;
 	} Portrait;
-#endif
 	MissileConfig Missile;                           /// Missile weapon
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
