@@ -92,6 +92,8 @@ jobs:
             -DBUILD_VENDORED_LUA=ON \
             -DBUILD_VENDORED_SDL=ON \
             -DBUILD_VENDORED_MEDIA_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DGAMEDIR=/usr/bin \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           cmake --build $ENGINE_SRC/build --config $build_type
 
