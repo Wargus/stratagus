@@ -3,6 +3,9 @@ name: ubuntu
 on:
   workflow_dispatch:
   push:
+    # master only: pushing to a branch that has a pull request would otherwise
+    # build what the pull_request event already builds.
+    branches: [master]
     paths:
       - '**'
       - '!.github/**'
