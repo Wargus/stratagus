@@ -43,22 +43,10 @@ jobs:
     - name: cmake --version
       run: cmake --version
 
-    - name: install NSIS
-      shell: pwsh
-      run: |
-        $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
-        if (-not (Test-Path $makensis)) {
-          choco install nsis --yes --no-progress
-        }
-        if (-not (Test-Path $makensis)) {
-          throw "did not find makensis.exe at $makensis"
-        }
-        & $makensis -VERSION
-
     - name: build stratagus
       run: |
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_NSIS=ON -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_TESTING=1 "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_TESTING=1 "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
         cmake --build . --config Release
 
     - name: run tests
@@ -66,19 +54,15 @@ jobs:
         cd build
         ctest --output-on-failure
 
+    # The games ship the installers players download, so what the engine
+    # publishes is only its own binaries together with the debug symbols that
+    # go with them: a crash log from any of the games can be analysed against
+    # the matching engine build.
     - name: collect release assets
       shell: pwsh
       run: |
         $ErrorActionPreference = 'Stop'
         New-Item -ItemType Directory -Path release-assets | Out-Null
-        $installers = @(Get-ChildItem build -Filter 'Stratagus-*.exe' -File)
-        if ($installers.Count -eq 0) {
-          throw 'the NSIS installer was not built'
-        }
-        Copy-Item $installers.FullName -Destination release-assets
-        Copy-Item build/Release/stratagus-midiplayer.exe -Destination release-assets
-        # Bundle the binaries with their debug symbols, so a crash log from a
-        # download of this build can be analysed.
         $binaries = @(Get-ChildItem build/Release -File | Where-Object {
             $_.Extension -eq '.pdb' -or $_.Name -in 'stratagus.exe', 'stratagus-midiplayer.exe'
           } | ForEach-Object { $_.FullName })
@@ -88,7 +72,7 @@ jobs:
         Compress-Archive -Path $binaries -DestinationPath release-assets/compiled-binaries.zip
         Get-ChildItem release-assets | Format-Table Name, Length
 
-    - name: Upload installer and symbols
+    - name: Upload binaries and symbols
       uses: actions/upload-artifact@v7
       with:
         name: stratagus-release-assets
