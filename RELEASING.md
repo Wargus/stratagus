@@ -26,10 +26,11 @@ release pages are where the releases of a version are found:
 | Linux AppImage | the same three |
 
 The engine does not build any of those itself, and it does not have to announce
-them either: each of the game workflows that publishes an artifact runs daily
-and compares the engine `master` with the artifact it last published, so an
-engine-only change is picked up by the `master-builds` releases within a day
-without needing a token that is valid in the game repositories.
+them either: each game repository has an `engine.yml` workflow that runs daily,
+compares the engine `master` with the artifacts of its `master-builds` release
+and starts the three build workflows of that repository when the engine has
+moved. A change that only touches the engine is therefore picked up within a day
+without any repository needing a token that is valid in another one.
 
 Debian packages used to be built on Launchpad for us, and Ubuntu and Debian
 users could install them from a PPA. That has been retired: the artifacts
