@@ -1,0 +1,165 @@
+name: Game build
+
+# One game, one platform, from a revision of the game repository: the engine is
+# checked out at the ref that matches the one being built and compiled, then the
+# game builds itself and whatever it leaves in release-assets is uploaded and
+# published. That shape is the same for every game and every platform, so the
+# games only say who they are and what to build; what is spelled out here is the
+# part that differs between platforms, which is the libraries the engine is built
+# against and the tools the packages are made with.
+#
+# Called by the three workflows of each game repository, which pass the platform
+# they are about, and by tools/ci-build.sh in that repository, which knows what
+# that game needs beyond the engine and produces the artifact of that platform:
+# the installer of Windows, the dmg of macOS and the AppImage of Linux.
+
+on:
+  workflow_call:
+    inputs:
+      game_id:
+        description: name of the game repository, of its binary and of its data directory
+        required: true
+        type: string
+      game_name:
+        description: name of the game as it is shown to players
+        required: true
+        type: string
+      platform:
+        description: >-
+          what to build, and the mode to run tools/ci-build.sh of the game with:
+          linux, macos or windows
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ inputs.game_name }} for ${{ inputs.platform }}
+    runs-on: ${{ fromJSON('{"linux":"ubuntu-latest","macos":"macos-latest","windows":"windows-latest"}')[inputs.platform] }}
+    permissions:
+      contents: write
+
+    env:
+      # Relative to the workspace, which is where a step starts: the game and the
+      # engine are checked out next to each other.
+      GAME_SRC: ${{ inputs.game_id }}
+      ENGINE_SRC: stratagus
+      RELEASE_ASSETS: release-assets
+      PLATFORM: ${{ inputs.platform }}
+      build_type: Release
+
+    steps:
+      - name: Checkout the game
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          path: ${{ inputs.game_id }}
+
+      - name: Resolve which Stratagus to build against
+        id: stratagus
+        uses: Wargus/stratagus/.github/actions/engine-ref@timfel/release-refactoring
+
+      # The engine is built from the same sources on every platform, so that the
+      # packages always ship the gameheaders the launcher was configured with and
+      # no platform depends on a release of the engine having been published
+      # first.
+      - name: Checkout Stratagus
+        uses: actions/checkout@v7
+        with:
+          repository: Wargus/stratagus
+          ref: ${{ steps.stratagus.outputs.ref }}
+          submodules: recursive
+          path: stratagus
+
+      # On Linux, the game is shipped as an AppImage, which bundles the engine and
+      # the game and every library that is not part of a base installation, so the
+      # only packages needed here are the build tools and the headers that the
+      # vendored SDL2 build of the engine looks for itself: what it finds decides
+      # which video and audio backends the shipped binary can use, so this is the
+      # list that says what an AppImage supports.
+      - name: Install the headers the vendored dependencies build against
+        if: inputs.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -yy \
+            build-essential cmake file pkg-config \
+            libx11-dev libxext-dev libxrender-dev libxrandr-dev libxi-dev \
+            libxfixes-dev libxcursor-dev libxss-dev libxtst-dev libsm-dev \
+            libgl-dev libegl-dev libgles-dev libglx-dev \
+            libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev libdecor-0-dev \
+            libdrm-dev libgbm-dev libudev-dev libdbus-1-dev \
+            libasound2-dev libpulse-dev
+
+      # On macOS the engine is built against the libraries of Homebrew instead of
+      # vendored ones, and the app bundle then carries them along.
+      - name: Install the libraries the engine is built against
+        if: inputs.platform == 'macos'
+        run: brew install dylibbundler sdl2 sdl2_mixer sdl2_image theora lua ffmpeg
+
+      # On Windows the installer is made with NSIS, and the runners do not all
+      # come with it.
+      - name: Install NSIS
+        if: inputs.platform == 'windows'
+        shell: pwsh
+        run: |
+          $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
+          if (-not (Test-Path $makensis)) {
+            choco install nsis --yes --no-progress
+          }
+          if (-not (Test-Path $makensis)) {
+            throw "did not find makensis.exe at $makensis"
+          }
+          & $makensis -VERSION
+
+      - name: Build Stratagus for Linux
+        if: inputs.platform == 'linux'
+        run: |
+          cmake -S $ENGINE_SRC -B $ENGINE_SRC/build \
+            -DCMAKE_BUILD_TYPE=$build_type \
+            -DBUILD_VENDORED_LUA=ON \
+            -DBUILD_VENDORED_SDL=ON \
+            -DBUILD_VENDORED_MEDIA_LIBS=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build $ENGINE_SRC/build --config $build_type
+
+      - name: Build Stratagus for macOS
+        if: inputs.platform == 'macos'
+        run: |
+          cmake -S $ENGINE_SRC -B $ENGINE_SRC/build \
+            -DCMAKE_BUILD_TYPE=$build_type \
+            -DCMAKE_FIND_FRAMEWORK=LAST \
+            -DBUILD_VENDORED_LUA=ON \
+            -DBUILD_VENDORED_SDL=OFF \
+            -DBUILD_VENDORED_MEDIA_LIBS=OFF \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build $ENGINE_SRC/build --config $build_type
+
+      # The libraries of the engine come from the shared dependencies submodule,
+      # so nothing here needs the separate win32 dependency archive the AppVeyor
+      # builds unpacked.
+      - name: Build Stratagus for Windows
+        if: inputs.platform == 'windows'
+        run: |
+          cmake -S $env:ENGINE_SRC -B $env:ENGINE_SRC/build "-DCMAKE_BUILD_TYPE=$env:build_type" -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+          cmake --build $env:ENGINE_SRC/build --config $env:build_type
+
+      - name: Build the game and its package
+        shell: bash
+        run: bash "$GAME_SRC/tools/ci-build.sh" "$PLATFORM"
+
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.game_name }}-${{ inputs.platform }}
+          path: release-assets/*
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload to the matching GitHub release
+        uses: Wargus/stratagus/.github/actions/publish-release@timfel/release-refactoring
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref_type == 'tag')
+        with:
+          name: ${{ inputs.game_name }}
+          path: release-assets
