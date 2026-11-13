@@ -15,31 +15,37 @@
 
 Windows: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/windows.yml)
 
-Linux: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml)
+Linux: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/ubuntu.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/ubuntu.yml)
 
-<!---
-For Mac OS X, Stratagus comes bundled in the app bundles for Wargus, Stargus, and War1gus:
-  - Wargus: https://github.com/Wargus/stratagus/wiki/osx/Wargus.app.tar.gz
-  - War1gus: https://github.com/Wargus/stratagus/wiki/osx/War1gus.app.tar.gz
-  - Stargus: https://github.com/Wargus/stratagus/wiki/osx/Stargus.app.tar.gz
---->
+macOS: [![Build Status](https://github.com/Wargus/stratagus/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/Wargus/stratagus/actions/workflows/macos.yml)
 
-The latest Linux dev builds come as [AppImage](https://appimage.org/):
-  - Go to [our workflow](https://github.com/Wargus/stratagus/actions/workflows/appimage.yml?query=branch%3Amaster+event%3Apush+is%3Asuccess), click the latest run, and scroll down to download the game you want.
+### Downloading
 
-The latest Windows dev builds of the engine (executables, installer, debug symbols):
-  - Go to [our workflow](https://github.com/Wargus/stratagus/actions/workflows/windows.yml?query=branch%3Amaster+event%3Apush+is%3Asuccess), click the latest run, and download the artifacts, or take them from the [master-builds release](https://github.com/Wargus/stratagus/releases/tag/master-builds).
+Stratagus is the engine, and players download a game built with it rather than
+the engine itself. The games are released together with the engine, under the
+same version number, and every one of them publishes a Windows installer, a
+macOS `dmg` and a Linux AppImage:
 
-For releases on Linux, you might want packages:
-  - Ubuntu/Debian, you might want the deb packages:
-     - https://launchpad.net/~stratagus/+archive/ubuntu/ppa
-     - Note that the game packages you probably want are `wargus`, `war1gus`, and `stargus`
-  - At least the OpenSUSE, Fedora, and Arch Linux communities maintain packages as well
+| game | latest stable | latest unstable |
+| --- | --- | --- |
+| Wargus (Warcraft II) | https://github.com/Wargus/wargus/releases/latest | https://github.com/Wargus/wargus/releases/tag/master-builds |
+| War1gus (Warcraft: Orcs & Humans) | https://github.com/Wargus/war1gus/releases/latest | https://github.com/Wargus/war1gus/releases/tag/master-builds |
+| Stargus (StarCraft) | https://github.com/Wargus/stargus/releases/latest | https://github.com/Wargus/stargus/releases/tag/master-builds |
 
-For Windows, you likely want the game installers:
-  - Wargus: https://github.com/Wargus/wargus/releases
-  - War1gus: https://github.com/Wargus/war1gus/releases
-  - Stargus: https://github.com/Wargus/stargus/releases
+The `master-builds` release is updated with every push to `master`, so it is
+the newest development build rather than a tested release. See the game
+repositories for how each platform is built.
+
+The engine itself publishes only the Windows build of its own binaries
+together with the debug symbols that go with them, so that a crash log can be
+analysed against the matching engine build:
+
+  - latest stable: https://github.com/Wargus/stratagus/releases/latest
+  - latest unstable: https://github.com/Wargus/stratagus/releases/tag/master-builds
+
+Distributions package the engine and the games their own way; the `debian/`
+directory of this repository is kept as a starting point for that, but nothing
+is published from it any more. See `RELEASING.md` for how a release is made.
 
 ### Contributing
 
@@ -49,9 +55,7 @@ Read 'doc/index.html' for general information and license information.
 Read 'doc/install.html' for Stratagus installation instructions.
 Read 'doc/changelog.html' for the Stratagus changelog.
 
-The Windows, macOS and Linux builds are all done on Github Actions. The Ubuntu packages
-are built on Launchpad:
-  - https://code.launchpad.net/~stratagus/+recipe/stratagus-github
-  - https://code.launchpad.net/~stratagus/+recipe/war1gus-github
-  - https://code.launchpad.net/~stratagus/+recipe/stargus-github
-  - https://code.launchpad.net/~stratagus/+recipe/wargus-github
+The Windows, macOS and Linux builds are all done on GitHub Actions: the engine
+builds are in the workflows of this repository, and the installers, bundles and
+AppImages that the games release are built by the workflows of the game
+repositories.
