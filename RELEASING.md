@@ -2,10 +2,9 @@
 
 The engine and the games are released in lockstep: a release of version
 `X.Y.Z` is tagged `vX.Y.Z` in this repository and in each of the game
-repositories, and the game workflows build against the engine tag with the
-matching name, falling back to the engine `master` branch when there is no
-such tag. See the *Resolve which Stratagus to build against* step of a game
-workflow for the details of that lookup.
+repositories, and a game built from a tag builds against the engine tag with the
+matching name, falling back to the engine `master` branch when there is no such
+tag. `.github/actions/engine-ref` is what works that out.
 
 ## Release artifacts
 
@@ -25,12 +24,36 @@ release pages are where the releases of a version are found:
 | macOS `dmg` | the same three |
 | Linux AppImage | the same three |
 
-The engine does not build any of those itself, and it does not have to announce
-them either: each game repository has an `engine.yml` workflow that runs daily,
-compares the engine `master` with the artifacts of its `master-builds` release
-and starts the three build workflows of that repository when the engine has
-moved. A change that only touches the engine is therefore picked up within a day
-without any repository needing a token that is valid in another one.
+## The games are built from here
+
+A game of Stratagus is a launcher, some scripts and some data, so building one
+means building the engine with it. That is what
+`.github/workflows/game-build.yml` does: given the name of a game repository, the
+name of the game to its players and a platform, it checks out both repositories at
+the refs that match, builds the engine for that platform, and then hands over to
+`tools/ci-build.sh` in the game, which knows the things a game differs in - the
+arguments of its own build, which libraries have to end up inside the bundle, what
+its installer is made from - and produces the artifact of that platform. The
+workflows in a game repository are therefore its triggers and nothing else.
+
+What an AppImage can do is decided by `game-build.yml`, because the vendored
+libraries it is built from take whatever headers they find: the list of packages
+that workflow installs on Linux is the list of video and audio backends an AppImage
+supports. Nothing more is installed before the engine is built, and a game that
+needs other packages installs them itself afterwards, in its `tools/ci-build.sh`.
+
+`.github/workflows/game-engine-check.yml` is the other shared half: the daily look
+for a moved engine that `engine.yml` in each game repository runs. Together with
+`.github/actions/publish-release`, which uploads a built artifact to the release
+its revision belongs to, that is everything the three games used to each have
+their own copy of.
+
+Nor does it have to announce its releases to the games: each game repository has
+an `engine.yml` workflow that runs daily, compares the engine
+`master` with the artifacts of its `master-builds` release and starts that
+repository's build workflow when the engine has moved. A change that only
+touches the engine is therefore picked up within a day without any repository
+needing a token that is valid in another one.
 
 Debian packages used to be built on Launchpad for us, and Ubuntu and Debian
 users could install them from a PPA. That has been retired: the artifacts

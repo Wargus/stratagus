@@ -1,0 +1,56 @@
+name: Publish artifacts to the matching release
+description: Uploads built artifacts to the release for the tag being built, or to master-builds
+
+inputs:
+  name:
+    description: Name of the thing being released, used for the notes of a new release
+    required: true
+  path:
+    description: Directory whose files are the artifacts to upload
+    required: true
+    default: release-assets
+
+runs:
+  using: composite
+  steps:
+    - name: Upload the artifacts to the release of this revision
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        NAME: ${{ inputs.name }}
+        PATH_IN: ${{ inputs.path }}
+      run: |
+        set -e
+        if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+          echo "a pull request is built to be reviewed, it publishes nothing"
+          exit 0
+        fi
+        if [ ! -d "$PATH_IN" ]; then
+          echo "$PATH_IN does not exist, nothing was built to publish" >&2
+          exit 1
+        fi
+        assets=("$PATH_IN"/*)
+        if [ ! -f "${assets[0]}" ]; then
+          echo "$PATH_IN is empty, nothing was built to publish" >&2
+          exit 1
+        fi
+        # A tag has a release of its own, and everything built from the default
+        # branch goes to the master-builds release, which holds the current
+        # development build rather than a tested release. Either of them is made by
+        # the first platform to finish, and the others add what they built to it.
+        if [ "$GITHUB_REF_TYPE" = tag ]; then
+          tag=$GITHUB_REF_NAME
+          title=$tag
+          notes="$NAME $tag"
+        else
+          tag=master-builds
+          title="$NAME master builds"
+          notes="The artifacts of the current build of $NAME from its default branch."
+        fi
+        if ! gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1; then
+          # Two platforms can decide to be the first at the same moment, so not
+          # creating one is only a failure when there is still no release to add to.
+          gh release create "$tag" --target "$GITHUB_SHA" --title "$title" --notes "$notes" \
+            || gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1
+        fi
+        gh release upload "$tag" --clobber "${assets[@]}"
