@@ -1,0 +1,42 @@
+name: Engine ref
+description: Work out which Wargus/stratagus ref a game should build against
+
+outputs:
+  ref:
+    description: The ref to check the engine out at, a tag, a branch or master
+    value: ${{ steps.resolve.outputs.ref }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve which Stratagus to build against
+      id: resolve
+      shell: bash
+      run: |
+        # The engine and the games are released in lockstep: a tag in a game
+        # repository has an engine tag of the same name, and a change that spans
+        # both repositories is developed on branches of the same name. So look for
+        # the same kind of ref as the one we are running on, and build against the
+        # engine master branch when the engine does not have it.
+        engine=https://github.com/Wargus/stratagus
+        # A pull request builds the branch it came from, not the merge ref.
+        name=${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}
+        if [ "$GITHUB_REF_TYPE" = tag ]; then
+          candidate=refs/tags/$name
+        else
+          candidate=refs/heads/$name
+        fi
+
+        if git ls-remote --exit-code --refs "$engine" "$candidate" > /dev/null; then
+          ref=$name
+          probe=$candidate
+        else
+          probe=refs/heads/master
+          if ! git ls-remote --exit-code --refs "$engine" "$probe" > /dev/null; then
+            echo "Wargus/stratagus has neither $candidate nor $probe" >&2
+            exit 1
+          fi
+          ref=master
+        fi
+        echo "ref=$ref" >> "$GITHUB_OUTPUT"
+        echo "building against Wargus/stratagus@$ref ($probe)"

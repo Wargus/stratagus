@@ -3,6 +3,7 @@ name: macos
 on:
   workflow_dispatch:
   push:
+    branches: [master]
     paths:
       - '**'
       - '!.github/**'
