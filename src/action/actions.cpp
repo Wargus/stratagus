@@ -81,8 +81,10 @@
 # include "st_backtrace.h"
 #endif
 
+#include <algorithm>
 #include <array>
 #include <ctime>
+#include <sstream>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -603,6 +605,31 @@ static void EndSyncDebugCycle(uint32_t randCalls)
 	entry->EndSeed = SyncRandSeed;
 	entry->EndHash = SyncHash;
 	entry->RandCalls = randCalls;
+}
+
+std::string GetSyncDebugHistoryReport(unsigned long centerCycle)
+{
+	std::vector<std::pair<unsigned long, const SyncCycleDebugEntry *>> entries;
+	for (const SyncCycleDebugEntry &entry : SyncCycleDebugHistory) {
+		if (entry.Valid) {
+			entries.emplace_back(entry.Cycle, &entry);
+		}
+	}
+	std::stable_sort(entries.begin(), entries.end(),
+	                 [](const auto &a, const auto &b) { return a.first < b.first; });
+
+	std::ostringstream out;
+	out << "cycle  seed(start->end)  hash(start->end)  units(hashed/total)  rand\n";
+	for (const auto &[cycle, entry] : entries) {
+		out << (cycle == centerCycle ? '*' : ' ')
+		    << ' ' << entry->Cycle << ": " << std::hex << entry->StartSeed << "->" << entry->EndSeed
+		    << " " << entry->StartHash << "->" << entry->EndHash << std::dec << " "
+		    << entry->HashedUnitCount << "/" << entry->UnitCount << " " << entry->RandCalls
+		    << " first=" << entry->FirstUnit << ":" << entry->FirstUnitType << " " << entry->FirstAction
+		    << " last=" << entry->LastUnit << ":" << entry->LastUnitType << " " << entry->LastAction
+		    << "\n";
+	}
+	return out.str();
 }
 
 void DumpSyncDebugCycleHistory(unsigned long centerCycle,

@@ -36,6 +36,7 @@
 #include "vec2i.h"
 
 #include <memory>
+#include <string>
 #include <string_view>
 
 /*----------------------------------------------------------------------------
@@ -177,6 +178,8 @@ using COrderPtr = COrder *;
 
 extern unsigned SyncHash;  /// Hash calculated to find sync failures
 extern void ResetSyncDebugCycleHistory();
+extern std::string GetSyncDebugHistoryReport(unsigned long centerCycle);
+
 extern void DumpSyncDebugCycleHistory(unsigned long centerCycle,
                                       unsigned int receivedSeed,
                                       unsigned int localSeed,
