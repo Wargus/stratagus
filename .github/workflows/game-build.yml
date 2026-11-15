@@ -146,16 +146,13 @@ jobs:
           cmake -S $env:ENGINE_SRC -B $env:ENGINE_SRC/build "-DCMAKE_BUILD_TYPE=$env:build_type" -DENABLE_STDIO_REDIRECT=ON -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" "-DBUILD_TESTING=$env:build_testing"
           cmake --build $env:ENGINE_SRC/build --config $env:build_type
 
-      - name: Run Stratagus tests on macOS and Linux
-        if: inputs.platform != 'windows' && inputs.run_stratagus_tests
+      - name: Run Stratagus tests
+        if: inputs.run_stratagus_tests
+        # bash is what Linux and macOS run by default, and it is available on
+        # the Windows runner too, so one step serves every platform.
+        shell: bash
         run: |
           cd $ENGINE_SRC/build
-          ctest --output-on-failure
-
-      - name: Run Stratagus tests on Windows
-        if: inputs.platform == 'windows' && inputs.run_stratagus_tests
-        run: |
-          cd $env:ENGINE_SRC/build
           ctest --output-on-failure
 
       - name: Run Timeless Tales tests for Stratagus jobs
