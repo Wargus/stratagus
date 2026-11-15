@@ -689,10 +689,6 @@ endif()
 
 find_package(OpenMP)
 
-if(WIN32)
-	find_package(MakeNSIS)
-endif()
-
 if(ENABLE_DOC)
 find_package(Doxygen
 			 REQUIRED dot
@@ -726,7 +722,6 @@ endif()
 
 if(WIN32)
 	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" ON)
-	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
@@ -1063,14 +1058,6 @@ else()
 	message("Upx packer: No (Enable by param -DENABLE_UPX=ON)")
 endif()
 
-if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
-	message("NSIS Installer: Yes (Disable by param -DENABLE_NSIS=OFF)")
-elseif(NOT WIN32)
-	message("NSIS Installer: Unsupported on this platform")
-else()
-	message("NSIS Installer: No (Enable by param -DENABLE_NSIS=ON)")
-endif()
-
 log_package("Bzip2" "BZIP2")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
@@ -1297,23 +1284,6 @@ endmacro()
 if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	self_packer(stratagus)
 	self_packer(png2stratagus)
-endif()
-
-########### next target ###############
-
-if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
-	# ship our DLLs
-	file(GLOB WINDLLS ${CMAKE_PREFIX_PATH}/bin/*.dll)
-	file(COPY ${WINDLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	# makensis resolves a relative path against the directory of the script, so
-	# pass absolute paths for the sources and for where the installer goes.
-	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
-		COMMAND ${MAKENSIS} ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} -DLICENSE_FILE=${CMAKE_CURRENT_SOURCE_DIR}/COPYING -DICON_FILE=${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico -DBINARY_DIR=$<TARGET_FILE_DIR:stratagus> -DOUT_DIR=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
-		DEPENDS src/win32/stratagus.nsi stratagus COPYING
-		COMMENT "Generating Stratagus Windows NSIS Installer"
-		VERBATIM
-	)
-	add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
 endif()
 
 if (WIN32)
