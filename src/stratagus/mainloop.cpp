@@ -46,6 +46,7 @@
 #include "particle.h"
 #include "replay.h"
 #include "results.h"
+#include "settings.h"
 #include "sound.h"
 #include "translate.h"
 #include "trigger.h"
@@ -405,6 +406,15 @@ void GameMainLoop(bool clean)
 
 	CParticleManager::init();
 
+	if (IsNetworkGame()) {
+		// The server's settings, copied into GameSettings when the game was
+		// prepared, are authoritative for the whole game. Locked before
+		// GameStarting runs, because that is where games such as war1gus
+		// store their custom setting bits from local configuration, which
+		// would otherwise overwrite the negotiated values per player.
+		SetGameSettingsLocked(true);
+	}
+
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
 	long ticks = SDL_GetTicks();
@@ -412,6 +422,8 @@ void GameMainLoop(bool clean)
 	MultiPlayerReplayEachCycle();
 
 	SingleGameLoop();
+
+	SetGameSettingsLocked(false);
 
 	//
 	// Game over

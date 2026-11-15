@@ -2124,12 +2124,74 @@ void NetworkServerResyncClients()
 	}
 }
 
+static bool GameSettingsLockedFlag = false;
+
+/**
+** Check whether game settings must be refused to change right now; called
+** by the Settings class for the custom game settings bitfield.
+**
+** Base assumption of multiplayer: all players run with the same settings,
+** agreed on in the lobby and synced from the server. Custom game settings
+** (UserGameSettings) gate unit definitions and gameplay scripts in games
+** like war1gus, so they are treated as simulation-relevant: changing them
+** mid-game would desync the players.
+*/
+bool GameSettingsLocked(const char *what)
+{
+	if (GameSettingsLockedFlag) {
+		ErrorPrint("Refusing to change %s while a network game is running; "
+		           "settings that can affect the simulation must be set in the "
+		           "lobby and are synced from the server.\n",
+		           what);
+		return true;
+	}
+	return false;
+}
+
+void SetGameSettingsLocked(bool locked)
+{
+	GameSettingsLockedFlag = locked;
+}
+
+/**
+** Report settings the joining player had set differently from the server;
+** the server values are authoritative and win. Custom game settings being
+** simulation relevant in some games, an override is not necessarily
+** harmless, so say which fields were affected.
+*/
+static void LogLocalSettingsOverridden()
+{
+	const Settings &srv = ServerSetupState.ServerGameSettings;
+	const Settings &local = GameSettings;
+	const auto check = [&](bool differs, const char *name) {
+		if (differs) {
+			ErrorPrint("Server setting '%s' overrides the locally configured value\n", name);
+		}
+	};
+
+	check(local.FoV != srv.FoV, "field of view type");
+	check(local.RevealMap != srv.RevealMap, "reveal map");
+	check(local.DefeatReveal != srv.DefeatReveal, "defeat reveal");
+	check(local.GameType != srv.GameType, "game type");
+	check(local.Difficulty != srv.Difficulty, "difficulty");
+	check(local.NoFogOfWar != srv.NoFogOfWar, "fog of war");
+	check(local.Inside != srv.Inside, "inside/obstacle logic");
+	check(local.AiExplores != srv.AiExplores, "ai exploration");
+	check(local.SimplifiedAutoTargeting != srv.SimplifiedAutoTargeting, "simplified auto targeting");
+	check(local.AiChecksDependencies != srv.AiChecksDependencies, "ai dependency checks");
+	check(local.AllyDepositsAllowed != srv.AllyDepositsAllowed, "ai ally deposits");
+	check(local.UserGameSettings != srv.UserGameSettings, "custom game settings");
+}
+
 /**
 ** Multiplayer network game final copy of server settings to game settings.
 */
 void NetworkGamePrepareGameSettings()
 {
 	DebugPrint("NetPlayers = %d\n", NetPlayers);
+	if (NetPlayers > 1) {
+		LogLocalSettingsOverridden();
+	}
 	GameSettings = ServerSetupState.ServerGameSettings;
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 

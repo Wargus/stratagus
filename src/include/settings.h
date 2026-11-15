@@ -128,6 +128,9 @@ extern std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueAct
 static_assert(MAX_RACES < 256, "Race selection needs to fit into 8 bits");
 static_assert(PlayerMax < 256, "Team number must fit into 8 bits");
 
+bool GameSettingsLocked(const char *what);
+void SetGameSettingsLocked(bool locked);
+
 struct SettingsPresets {
 	int8_t PlayerColor = 0;   /// Color of a player
 	std::string AIScript;     /// AI script for computer to use
@@ -254,7 +257,16 @@ struct Settings {
 		return std::bitset<26>(UserGameSettings).test(i);
 	}
 
+	/**
+	** Custom game settings are treated as simulation-relevant: games gate
+	** unit definitions and gameplay scripts on them, so they must be agreed
+	** on in the lobby via the server-authoritative sync and cannot be
+	** changed while a network game runs (refused with GameSettingsLocked).
+	*/
 	void SetUserGameSetting(int i, bool v) {
+		if (GameSettingsLocked("custom game settings")) {
+			return;
+		}
 		std::bitset<26> bs(UserGameSettings);
 		bs.set(i, v);
 		UserGameSettings = bs.to_ulong();
