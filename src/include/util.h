@@ -54,6 +54,7 @@ extern uint32_t FileChecksums;          /// Checksum over the shared game script
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
 extern int SyncRand(int max);           /// Syncron rand
+extern uint32_t TakeSyncRandCalls();    /// Fetch and reset counter of SyncRand() calls
 
 ///  rand only used on this computer.
 extern int MyRand();

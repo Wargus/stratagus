@@ -70,6 +70,7 @@
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"
+#include "util.h"
 #include "version.h"
 
 #ifdef USE_STACKTRACE
@@ -98,6 +99,7 @@ struct SyncCycleDebugEntry
 	unsigned int EndSeed = 0;
 	unsigned int EndHash = 0;
 	size_t UnitCount = 0;
+	uint32_t RandCalls = 0;
 	size_t HashedUnitCount = 0;
 	int FirstUnit = -1;
 	int LastUnit = -1;
@@ -592,7 +594,7 @@ static void RecordSyncDebugUnit(const CUnit &unit, const char *action, unsigned 
 	++entry->HashedUnitCount;
 }
 
-static void EndSyncDebugCycle()
+static void EndSyncDebugCycle(uint32_t randCalls)
 {
 	SyncCycleDebugEntry *entry = GetSyncDebugEntry(GameCycle);
 	if (!entry) {
@@ -600,6 +602,7 @@ static void EndSyncDebugCycle()
 	}
 	entry->EndSeed = SyncRandSeed;
 	entry->EndHash = SyncHash;
+	entry->RandCalls = randCalls;
 }
 
 void DumpSyncDebugCycleHistory(unsigned long centerCycle,
@@ -636,6 +639,7 @@ void DumpSyncDebugCycleHistory(unsigned long centerCycle,
 		           entry->EndHash,
 		           entry->HashedUnitCount,
 		           entry->UnitCount);
+		ErrorPrint(" rand %u", entry->RandCalls);
 		if (entry->HashedUnitCount != 0) {
 			ErrorPrint("; first unit %d:%s %s refs %d pos %d,%d hash %X; "
 			           "last unit %d:%s %s refs %d pos %d,%d hash %X",
@@ -783,7 +787,14 @@ void UnitActions()
 	}
 	// Do all actions
 	UnitActionsEachCycle(units);
-	EndSyncDebugCycle();
+
+	// Mix the number of sync random calls during this cycle into the hash,
+	// lua scripts (especially animations) sometimes use random also, and
+	// this trips faster and makes debugging easier then.
+	const uint32_t randCalls = TakeSyncRandCalls();
+	SyncHash = (SyncHash << 5) | (SyncHash >> 27);
+	SyncHash ^= randCalls << 9;
+	EndSyncDebugCycle(randCalls);
 }
 
 //@}

@@ -65,7 +65,16 @@
 ----------------------------------------------------------------------------*/
 
 uint32_t SyncRandSeed;               /// sync random seed value.
-uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
+uint32_t FileChecksums = 0;          /// checksums of all loaded lua files
+
+static uint32_t SyncRandCalls = 0;   /// ongoing count of SyncRand() calls
+
+uint32_t TakeSyncRandCalls()
+{
+	const uint32_t calls = SyncRandCalls;
+	SyncRandCalls = 0;
+	return calls;
+}
 
 /**
 **  Inititalize sync rand seed.
@@ -73,6 +82,7 @@ uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
 void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
+	SyncRandCalls = 0;
 	if (EnableDebugPrint) {
 		DebugPrint("GameCycle: %lud, init seed: %x\n", GameCycle, SyncRandSeed);
 		//print_backtrace();
@@ -93,6 +103,7 @@ int SyncRand()
 	val = SyncRandSeed >> 16;
 
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
+	SyncRandCalls++;
 
 	if (EnableDebugPrint) {
 		DebugPrint("GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
