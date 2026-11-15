@@ -1571,7 +1571,7 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 
 	if (msg.Version != FileChecksums) {
 		const std::string hostStr = host.toString();
-		ErrorPrint("Incompatible lua files %d <-> %d\nfrom '%s'\n",
+		ErrorPrint("Incompatible lua files %X <-> %X\nfrom '%s'\n",
 		           FileChecksums,
 		           msg.Version,
 		           hostStr.c_str());

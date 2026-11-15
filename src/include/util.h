@@ -49,7 +49,7 @@
 #include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
-extern uint32_t FileChecksums;          /// checksums of all loaded lua files
+extern uint32_t FileChecksums;          /// Checksum over the shared game scripts
 
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
