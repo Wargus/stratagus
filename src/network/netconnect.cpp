@@ -58,6 +58,7 @@
 #include "player.h"
 #include "script.h"
 #include "settings.h"
+#include "util.h"
 #include "version.h"
 #include "video.h"
 
@@ -816,6 +817,26 @@ static bool IsSafeMapName(const char *mapname)
 	return true;
 }
 
+/**
+** Map UID is not always used, and would not catch intentional messing with
+** the map.
+*/
+static uint32_t NetworkEffectiveMapUID(const fs::path &mapPath)
+{
+	std::ifstream in(mapPath, std::ios::binary);
+	if (!in) {
+		ErrorPrint("Cannot read map file '%s' for the map checksum\n", mapPath.u8string().c_str());
+		return 0;
+	}
+	std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
+		static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
+		content.erase(0, 3);
+	}
+	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
+	return fletcher32(content);
+}
+
 void CClient::Parse_Map(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connected) {
@@ -835,7 +856,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 		networkState.State = ccs_needmap;
 		networkState.MsgCnt = 0;
 		return;
-	} else if (msg.MapUID != Map.Info.MapUID) {
+	} else if (msg.MapUID != NetworkEffectiveMapUID(mappath)) {
 		networkState.State = ccs_badmap;
 		ErrorPrint("Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 		           Map.Info.MapUID,
@@ -1123,7 +1144,8 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
-	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
+	const fs::path mappath = fs::path(StratagusLibPath) / NetworkMapName;
+	const CInitMessage_Map message(NetworkMapName.c_str(), NetworkEffectiveMapUID(mappath));
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1629,7 +1651,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 			Parse_State(index, msg);
 			break;
 		}
-		case ICMMapUidMismatch: // Parse_MapUidMismatch(index, buf); break;
+		case ICMMapUidMismatch: [[fallthrough]];
 		case ICMGoodBye: Parse_GoodBye(index); break;
 		case ICMSeeYou: Parse_SeeYou(index); break;
 		case ICMIAH: break;
