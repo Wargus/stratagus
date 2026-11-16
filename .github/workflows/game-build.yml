@@ -209,9 +209,9 @@ jobs:
             title="$NAME master builds"
             notes="The artifacts of the current build of $NAME from its default branch."
           fi
-          if ! gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1; then
+          if ! gh release -R "$GITHUB_REPOSITORY" view "$tag" --exit-status --json tagName > /dev/null 2>&1; then
             # Platform builds may race
-            gh release create "$tag" --target "$GITHUB_SHA" --title "$title" --notes "$notes" \
-              || gh release view "$tag" --exit-status --json tagName > /dev/null 2>&1
+            gh release -R "$GITHUB_REPOSITORY" create "$tag" --target "$GITHUB_SHA" --title "$title" --notes "$notes" \
+              || gh release -R "$GITHUB_REPOSITORY" view "$tag" --exit-status --json tagName > /dev/null 2>&1
           fi
-          gh release upload "$tag" --clobber "${assets[@]}"
+          gh release -R "$GITHUB_REPOSITORY" upload "$tag" --clobber "${assets[@]}"
