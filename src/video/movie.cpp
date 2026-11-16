@@ -488,6 +488,12 @@ SDL_Surface *Movie::getSurface() const /* override */
 	}
 	if (need_data) {
 		if (!TheoraProcessData(*data)) {
+			if (loop) {
+				OggFree(data.get());
+				data.reset();
+				f->seek(0, SEEK_SET);
+				return getSurface();
+			}
 			return mSurface;
 		}
 		need_data = false;
