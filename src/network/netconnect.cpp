@@ -58,6 +58,7 @@
 #include "player.h"
 #include "script.h"
 #include "settings.h"
+#include "util.h"
 #include "version.h"
 #include "video.h"
 
@@ -816,6 +817,21 @@ static bool IsSafeMapName(const char *mapname)
 	return true;
 }
 
+/**
+** Map UID is not always used, and would not catch intentional messing with
+** the map.
+*/
+static uint32_t NetworkEffectiveMapUID(const fs::path &mapPath)
+{
+	std::ifstream in(mapPath, std::ios::binary);
+	if (!in) {
+		ErrorPrint("Cannot read map file '%s' for the map checksum\n", mapPath.u8string().c_str());
+		return 0;
+	}
+	std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+	return fletcher32(RemoveBomAndCR(std::move(content)));
+}
+
 void CClient::Parse_Map(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connected) {
@@ -835,7 +851,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 		networkState.State = ccs_needmap;
 		networkState.MsgCnt = 0;
 		return;
-	} else if (msg.MapUID != Map.Info.MapUID) {
+	} else if (msg.MapUID != NetworkEffectiveMapUID(mappath)) {
 		networkState.State = ccs_badmap;
 		ErrorPrint("Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 		           Map.Info.MapUID,
@@ -1123,7 +1139,8 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
-	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
+	const fs::path mappath = fs::path(StratagusLibPath) / NetworkMapName;
+	const CInitMessage_Map message(NetworkMapName.c_str(), NetworkEffectiveMapUID(mappath));
 
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1571,7 +1588,7 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 
 	if (msg.Version != FileChecksums) {
 		const std::string hostStr = host.toString();
-		ErrorPrint("Incompatible lua files %d <-> %d\nfrom '%s'\n",
+		ErrorPrint("Incompatible lua files %X <-> %X\nfrom '%s'\n",
 		           FileChecksums,
 		           msg.Version,
 		           hostStr.c_str());
@@ -1629,7 +1646,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 			Parse_State(index, msg);
 			break;
 		}
-		case ICMMapUidMismatch: // Parse_MapUidMismatch(index, buf); break;
+		case ICMMapUidMismatch: [[fallthrough]];
 		case ICMGoodBye: Parse_GoodBye(index); break;
 		case ICMSeeYou: Parse_SeeYou(index); break;
 		case ICMIAH: break;
@@ -2102,12 +2119,78 @@ void NetworkServerResyncClients()
 	}
 }
 
+static bool GameSettingsLockedFlag = false;
+
+/**
+** Check whether the given setting may be changed right now, telling the
+** user why not if it may not; called by the Settings class for the custom
+** game settings bitfield.
+**
+** Base assumption of multiplayer: all players run with the same settings,
+** agreed on in the lobby and synced from the server. Custom game settings
+** (UserGameSettings) gate unit definitions and gameplay scripts in games
+** like war1gus, so they are treated as simulation-relevant: changing them
+** mid-game would desync the players.
+**
+** @param what  human readable name of the setting being changed
+** @return      true if the change is allowed, false if it must be refused
+*/
+bool CheckGameSettingsUnlocked(const char *what)
+{
+	if (GameSettingsLockedFlag) {
+		ErrorPrint("Refusing to change %s while a network game is running; "
+		           "settings that can affect the simulation must be set in the "
+		           "lobby and are synced from the server.\n",
+		           what);
+		return false;
+	}
+	return true;
+}
+
+void SetGameSettingsLocked(bool locked)
+{
+	GameSettingsLockedFlag = locked;
+}
+
+/**
+** Report settings the joining player had set differently from the server;
+** the server values are authoritative and win. Custom game settings being
+** simulation relevant in some games, an override is not necessarily
+** harmless, so say which fields were affected.
+*/
+static void LogLocalSettingsOverridden()
+{
+	const Settings &srv = ServerSetupState.ServerGameSettings;
+	const Settings &local = GameSettings;
+	const auto check = [&](bool differs, const char *name) {
+		if (differs) {
+			ErrorPrint("Server setting '%s' overrides the locally configured value\n", name);
+		}
+	};
+
+	check(local.FoV != srv.FoV, "field of view type");
+	check(local.RevealMap != srv.RevealMap, "reveal map");
+	check(local.DefeatReveal != srv.DefeatReveal, "defeat reveal");
+	check(local.GameType != srv.GameType, "game type");
+	check(local.Difficulty != srv.Difficulty, "difficulty");
+	check(local.NoFogOfWar != srv.NoFogOfWar, "fog of war");
+	check(local.Inside != srv.Inside, "inside/obstacle logic");
+	check(local.AiExplores != srv.AiExplores, "ai exploration");
+	check(local.SimplifiedAutoTargeting != srv.SimplifiedAutoTargeting, "simplified auto targeting");
+	check(local.AiChecksDependencies != srv.AiChecksDependencies, "ai dependency checks");
+	check(local.AllyDepositsAllowed != srv.AllyDepositsAllowed, "ai ally deposits");
+	check(local.UserGameSettings != srv.UserGameSettings, "custom game settings");
+}
+
 /**
 ** Multiplayer network game final copy of server settings to game settings.
 */
 void NetworkGamePrepareGameSettings()
 {
 	DebugPrint("NetPlayers = %d\n", NetPlayers);
+	if (NetPlayers > 1) {
+		LogLocalSettingsOverridden();
+	}
 	GameSettings = ServerSetupState.ServerGameSettings;
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 

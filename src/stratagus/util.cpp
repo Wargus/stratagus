@@ -32,6 +32,7 @@
 #include "stratagus.h"
 
 #include <SDL.h>
+#include <algorithm>
 #include <cctype>
 #include <cerrno>
 #include <cstdarg>
@@ -64,7 +65,16 @@
 ----------------------------------------------------------------------------*/
 
 uint32_t SyncRandSeed;               /// sync random seed value.
-uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
+uint32_t FileChecksums = 0;          /// checksums of all loaded lua files
+
+static uint32_t SyncRandCalls = 0;   /// ongoing count of SyncRand() calls
+
+uint32_t TakeSyncRandCalls()
+{
+	const uint32_t calls = SyncRandCalls;
+	SyncRandCalls = 0;
+	return calls;
+}
 
 /**
 **  Inititalize sync rand seed.
@@ -72,6 +82,7 @@ uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
 void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
+	SyncRandCalls = 0;
 	if (EnableDebugPrint) {
 		DebugPrint("GameCycle: %lud, init seed: %x\n", GameCycle, SyncRandSeed);
 		//print_backtrace();
@@ -92,6 +103,7 @@ int SyncRand()
 	val = SyncRandSeed >> 16;
 
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
+	SyncRandCalls++;
 
 	if (EnableDebugPrint) {
 		DebugPrint("GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
@@ -172,41 +184,47 @@ long isqrt(long num)
 	return root;
 }
 
-// from wikipedia, simple checksumming of our lua files. only considers a subset of 7-bit
-// ascii chars to hopefully avoid issues with filesystem encodings
+// from wikipedia, simple checksumming of our lua files.
 uint32_t fletcher32(std::string_view content)
 {
-	std::vector<uint16_t> alphas;
-	size_t consideredChars = 0;
-	for (size_t i = 0; i < content.size(); i++) {
-		uint16_t c = content[i];
-		if (c >= 'A' && c <= 'z') {
-			if ((consideredChars++ % 2) == 0) {
-				alphas.push_back(c);
-			} else {
-				alphas.back() |= c << 8;
-			}
-		}
-	}
-
-	const uint16_t *data = alphas.data();
+	// The sum is built over big-endian 16-bit words, so the result is
+	// byte-order independent: the returned 32 bit value has the low word
+	// in the low 16 bits (see the reference values in the tests).
+	const unsigned char *data = reinterpret_cast<const unsigned char *>(content.data());
+	size_t remaining = content.size();
 	uint32_t sum1 = 0xffff, sum2 = 0xffff;
 
-	auto shorts = alphas.size();
-	while (shorts) {
-		size_t tlen = ((shorts >= 359) ? 359 : shorts);
-		shorts -= tlen;
-		do {
-			sum2 += sum1 += *data++;
-			tlen--;
-		} while (tlen);
+	while (remaining >= 2) {
+		const size_t words = std::min<size_t>(remaining / 2, 360);
+		remaining -= words * 2;
+		for (size_t i = 0; i < words; ++i) {
+			const uint32_t word = (static_cast<uint32_t>(data[0]) << 8) | data[1];
+			data += 2;
+			sum1 += word;
+			sum2 += sum1;
+		}
 		sum1 = (sum1 & 0xffff) + (sum1 >> 16);
 		sum2 = (sum2 & 0xffff) + (sum2 >> 16);
+	}
+	// An odd trailing byte is padded with a zero byte.
+	if (remaining) {
+		sum1 += static_cast<uint32_t>(*data) << 8;
+		sum2 += sum1;
 	}
 	/* Second reduction step to reduce sums to 16 bits */
 	sum1 = (sum1 & 0xffff) + (sum1 >> 16);
 	sum2 = (sum2 & 0xffff) + (sum2 >> 16);
 	return (sum2 << 16) | sum1;
+}
+
+std::string RemoveBomAndCR(std::string content)
+{
+	if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
+		static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
+		content.erase(0, 3);
+	}
+	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
+	return content;
 }
 
 /*----------------------------------------------------------------------------

@@ -39,13 +39,16 @@
 #include "font.h"
 #include "game.h"
 #include "iolib.h"
+#include "map.h"
 #include "parameters.h"
 #include "stratagus.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+#include "util.h"
 
+#include <algorithm>
 #include <optional>
 #include <set>
 #include <signal.h>
@@ -234,6 +237,63 @@ static std::optional<std::string> GetFileContent(const fs::path& file)
 }
 
 /**
+** Check if 'child' lies lexically inside 'dir'.
+*/
+static bool PathIsInside(const fs::path &child, const fs::path &dir)
+{
+	if (dir.empty()) {
+		return false;
+	}
+	std::error_code ec;
+	const fs::path base = fs::absolute(dir, ec).lexically_normal();
+	if (ec) {
+		return false;
+	}
+	const fs::path absChild = fs::absolute(child, ec).lexically_normal();
+	if (ec) {
+		return false;
+	}
+	// 'child' is inside 'dir' when all components of 'dir' match its own,
+	// i.e. 'dir' is a prefix of the (normalised) absolute child path.
+	return std::mismatch(base.begin(), base.end(), absChild.begin(), absChild.end()).first == base.end();
+}
+
+/**
+** Check whether a loaded script file is shared game data whose exact
+** content all players in a network game must have in common. This is
+** a little ad-hoc, because some things can contain different content
+** would be only partially relevant. We try our best.
+*/
+static bool IsSharedGameScript(const fs::path &file)
+{
+	const std::string fileName = file.filename().string();
+	const std::string_view suffix = "-config.lua";
+	if (ends_with(fileName, suffix)) {
+		// Generated per-user configuration
+		return false;
+	}
+	// Per-user data and preferences
+	if (PathIsInside(file, Parameters::Instance.GetUserDirectory())) {
+		return false;
+	}
+	// Anything that is not game data scripts is skipped
+	const fs::path dataDir = StratagusLibPath.empty() ? fs::current_path() : fs::path(StratagusLibPath);
+	if (!PathIsInside(file, dataDir)) {
+		return false;
+	}
+	// The map is not compared here, there's a separate path during game join for that
+	if (*CurrentMapPath) {
+		const fs::path mapDir = (*CurrentMapPath == '.' || *CurrentMapPath == '/')
+		                           ? fs::path(CurrentMapPath)
+		                           : dataDir / CurrentMapPath;
+		if (PathIsInside(file, mapDir)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
 **  Load a file and execute it
 **
 **  @param file  File to load and execute
@@ -249,8 +309,8 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 	if (!content) {
 		return -1;
 	}
-	if (file.string().rfind("stratagus.lua") != std::string::npos) {
-		FileChecksums ^= fletcher32(*content);
+	if (IsSharedGameScript(file)) {
+		FileChecksums ^= fletcher32(RemoveBomAndCR(*content));
 		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
 	// save the current __file__

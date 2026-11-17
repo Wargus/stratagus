@@ -183,6 +183,11 @@ inline bool starts_with(std::wstring_view s, std::wstring_view prefix)
 	return s.substr(0, prefix.size()) == prefix;
 }
 
+inline bool ends_with(std::string_view s, std::string_view suffix)
+{
+	return s.size() >= suffix.size() && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/
