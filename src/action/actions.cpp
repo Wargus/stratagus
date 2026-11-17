@@ -615,8 +615,7 @@ std::string GetSyncDebugHistoryReport(unsigned long centerCycle)
 			entries.emplace_back(entry.Cycle, &entry);
 		}
 	}
-	std::stable_sort(entries.begin(), entries.end(),
-	                 [](const auto &a, const auto &b) { return a.first < b.first; });
+	ranges::stable_sort(entries, std::less<>{}, [](const auto &entry) { return entry.first; });
 
 	std::ostringstream out;
 	out << "cycle  seed(start->end)  hash(start->end)  units(hashed/total)  rand\n";

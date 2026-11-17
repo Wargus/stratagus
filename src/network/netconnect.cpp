@@ -829,12 +829,7 @@ static uint32_t NetworkEffectiveMapUID(const fs::path &mapPath)
 		return 0;
 	}
 	std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-	if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
-		static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
-		content.erase(0, 3);
-	}
-	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
-	return fletcher32(content);
+	return fletcher32(RemoveBomAndCR(std::move(content)));
 }
 
 void CClient::Parse_Map(const unsigned char *buf)
@@ -2127,25 +2122,29 @@ void NetworkServerResyncClients()
 static bool GameSettingsLockedFlag = false;
 
 /**
-** Check whether game settings must be refused to change right now; called
-** by the Settings class for the custom game settings bitfield.
+** Check whether the given setting may be changed right now, telling the
+** user why not if it may not; called by the Settings class for the custom
+** game settings bitfield.
 **
 ** Base assumption of multiplayer: all players run with the same settings,
 ** agreed on in the lobby and synced from the server. Custom game settings
 ** (UserGameSettings) gate unit definitions and gameplay scripts in games
 ** like war1gus, so they are treated as simulation-relevant: changing them
 ** mid-game would desync the players.
+**
+** @param what  human readable name of the setting being changed
+** @return      true if the change is allowed, false if it must be refused
 */
-bool GameSettingsLocked(const char *what)
+bool CheckGameSettingsUnlocked(const char *what)
 {
 	if (GameSettingsLockedFlag) {
 		ErrorPrint("Refusing to change %s while a network game is running; "
 		           "settings that can affect the simulation must be set in the "
 		           "lobby and are synced from the server.\n",
 		           what);
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 void SetGameSettingsLocked(bool locked)

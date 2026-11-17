@@ -187,6 +187,9 @@ long isqrt(long num)
 // from wikipedia, simple checksumming of our lua files.
 uint32_t fletcher32(std::string_view content)
 {
+	// The sum is built over big-endian 16-bit words, so the result is
+	// byte-order independent: the returned 32 bit value has the low word
+	// in the low 16 bits (see the reference values in the tests).
 	const unsigned char *data = reinterpret_cast<const unsigned char *>(content.data());
 	size_t remaining = content.size();
 	uint32_t sum1 = 0xffff, sum2 = 0xffff;
@@ -212,6 +215,16 @@ uint32_t fletcher32(std::string_view content)
 	sum1 = (sum1 & 0xffff) + (sum1 >> 16);
 	sum2 = (sum2 & 0xffff) + (sum2 >> 16);
 	return (sum2 << 16) | sum1;
+}
+
+std::string RemoveBomAndCR(std::string content)
+{
+	if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
+		static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
+		content.erase(0, 3);
+	}
+	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
+	return content;
 }
 
 /*----------------------------------------------------------------------------

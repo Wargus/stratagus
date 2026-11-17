@@ -80,6 +80,7 @@ void clamp(T *value, T minValue, T maxValue)
 }
 
 extern uint32_t fletcher32(std::string_view content);
+extern std::string RemoveBomAndCR(std::string content);
 
 /*----------------------------------------------------------------------------
 --  Strings
@@ -360,6 +361,14 @@ namespace ranges
 	void sort(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
 	{
 		std::sort(std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
+			return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
+		});
+	}
+
+	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>
+	void stable_sort(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
+	{
+		std::stable_sort(std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
 			return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
 		});
 	}

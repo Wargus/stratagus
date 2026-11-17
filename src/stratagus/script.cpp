@@ -46,6 +46,7 @@
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+#include "util.h"
 
 #include <algorithm>
 #include <optional>
@@ -252,14 +253,9 @@ static bool PathIsInside(const fs::path &child, const fs::path &dir)
 	if (ec) {
 		return false;
 	}
-	auto baseIt = base.begin();
-	for (auto childIt = absChild.begin(); childIt != absChild.end(); ++childIt) {
-		if (baseIt == base.end() || *baseIt != *childIt) {
-			return false;
-		}
-		++baseIt;
-	}
-	return baseIt == base.end();
+	// 'child' is inside 'dir' when all components of 'dir' match its own,
+	// i.e. 'dir' is a prefix of the (normalised) absolute child path.
+	return std::mismatch(base.begin(), base.end(), absChild.begin(), absChild.end()).first == base.end();
 }
 
 /**
@@ -272,8 +268,7 @@ static bool IsSharedGameScript(const fs::path &file)
 {
 	const std::string fileName = file.filename().string();
 	const std::string_view suffix = "-config.lua";
-	if (fileName.size() >= suffix.size() &&
-		fileName.compare(fileName.size() - suffix.size(), suffix.size(), suffix) == 0) {
+	if (ends_with(fileName, suffix)) {
 		// Generated per-user configuration
 		return false;
 	}
@@ -299,20 +294,6 @@ static bool IsSharedGameScript(const fs::path &file)
 }
 
 /**
-** Sanitize script content, so e.g. differences in line endings or a leading
-** UTF-8 BOM are not counted.
-*/
-static std::string NormalizeScriptContent(std::string content)
-{
-	if (content.size() >= 3 && static_cast<unsigned char>(content[0]) == 0xEF &&
-		static_cast<unsigned char>(content[1]) == 0xBB && static_cast<unsigned char>(content[2]) == 0xBF) {
-		content.erase(0, 3);
-	}
-	content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
-	return content;
-}
-
-/**
 **  Load a file and execute it
 **
 **  @param file  File to load and execute
@@ -329,7 +310,7 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 		return -1;
 	}
 	if (IsSharedGameScript(file)) {
-		FileChecksums ^= fletcher32(NormalizeScriptContent(*content));
+		FileChecksums ^= fletcher32(RemoveBomAndCR(*content));
 		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
 	// save the current __file__
