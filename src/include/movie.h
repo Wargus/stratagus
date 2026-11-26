@@ -97,6 +97,7 @@ public:
 	~Movie();
 	bool Load(const std::string &filename, int w, int h);
 	bool IsPlaying() const { return true; }
+	void SetLoop(bool value) { loop = value; }
 
 	// guichan
 	SDL_Surface *getSurface() const override;
@@ -108,6 +109,7 @@ private:
 	mutable std::unique_ptr<OggData> data;
 	mutable SDL_Rect rect{};
 	mutable sdl2::TexturePtr yuv_overlay;
+	bool loop = false;
 };
 #endif
 
