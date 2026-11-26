@@ -226,6 +226,8 @@
 
 #include "actions.h"
 #include "commands.h"
+#include "filesystem.h"
+#include "game.h"
 #include "interface.h"
 #include "map.h"
 #include "net_lowlevel.h"
@@ -234,16 +236,20 @@
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
+#include "settings.h"
 #include "sound.h"
 #include "translate.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
+#include "util.h"
+#include "version.h"
 #include "video.h"
 
 #include <array>
 #include <cstddef>
 #include <deque>
+#include <fstream>
 #include <list>
 
 //----------------------------------------------------------------------------
@@ -305,6 +311,7 @@ static unsigned int NetworkSyncHashs[256];          /// Network sync hashs.
 static unsigned long NetworkSyncCycles[256];        /// Game cycle sampled for sync data.
 static unsigned long NetworkFirstDesyncGameCycle;   /// First cycle that detected a desync.
 static unsigned long NetworkFirstDesyncSampleCycle; /// First sampled cycle that diverged.
+static std::string NetworkDesyncStateFile;          /// State snapshot file name of the first detected desync
 static bool NetworkGameInSync = true;               /// Last sync command comparison result.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
@@ -522,6 +529,7 @@ void NetworkOnStartGame()
 	ranges::fill(NetworkSyncCycles, 0);
 	NetworkFirstDesyncGameCycle = 0;
 	NetworkFirstDesyncSampleCycle = 0;
+	NetworkDesyncStateFile.clear();
 	NetworkGameInSync = true;
 	ranges::fill(PlayerQuit, 0);
 	ranges::fill(NetworkLastFrame, 0);
@@ -948,6 +956,63 @@ void NetworkQuitGame()
 	NetworkSendPacket(ncqs);
 }
 
+/**
+** Write everything this player knows about a detected desync into a report
+** bundle under logs/, and tell the user what to hand to the developers.
+**
+** Every player affected by a desync detects the same mismatch (sync packets
+** are compared by everyone), so every player keeps a local bundle; together
+** they let developers diff the per-cycle sync histories and states of the
+** peers without any live data collection.
+*/
+static void NetworkWriteDesyncBundle(int player, unsigned long gameNetCycle, unsigned long sampledCycle,
+                                     unsigned int receivedSeed, unsigned int receivedHash,
+                                     unsigned int localSeed, unsigned int localHash)
+{
+	const time_t now = time(nullptr);
+	fs::path dir(Parameters::Instance.GetUserDirectory());
+	if (!GameName.empty()) {
+		dir /= GameName;
+	}
+	dir /= "logs";
+	dir /= "desync_report_player" + std::to_string(ThisPlayer->Index) + "_" + std::to_string((intmax_t)now);
+
+	std::error_code ec;
+	fs::create_directories(dir, ec);
+	if (ec) {
+		ErrorPrint("Could not create desync report directory '%s': %s\n",
+		           dir.u8string().c_str(), ec.message().c_str());
+		return;
+	}
+
+	std::ofstream report(dir / "desync_report.txt");
+	report << "=== Stratagus desync report ===\n"
+	       << "date                  : " << ctime(&now)
+	       << "engine                : " << VERSION " (" << StratagusVersion << ")\n"
+	       << "game data checksum    : " << std::hex << FileChecksums << std::dec << "\n"
+	       << "map                   : " << Map.Info.Description << " [" << Map.Info.Filename << "]\n"
+	       << "map uid               : 0x" << std::hex << Map.Info.MapUID << std::dec << "\n"
+	       << "detected at           : net cycle " << gameNetCycle << ", sample taken after cycle " << sampledCycle << "\n"
+	       << "mismatching sync from : player " << player << " (" << Players[player].Name << ")\n"
+	       << "local  seed/hash      : 0x" << std::hex << localSeed << " / 0x" << localHash << "\n"
+	       << "remote seed/hash      : 0x" << receivedSeed << " / 0x" << receivedHash << std::dec << "\n"
+	       << "network lag           : " << CNetworkParameter::Instance.NetworkLag
+	       << ", cycles per update   : " << CNetworkParameter::Instance.gameCyclesPerUpdate << "\n"
+	       << "\n--- game settings ---\n";
+	GameSettings.Save([&report](std::string line) { report << line << "\n"; });
+	report << "\n--- local sync cycle history ('*' is the sampled cycle) ---\n"
+	       << GetSyncDebugHistoryReport(sampledCycle)
+	       << "\n--- what to send to the developers ---\n"
+	       << "  1. this report: " << (dir / "desync_report.txt").u8string() << "\n"
+	       << "  2. the game state snapshot: save/" << NetworkDesyncStateFile << "\n"
+	       << "  3. ideally a bundle from every player of the game, plus the map if it is a custom one\n";
+	report.close();
+
+	ErrorPrint("Desync report written to '%s'; please send it and save/%s to the developers\n",
+	           dir.u8string().c_str(), NetworkDesyncStateFile.c_str());
+	SetMessage("%s %s save/%s", _("Desync! Please report!"), dir.u8string().c_str(), NetworkDesyncStateFile.c_str());
+}
+
 static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq, int player)
 {
 	Assert((ncq.Type & 0x7F) == MessageSync);
@@ -965,22 +1030,37 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq, int player)
 		// if it wasn't already, force enable debug output right now. maybe we get lucky ...
 		EnableDebugPrint = true;
 		EnableUnitDebug = true;
+		const bool firstDesync = !NetworkFirstDesyncGameCycle;
+		if (firstDesync) {
+			time_t now;
+			time(&now);
+			NetworkDesyncStateFile = "desync_savegame_";
+			NetworkDesyncStateFile += std::to_string(ThisPlayer->Index);
+			NetworkDesyncStateFile += "_";
+			NetworkDesyncStateFile += std::to_string((intmax_t)now);
+			NetworkDesyncStateFile += ".sav";
+		}
 		if (NetworkGameInSync || (gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
 			NetworkGameInSync = false;
 			SetGamePaused(true);
 
-			time_t now;
-			time(&now);
-			std::string savefile = "desync_savegame_";
-			savefile += std::to_string(ThisPlayer->Index);
-			savefile += "_";
-			savefile += std::to_string((intmax_t)now);
-			savefile += ".sav";
+			std::string savefile;
+			if (firstDesync) {
+				savefile = NetworkDesyncStateFile;
+			} else {
+				time_t now;
+				time(&now);
+				savefile = "desync_savegame_";
+				savefile += std::to_string(ThisPlayer->Index);
+				savefile += "_";
+				savefile += std::to_string((intmax_t)now);
+				savefile += ".sav";
+			}
 			SaveGame(savefile);
 		}
-		if (!NetworkFirstDesyncGameCycle) {
+		if (firstDesync) {
 			NetworkFirstDesyncGameCycle = gameNetCycle;
 			NetworkFirstDesyncSampleCycle = sampledCycle;
 			ErrorPrint("\nFirst network desync detected from player %d (%s): "
@@ -994,6 +1074,8 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq, int player)
 			           CNetworkParameter::Instance.NetworkLag,
 			           CNetworkParameter::Instance.gameCyclesPerUpdate);
 			DumpSyncDebugCycleHistory(sampledCycle, syncSeed, localSeed, syncHash, localHash);
+			NetworkWriteDesyncBundle(player, gameNetCycle, sampledCycle, syncSeed, syncHash,
+			                           localSeed, localHash);
 		}
 		ErrorPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X "
 		           "Cycle %lu sampled-after-cycle %lu first-desync-cycle %lu "

@@ -108,9 +108,13 @@ TEST_CASE("strnlen")
 
 TEST_CASE("fletcher32")
 {
-	CHECK(4031760169 == fletcher32("abcde"));    // 0xF04FC729
-	CHECK(1448095018 == fletcher32("abcdef"));   // 0x56502D2A
-	CHECK(3957429649 == fletcher32("abcdefgh")); // 0xEBE19591
+	// canonical reference values, big-endian 16-bit words, odd tail padded
+	CHECK(0x4FF029C7 == fletcher32("abcde"));
+	CHECK(0x50562A2D == fletcher32("abcdef"));
+	CHECK(0xE1EB9195 == fletcher32("abcdefgh"));
+	CHECK(0xFFFFFFFF == fletcher32(""));
+	// full content, not a letter subset: digits and punctuation matter
+	CHECK(fletcher32("SightRange = 5") != fletcher32("SightRange = 4"));
 }
 
 // TODO: int getopt(int argc, char *const argv[], const char *optstring);

@@ -49,11 +49,12 @@
 #include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
-extern uint32_t FileChecksums;          /// checksums of all loaded lua files
+extern uint32_t FileChecksums;          /// Checksum over the shared game scripts
 
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
 extern int SyncRand(int max);           /// Syncron rand
+extern uint32_t TakeSyncRandCalls();    /// Fetch and reset counter of SyncRand() calls
 
 ///  rand only used on this computer.
 extern int MyRand();
@@ -79,6 +80,7 @@ void clamp(T *value, T minValue, T maxValue)
 }
 
 extern uint32_t fletcher32(std::string_view content);
+extern std::string RemoveBomAndCR(std::string content);
 
 /*----------------------------------------------------------------------------
 --  Strings
@@ -359,6 +361,14 @@ namespace ranges
 	void sort(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
 	{
 		std::sort(std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
+			return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
+		});
+	}
+
+	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>
+	void stable_sort(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
+	{
+		std::stable_sort(std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
 			return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
 		});
 	}

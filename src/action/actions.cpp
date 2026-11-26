@@ -70,6 +70,7 @@
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"
+#include "util.h"
 #include "version.h"
 
 #ifdef USE_STACKTRACE
@@ -80,8 +81,10 @@
 # include "st_backtrace.h"
 #endif
 
+#include <algorithm>
 #include <array>
 #include <ctime>
+#include <sstream>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -98,6 +101,7 @@ struct SyncCycleDebugEntry
 	unsigned int EndSeed = 0;
 	unsigned int EndHash = 0;
 	size_t UnitCount = 0;
+	uint32_t RandCalls = 0;
 	size_t HashedUnitCount = 0;
 	int FirstUnit = -1;
 	int LastUnit = -1;
@@ -592,7 +596,7 @@ static void RecordSyncDebugUnit(const CUnit &unit, const char *action, unsigned 
 	++entry->HashedUnitCount;
 }
 
-static void EndSyncDebugCycle()
+static void EndSyncDebugCycle(uint32_t randCalls)
 {
 	SyncCycleDebugEntry *entry = GetSyncDebugEntry(GameCycle);
 	if (!entry) {
@@ -600,6 +604,31 @@ static void EndSyncDebugCycle()
 	}
 	entry->EndSeed = SyncRandSeed;
 	entry->EndHash = SyncHash;
+	entry->RandCalls = randCalls;
+}
+
+std::string GetSyncDebugHistoryReport(unsigned long centerCycle)
+{
+	std::vector<std::pair<unsigned long, const SyncCycleDebugEntry *>> entries;
+	for (const SyncCycleDebugEntry &entry : SyncCycleDebugHistory) {
+		if (entry.Valid) {
+			entries.emplace_back(entry.Cycle, &entry);
+		}
+	}
+	ranges::stable_sort(entries, std::less<>{}, [](const auto &entry) { return entry.first; });
+
+	std::ostringstream out;
+	out << "cycle  seed(start->end)  hash(start->end)  units(hashed/total)  rand\n";
+	for (const auto &[cycle, entry] : entries) {
+		out << (cycle == centerCycle ? '*' : ' ')
+		    << ' ' << entry->Cycle << ": " << std::hex << entry->StartSeed << "->" << entry->EndSeed
+		    << " " << entry->StartHash << "->" << entry->EndHash << std::dec << " "
+		    << entry->HashedUnitCount << "/" << entry->UnitCount << " " << entry->RandCalls
+		    << " first=" << entry->FirstUnit << ":" << entry->FirstUnitType << " " << entry->FirstAction
+		    << " last=" << entry->LastUnit << ":" << entry->LastUnitType << " " << entry->LastAction
+		    << "\n";
+	}
+	return out.str();
 }
 
 void DumpSyncDebugCycleHistory(unsigned long centerCycle,
@@ -636,6 +665,7 @@ void DumpSyncDebugCycleHistory(unsigned long centerCycle,
 		           entry->EndHash,
 		           entry->HashedUnitCount,
 		           entry->UnitCount);
+		ErrorPrint(" rand %u", entry->RandCalls);
 		if (entry->HashedUnitCount != 0) {
 			ErrorPrint("; first unit %d:%s %s refs %d pos %d,%d hash %X; "
 			           "last unit %d:%s %s refs %d pos %d,%d hash %X",
@@ -783,7 +813,14 @@ void UnitActions()
 	}
 	// Do all actions
 	UnitActionsEachCycle(units);
-	EndSyncDebugCycle();
+
+	// Mix the number of sync random calls during this cycle into the hash,
+	// lua scripts (especially animations) sometimes use random also, and
+	// this trips faster and makes debugging easier then.
+	const uint32_t randCalls = TakeSyncRandCalls();
+	SyncHash = (SyncHash << 5) | (SyncHash >> 27);
+	SyncHash ^= randCalls << 9;
+	EndSyncDebugCycle(randCalls);
 }
 
 //@}
